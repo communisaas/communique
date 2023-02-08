@@ -16,6 +16,8 @@ jobs:
           node-version: 16
       - name: Install dependencies
         run: npm ci
+      - name: Generate dotenv file
+        run: set > ".env"
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
