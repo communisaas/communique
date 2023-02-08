@@ -1,0 +1,12 @@
+<script>
+</script>
+
+<svelte:head>
+	<title>Communique</title>
+	<meta name="description" content="Write & share email templates!" />
+</svelte:head>
+
+<section>item</section>
+
+<style>
+</style>

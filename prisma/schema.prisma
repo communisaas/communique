@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model author {
+  rowid            BigInt      @id(map: "author___pkey") @default(autoincrement())
+  profile          Json
+  read_email_count BigInt
+  sent_email_count BigInt
+  open_email_count BigInt
+  email            email[]
+  issue            issue[]
+  recipient        recipient[]
+  topic            topic[]
+}
+
+model email {
+  rowid           BigInt   @id(map: "email___pkey") @default(autoincrement())
+  subject         String
+  body            String
+  topic_list      String[]
+  open_count      BigInt
+  clipboard_count BigInt
+  send_count      BigInt
+  read_count      Json
+  recipient_list  String[]
+  author_id       BigInt
+  author          author   @relation(fields: [author_id], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "author_id___fk")
+  issue           issue[]
+}
+
+model issue {
+  rowid       BigInt @id(map: "issue___pkey") @default(autoincrement())
+  type        String
+  description String
+  email_id    BigInt
+  author_id   BigInt
+  author      author @relation(fields: [author_id], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "author_id___fk")
+  email       email  @relation(fields: [email_id], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "issue_email_id___fkey")
+}
+
+model recipient {
+  rowid            BigInt @id(map: "recipient___pkey") @default(autoincrement())
+  address          String
+  email_open_count BigInt
+  email_read_count BigInt
+  email_sent_count BigInt
+  author_id        BigInt
+  author           author @relation(fields: [author_id], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "author_id___fk")
+}
+
+model topic {
+  name             String   @id(map: "topic___pkey")
+  email_count      BigInt
+  last_updated     DateTime @db.Timestamp(6)
+  email_open_count BigInt
+  email_read_count BigInt
+  email_sent_count BigInt
+  added_by         BigInt
+  author           author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "added_by___fk")
+}
