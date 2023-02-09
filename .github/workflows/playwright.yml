@@ -21,8 +21,10 @@ jobs:
         run: npm ci
       - name: Generate dotenv file
         run: |
-          echo TINYMCEKEY="$TINYMCEKEY" >> .env
-          echo DATABASE_URL="$DATABASE_URL" >> .env
+          cat <<EOF >  ${GITHUB_WORKSPACE}/.env
+          TINYMCEKEY="$TINYMCEKEY"
+          DATABASE_URL="$DATABASE_URL"
+          EOF
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
