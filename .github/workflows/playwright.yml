@@ -8,8 +8,8 @@ jobs:
   test:
     environment: Development
     env:
-      TINYMCEKEY: $${{ secrets.tinymcekey }}
-      DATABASE_URL: $${{ secrets.database_url }}
+      TINYMCEKEY: ${{ secrets.tinymcekey }}
+      DATABASE_URL: ${{ secrets.database_url }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
