@@ -87,7 +87,7 @@
 		padding: 0.125rem;
 	}
 	:global(.mce-content-body::before) {
-		padding: 0.125rem;
+		padding: calc(0.125rem / 2) 0.125rem;
 	}
 	.gradient-background {
 		background: linear-gradient(
