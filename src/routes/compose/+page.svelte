@@ -82,6 +82,13 @@
 		transform: scale(0.85);
 		transition: all 0.2s ease-out;
 	}
+
+	:global(.mce-content-body) {
+		padding: 0.125rem;
+	}
+	:global(.mce-content-body::before) {
+		padding: 0.125rem;
+	}
 	.gradient-background {
 		background: linear-gradient(
 			90deg,

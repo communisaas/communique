@@ -55,7 +55,7 @@
 					inputVisible = false;
 					e.currentTarget.value = '';
 				}}
-				class="space-x-2 rounded h-full bg-larimarGreen-500 shadow-artistBlue shadow-card w-0"
+				class="space-x-2 rounded h-full bg-larimarGreen-500 shadow-artistBlue shadow-card w-0 focus:p-0.5"
 				class:show={inputVisible}
 				{type}
 			/>
