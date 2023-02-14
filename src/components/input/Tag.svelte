@@ -5,7 +5,7 @@
 	let inputVisible: boolean = false;
 	let deleteVisible: boolean = false;
 
-	let inputField: HTMLInputElement;
+	let inputField: HTMLInputElement, tagForm: HTMLFormElement;
 	function addTag(e: Event) {
 		if (e.currentTarget == null) return;
 		let form = e.currentTarget as HTMLFormElement;
@@ -20,13 +20,10 @@
 	$: if (inputField && inputVisible) inputField.focus();
 </script>
 
-<form class={style} on:submit|preventDefault={(e) => addTag(e)}>
+<form bind:this={tagForm} class={style} on:submit|preventDefault={(e) => addTag(e)}>
 	<ul
 		class="max-w-fit px-3 py-1 h-full flex flex-row place-items-center justify-center 
 		flex-wrap gap-2 rounded bg-larimarGreen-600 shadow-artistBlue shadow-card"
-		on:mousedown|preventDefault={(e) => {
-			inputVisible = true;
-		}}
 		on:mouseenter={() => (deleteVisible = true)}
 		on:mouseleave={() => (deleteVisible = false)}
 	>
@@ -60,8 +57,14 @@
 				{type}
 			/>
 			<button
-				on:mousedown|preventDefault|stopPropagation={() => {
-					inputVisible = inputVisible ? false : true;
+				on:mousedown|preventDefault={(e) => {
+					if (inputField.value == '' && inputVisible) {
+						inputVisible = false;
+						inputField.blur();
+						e.stopPropagation();
+					} else {
+						inputVisible = true;
+					}
 				}}
 				type="submit"
 				class="flex justify-center items-center relative"
