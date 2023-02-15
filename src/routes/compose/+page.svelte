@@ -50,12 +50,6 @@
 			</span>
 
 			<LineInput type="text" name="Subject" style="w-fit h-fit" />
-			<aside class="inline-block w-fit">
-				<p>Placeholders</p>
-				<div
-					class="px-1 py-2 h-10 w-full rounded bg-larimarGreen-600 shadow-artistBlue shadow-card"
-				/>
-			</aside>
 		</div>
 
 		<span class="py-8">

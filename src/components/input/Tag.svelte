@@ -52,6 +52,7 @@
 					inputVisible = false;
 					e.currentTarget.value = '';
 				}}
+				on:focus={() => (inputVisible = true)}
 				class="space-x-2 rounded h-full bg-larimarGreen-500 shadow-artistBlue shadow-card w-0 focus:p-0.5"
 				class:show={inputVisible}
 				{type}
@@ -78,7 +79,7 @@
 <style>
 	input {
 		opacity: 0;
-		transition: opacity 0.25s, width 0.25s;
+		transition: all 0.25s;
 	}
 	.delete {
 		opacity: 0;
@@ -100,7 +101,7 @@
 	}
 	input.show {
 		width: 5rem;
-		transition: opacity 0.25s, width 0.25s;
+		transition: all 0.25s;
 	}
 	.delete.show {
 		transform: scale(1);

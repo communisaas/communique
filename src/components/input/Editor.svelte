@@ -1,8 +1,9 @@
 <script lang="ts">
-	import Editor from '@tinymce/tinymce-svelte';
+	import EditorComponent from '@tinymce/tinymce-svelte';
+	import type { Editor } from 'tinymce';
 	export let apiKey: string;
 
-	let inputData;
+	let inputData: string, context: Editor;
 	const conf = {
 		placeholder: 'Write me a letter...',
 		menubar: false,
@@ -12,28 +13,41 @@
 			{ name: 'font', items: ['fontfamily'] },
 			{ name: 'color', items: ['forecolor', 'backcolor'] },
 			{ name: 'alignment', items: ['alignleft', 'aligncenter', 'alignright', 'alignjustify'] },
-			{ name: 'media', items: ['link', 'numlist', 'bullist', 'table', 'image'] }
+			{ name: 'media', items: ['link', 'table', 'image'] }
 		],
 		toolbar_persist: true,
 		toolbar_mode: 'sliding',
 		fixed_toolbar_container: '#toolbar',
 		statusbar: true,
-		plugins: 'quickbars image table editimage autolink link lists',
+		plugins: 'quickbars image table editimage autolink link',
 		quickbars_insert_toolbar: false,
 		quickbars_selection_toolbar: 'forecolor backcolor | h1 h2 h3 | link  ',
 		link_default_target: '_blank',
+		browser_spellcheck: true,
 		init_instance_callback: (editor: Editor) => {
-			editor.on('keypress', () => {
-				inputData = editor.getContent();
-				console.log(inputData);
-			});
+			context = editor;
+			console.log(context);
 		}
 	};
+
+	const editorID = 'letterWriter';
+	function focusInput(wrapper: Element) {
+		if (context) {
+			console.log(context.hasFocus());
+			context.focus();
+			console.log(context.hasFocus());
+		}
+	}
+
+	$: console.log(inputData);
 </script>
 
-<main class="relative flex flex-col items-center  bg-paper px-40 py-5 min-h-[10vh]">
-	<span id="toolbar" class="-mt-12" />
-	<Editor {apiKey} {conf} inline={true} />
+<main
+	on:mouseup={(e) => focusInput(e.currentTarget)}
+	class="relative flex flex-col items-center  bg-paper px-40 py-5 min-h-[10vh]"
+>
+	<span id="toolbar" class="-mt-12 absolute" />
+	<EditorComponent {apiKey} {conf} bind:text={inputData} inline={true} id={editorID} />
 </main>
 
 <style>
