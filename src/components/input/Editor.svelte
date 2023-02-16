@@ -13,13 +13,14 @@
 			{ name: 'font', items: ['fontfamily'] },
 			{ name: 'color', items: ['forecolor', 'backcolor'] },
 			{ name: 'alignment', items: ['alignleft', 'aligncenter', 'alignright', 'alignjustify'] },
-			{ name: 'media', items: ['link', 'table', 'image'] }
+			{ name: 'media', items: ['link', 'table', 'image', 'example'] }
 		],
 		toolbar_persist: true,
 		toolbar_mode: 'sliding',
 		fixed_toolbar_container: '#toolbar',
 		statusbar: true,
 		plugins: 'quickbars image table editimage autolink link',
+		external_plugins: { example: '/editorPlugins/placeholder.js' },
 		quickbars_insert_toolbar: false,
 		quickbars_selection_toolbar: 'forecolor backcolor | h1 h2 h3 | link  ',
 		link_default_target: '_blank',

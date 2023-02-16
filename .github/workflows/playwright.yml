@@ -8,8 +8,8 @@ jobs:
   test:
     environment: Development
     env:
-      TINYMCEKEY: ${{ secrets.tinymcekey }}
-      DATABASE_URL: ${{ secrets.database_url }}
+      TINYMCEKEY: testkey
+      DATABASE_URL: testurl
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -21,10 +21,20 @@ jobs:
         run: npm ci
       - name: Generate dotenv file
         run: |
-          cat <<EOF >  ${GITHUB_WORKSPACE}/.env
+          cat <<EOF > .env
           TINYMCEKEY="$TINYMCEKEY"
           DATABASE_URL="$DATABASE_URL"
           EOF
+
+          echo "cat .env"
+          cat .env
+
+          echo "ls -a ."
+          ls -a .
+
+          echo "ls -a ${{ github.workspace }}"
+          ls -a ${{ github.workspace }}
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
