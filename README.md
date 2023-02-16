@@ -14,4 +14,4 @@ Let the collective voice rise.
 
 1. Install [Node.js v18.x](https://nodejs.org/en/download/)
 2. Download dependencies into app directory with `npm install`
-3. Run development server on [localhost:5173](localhost:5173) with `npm run dev`
+3. Run development server on `localhost:5173` with `npm run dev`
