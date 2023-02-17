@@ -15,12 +15,13 @@
 
 	$: console.log(recipientEmails);
 
-	const addIconStyle =
-		'add after:content-["+"] -bottom-0.5 -right-1 rounded-full bg-peacockFeather-600 h-6 w-6';
+	const addIconClass = 'add bg-peacockFeather-600 h-6 w-6';
+
+	function sanitizeEmailForm(click: Event) {}
 </script>
 
 <section class="gradient-background py-8">
-	<form class="flex flex-col gap-y-5">
+	<form class="flex flex-col gap-y-5 rounded-full">
 		<div class="ml-20 flex flex-col w-fit h-full gap-x-20 gap-y-3">
 			<span class="flex flex-row gap-x-5">
 				<TagInput
@@ -32,7 +33,7 @@
 				>
 					<span class="relative w-12 shadow-artistBlue">
 						<AddRecipient />
-						<icon class={addIconStyle} />
+						<icon class={addIconClass} />
 					</span>
 				</TagInput>
 				<TagInput
@@ -44,7 +45,7 @@
 				>
 					<span class="relative w-12 shadow-artistBlue">
 						<AddTopic />
-						<icon class={addIconStyle} />
+						<icon class={addIconClass} />
 					</span>
 				</TagInput>
 			</span>
@@ -55,13 +56,20 @@
 		<span class="py-8">
 			<Editor apiKey={data.key} />
 		</span>
-		<button class="ml-20 px-1 py-2 w-28 rounded bg-larimarGreen-600" type="submit">Post</button>
+		<button
+			type="submit"
+			class="ml-20 px-1 py-2 w-28 rounded bg-larimarGreen-600"
+			on:click={sanitizeEmailForm}>Post</button
+		>
 	</form>
 </section>
 
 <style>
 	.add {
 		position: absolute;
+		bottom: -0.125rem;
+		right: -0.25rem;
+		border-radius: 9999px;
 		color: #fff;
 		font-size: 1.5rem;
 		line-height: 1.5rem;
@@ -75,6 +83,10 @@
 		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
 		transform: scale(0.85);
 		transition: all 0.2s ease-out;
+	}
+
+	.add:after {
+		content: '+';
 	}
 
 	:global(.mce-content-body) {
