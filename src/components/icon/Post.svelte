@@ -9,7 +9,9 @@
 			duration,
 			css: (t) => {
 				const eased = backInOut(t);
-				const easedY = eased * eased;
+				// steepen y perspective
+				const easedY = eased ** 2;
+				// mostly constant width folding into envelope
 				const easedX = eased > 0.9 ? eased : 0.9;
 
 				return `
