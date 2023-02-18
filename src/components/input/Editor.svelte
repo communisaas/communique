@@ -32,17 +32,10 @@
 	};
 
 	const editorID = 'letterWriter';
-	function focusInput(wrapper: Element) {
-		if (context) {
-			console.log(context.hasFocus());
-			context.focus();
-			console.log(context.hasFocus());
-		}
-	}
 </script>
 
 <main
-	on:mouseup={(e) => focusInput(e.currentTarget)}
+	on:mouseup={(e) => e.currentTarget.focus())}
 	class="relative flex flex-col items-center  bg-paper px-40 py-5 min-h-[10vh]"
 >
 	<span id="toolbar" class="-mt-12 absolute" />
