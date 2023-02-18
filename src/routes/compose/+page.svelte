@@ -8,10 +8,10 @@
 	import { writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
 
-	type ServerData = {
+	type ComposeSchema = {
 		key: string;
 	};
-	export let data: ServerData;
+	export let data: ComposeSchema;
 
 	$: recipientEmails = [] as (string | FormDataEntryValue)[];
 	$: topics = [] as (string | FormDataEntryValue)[];
