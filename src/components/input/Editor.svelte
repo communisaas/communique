@@ -35,7 +35,7 @@
 </script>
 
 <main
-	on:mouseup={(e) => e.currentTarget.focus())}
+	on:mouseup={(e) => e.currentTarget.focus()}
 	class="relative flex flex-col items-center  bg-paper px-40 py-5 min-h-[10vh]"
 >
 	<span id="toolbar" class="-mt-12 absolute" />
