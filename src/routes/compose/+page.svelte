@@ -1,9 +1,12 @@
 <script type="ts">
 	import TagInput from '$components/input/Tag.svelte';
-	import LineInput from '$components/input/Line.svelte';
 	import Editor from '$components/input/Editor.svelte';
 	import AddRecipient from '$components/icon/Recipient.svelte';
 	import AddTopic from '$components/icon/Topic.svelte';
+	import Post from '$components/icon/Post.svelte';
+
+	import { writable } from 'svelte/store';
+	import { enhance } from '$app/forms';
 
 	type ServerData = {
 		key: string;
@@ -13,15 +16,31 @@
 	$: recipientEmails = [] as (string | FormDataEntryValue)[];
 	$: topics = [] as (string | FormDataEntryValue)[];
 
-	$: console.log(recipientEmails);
+	let postButtonHovered = writable(false);
 
 	const addIconClass = 'add bg-peacockFeather-600 h-6 w-6';
-
-	function sanitizeEmailForm(click: Event) {}
 </script>
 
 <section class="gradient-background py-8">
-	<form class="flex flex-col gap-y-5 rounded-full">
+	<form
+		class="flex flex-col gap-y-5 rounded-full"
+		method="POST"
+		action="?/publish"
+		use:enhance={({ form, data, action, cancel }) => {
+			// `form` is the `<form>` element
+			// `data` is its `FormData` object
+			// `action` is the URL to which the form is posted
+			// `cancel()` will prevent the submission
+			for (const [name, list] of Object.entries({ Recipient: recipientEmails, Topic: topics })) {
+				data.set(name, list.join('␞'));
+			}
+
+			return async ({ result, update }) => {
+				// `result` is an `ActionResult` object
+				// `update` is a function which triggers the logic that would be triggered if this callback wasn't set
+			};
+		}}
+	>
 		<div class="ml-20 flex flex-col w-fit h-full gap-x-20 gap-y-3">
 			<span class="flex flex-row gap-x-5">
 				<TagInput
@@ -50,7 +69,20 @@
 				</TagInput>
 			</span>
 
-			<LineInput type="text" name="Subject" style="w-fit h-fit" />
+			<span class="px-1 py-1 w-fit rounded bg-larimarGreen-600 shadow-artistBlue shadow-card">
+				<input
+					required
+					type="text"
+					on:keypress={(e) => {
+						if (e.key == 'Enter') {
+							e.preventDefault();
+						}
+					}}
+					name="Subject"
+					placeholder="Subject"
+					class="w-42 h-fit p-0.5 rounded"
+				/>
+			</span>
 		</div>
 
 		<span class="py-8">
@@ -58,9 +90,14 @@
 		</span>
 		<button
 			type="submit"
-			class="ml-20 px-1 py-2 w-28 rounded bg-larimarGreen-600"
-			on:click={sanitizeEmailForm}>Post</button
+			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-larimarGreen-600 text-white"
+			on:mouseenter={() => ($postButtonHovered = true)}
+			on:focus={() => ($postButtonHovered = true)}
+			on:mouseleave={() => ($postButtonHovered = false)}
+			on:blur={() => ($postButtonHovered = false)}
 		>
+			<Post hovered={$postButtonHovered} />Post
+		</button>
 	</form>
 </section>
 
