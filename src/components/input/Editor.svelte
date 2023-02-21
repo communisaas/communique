@@ -1,11 +1,13 @@
 <script lang="ts">
-	import EditorComponent from '@tinymce/tinymce-svelte';
+	import Editor from '@tinymce/tinymce-svelte';
 	import type { Writable } from 'svelte/types/runtime/store';
-	import type { Editor } from 'tinymce';
+	import type { Editor as EditorComponent } from 'tinymce';
+
 	export let apiKey: string = '';
 	export let content: Writable<string>;
 
-	let context: Editor;
+	let context: EditorComponent;
+
 	const conf = {
 		placeholder: 'Write me a letter...',
 		menubar: false,
@@ -21,16 +23,15 @@
 		toolbar_mode: 'sliding',
 		fixed_toolbar_container: '#toolbar',
 		statusbar: true,
-		plugins: 'quickbars image table autolink link',
+		plugins: 'quickbars image table autolink link autosave',
 		// TODO implement template strings
 		// external_plugins: { example: '/editorPlugins/placeholder.js' },
 		quickbars_insert_toolbar: false,
 		quickbars_selection_toolbar: 'forecolor backcolor | h1 h2 h3 | link  ',
 		link_default_target: '_blank',
 		browser_spellcheck: true,
-		init_instance_callback: (editor: Editor) => {
+		init_instance_callback: (editor: EditorComponent) => {
 			context = editor;
-			console.log(context);
 		}
 	};
 
@@ -42,7 +43,14 @@
 	class="relative flex flex-col items-center  bg-paper px-40 py-5 min-h-[10vh]"
 >
 	<span id="toolbar" class="-mt-12 absolute" />
-	<EditorComponent {apiKey} {conf} bind:text={$content} inline={true} id={editorID} />
+	<Editor
+		on:change={() => context.save()}
+		{apiKey}
+		{conf}
+		bind:text={$content}
+		inline={true}
+		id={editorID}
+	/>
 </main>
 
 <style>

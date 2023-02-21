@@ -24,10 +24,6 @@
 
 	$: recipientEmails = [] as (string | FormDataEntryValue)[];
 	$: topics = [] as (string | FormDataEntryValue)[];
-
-	const profiler = FingerprintJS.load({
-		apiKey: data.profilerKey
-	});
 </script>
 
 <section class="gradient-background py-8">
@@ -35,18 +31,23 @@
 		class="flex flex-col gap-y-5 rounded-full"
 		method="POST"
 		action="?/publish"
-		use:enhance={async ({ form, data, action, cancel }) => {
+		use:enhance={async ({ form, data: post, action, cancel }) => {
 			// `form` is the `<form>` element
 			// `data` is its `FormData` object
 			// `action` is the URL to which the form is posted
 			// `cancel()` will prevent the submission
-			for (const [name, list] of Object.entries({ Recipient: recipientEmails, Topic: topics })) {
-				data.set(name, list.join('␞'));
+			for (const [tagName, list] of Object.entries({ Recipient: recipientEmails, Topic: topics })) {
+				post.set(tagName, list.join('␞'));
 			}
-			data.set('body', $composed);
-			const webProfile = (await profiler).get();
 
-			data.set('profile', (await webProfile).requestId);
+			const webProfile = (
+				await FingerprintJS.load({
+					apiKey: data.profilerKey,
+					endpoint: 'https://post.communi.email'
+				})
+			).get();
+
+			post.set('profile', (await webProfile).requestId);
 
 			return async ({ result, update }) => {
 				// `result` is an `ActionResult` object
@@ -101,6 +102,7 @@
 		<span class="py-8">
 			<Editor apiKey={data.editorKey} content={composed} />
 		</span>
+
 		<button
 			type="submit"
 			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-larimarGreen-600 text-white"
