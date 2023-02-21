@@ -5,20 +5,29 @@
 	import AddTopic from '$components/icon/Topic.svelte';
 	import Post from '$components/icon/Post.svelte';
 
-	import { writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
 
+	import FingerprintJS from '@fingerprintjs/fingerprintjs-pro';
+
 	type ComposeSchema = {
-		key: string;
+		profilerKey: string;
+		editorKey: string;
 	};
+
 	export let data: ComposeSchema;
+
+	let composed: Writable<string> = writable('');
+	let postButtonHovered = writable(false);
+
+	const addIconClass = 'add bg-peacockFeather-600 h-6 w-6';
 
 	$: recipientEmails = [] as (string | FormDataEntryValue)[];
 	$: topics = [] as (string | FormDataEntryValue)[];
 
-	let postButtonHovered = writable(false);
-
-	const addIconClass = 'add bg-peacockFeather-600 h-6 w-6';
+	const profiler = FingerprintJS.load({
+		apiKey: data.profilerKey
+	});
 </script>
 
 <section class="gradient-background py-8">
@@ -26,7 +35,7 @@
 		class="flex flex-col gap-y-5 rounded-full"
 		method="POST"
 		action="?/publish"
-		use:enhance={({ form, data, action, cancel }) => {
+		use:enhance={async ({ form, data, action, cancel }) => {
 			// `form` is the `<form>` element
 			// `data` is its `FormData` object
 			// `action` is the URL to which the form is posted
@@ -34,6 +43,10 @@
 			for (const [name, list] of Object.entries({ Recipient: recipientEmails, Topic: topics })) {
 				data.set(name, list.join('␞'));
 			}
+			data.set('body', $composed);
+			const webProfile = (await profiler).get();
+
+			data.set('profile', (await webProfile).requestId);
 
 			return async ({ result, update }) => {
 				// `result` is an `ActionResult` object
@@ -86,7 +99,7 @@
 		</div>
 
 		<span class="py-8">
-			<Editor apiKey={data.key} />
+			<Editor apiKey={data.editorKey} content={composed} />
 		</span>
 		<button
 			type="submit"
@@ -113,13 +126,13 @@
 		opacity: 75%;
 		filter: drop-shadow(0 rgb(0 0 0 / 0.4));
 		transform: scale(0.75);
-		transition: all 0.2s ease-in;
+		transition: all 0.4s ease-in;
 	}
 	span:hover > .add {
 		opacity: 85%;
 		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
 		transform: scale(0.85);
-		transition: all 0.2s ease-out;
+		transition: all 0.3s ease-out;
 	}
 
 	.add:after {

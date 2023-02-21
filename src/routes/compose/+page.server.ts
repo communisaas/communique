@@ -1,10 +1,11 @@
-import { TINYMCEKEY } from '$env/static/private';
+import { TINYMCEKEY, FINGERPRINTJSKEY } from '$env/static/private';
 import type { PageLoad } from '../$types';
 import type { RequestEvent } from './$types';
 
 export const load: PageLoad = () => {
 	return {
-		key: TINYMCEKEY
+		editorKey: TINYMCEKEY,
+		profilerKey: FINGERPRINTJSKEY
 	};
 };
 

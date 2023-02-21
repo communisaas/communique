@@ -3,11 +3,15 @@
 
 	export let hovered: boolean = false;
 
-	function scale(node, { duration, delay }) {
+	interface AnimationTiming {
+		duration: number;
+		delay: number;
+	}
+	function scale(node: SVGGElement, { duration, delay }: AnimationTiming) {
 		return {
 			delay,
 			duration,
-			css: (t) => {
+			css: (t: number) => {
 				const eased = backInOut(t);
 				// steepen y perspective
 				const easedY = eased ** 2;
