@@ -8,7 +8,7 @@ jobs:
   test:
     environment: Development
     env:
-      TINYMCEKEY: ${{ secrets.tinymcekey }}
+      TINYMCE_KEY: ${{ secrets.TINYMCE_KEY }}
       DATABASE_URL: ${{ secrets.database_url }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
@@ -22,7 +22,7 @@ jobs:
       - name: Generate dotenv file
         run: |
           cat <<EOF > .env
-          TINYMCEKEY="$TINYMCEKEY"
+          TINYMCE_KEY="$TINYMCE_KEY"
           DATABASE_URL="$DATABASE_URL"
           EOF
       - name: Install Playwright Browsers

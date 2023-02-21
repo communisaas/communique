@@ -35,7 +35,7 @@
 		}
 	};
 
-	const editorID = 'letterWriter';
+	const editorID = 'Letter';
 </script>
 
 <main
