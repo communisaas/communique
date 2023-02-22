@@ -16,11 +16,11 @@ export const load: PageLoad = () => {
 		profilerKey: FINGERPRINTJS_KEY
 	};
 };
+
 class EmailForm {
 	inputFields: Record<string, string | string[] | number> = {
 		subject: '',
 		body: '',
-		added_by: '',
 		topic_list: [],
 		recipient_list: [],
 		set topic(tagList: string) {
@@ -53,31 +53,56 @@ export const actions = {
 	publish: async ({ cookies, request }: RequestEvent) => {
 		const formSubmission = await request.formData();
 		const objectMapper = new PrismaClient();
-		const profileRequestID: string | undefined = formSubmission.get('profile')?.toString();
+		const profileRequestID: string | undefined = formSubmission.get('profileRequestID')?.toString();
 
-		if (profileRequestID) {
-			const response = await fetch(`${FINGERPRINTJS_URL}/events/${profileRequestID}`, {
-				headers: { 'Auth-API-Key': FINGERPRINTJS_SERVER_KEY }
-			});
-			const profile = await response.json();
-			formSubmission.set('added_by', profile.products.identification.data.visitorId);
-			formSubmission.delete('profile');
+		const response = await fetch(`${FINGERPRINTJS_URL}/events/${profileRequestID}`, {
+			headers: { 'Auth-API-Key': FINGERPRINTJS_SERVER_KEY }
+		});
+
+		const profile = (await response.json()).products.identification.data;
+		if (profile) {
+			formSubmission.delete('profileRequestId');
 		} else return fail(400, { name: 'profile', missing: true });
 
-		// TODO more email form validation
 		const email = new EmailForm(formSubmission);
 		try {
 			email.validate();
 		} catch (error) {
 			fail(400, { name: error, missing: true });
 		}
-		// TODO recipient, author, topic
 
-		// await objectMapper.author.create({data:{}})
-		console.log({ ...email.inputFields, ...email.defaultMetrics });
-		await objectMapper.email.create({
-			data: { ...email.inputFields, ...email.defaultMetrics }
-		});
+		await objectMapper.$transaction([
+			// TODO recipient, topic
+
+			objectMapper.author.upsert({
+				where: {
+					rowid: profile.visitorId
+				},
+				update: { profile },
+				create: {
+					rowid: profile.visitorId,
+					profile: profile,
+					read_email_count: 0,
+					sent_email_count: 0,
+					open_email_count: 0,
+					is_registered: false
+				}
+			}),
+			// emailForm.inputFields.recipient_list.map(address => objectMapper.recipient.upsert({
+			// 	where: {}
+			// }))
+			objectMapper.email.create({
+				data: {
+					...email.inputFields,
+					...email.defaultMetrics,
+					author: {
+						connect: {
+							rowid: profile.visitorId
+						}
+					}
+				}
+			})
+		]);
 
 		return { success: true };
 	}

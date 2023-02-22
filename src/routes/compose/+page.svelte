@@ -50,7 +50,7 @@
 				})
 			).get();
 
-			post.set('profile', (await webProfile).requestId);
+			post.set('profileRequestID', (await webProfile).requestId);
 
 			return async ({ result, update }) => {
 				console.log(result);
@@ -134,13 +134,13 @@
 		opacity: 75%;
 		filter: drop-shadow(0 rgb(0 0 0 / 0.4));
 		transform: scale(0.75);
-		transition: all 0.4s ease-in;
+		transition: all 0.8s ease-in;
 	}
 	span:hover > .add {
 		opacity: 85%;
 		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
 		transform: scale(0.85);
-		transition: all 0.3s ease-out;
+		transition: all 0.6s ease-out;
 	}
 
 	.add:after {
