@@ -20,15 +20,17 @@ class EmailForm {
 	inputFields: Record<string, string | string[] | number> = {
 		subject: '',
 		body: '',
-		author_id: '',
-		set topic_list(tagList: string) {
-			tagList.split('␞');
+		added_by: '',
+		topic_list: [],
+		recipient_list: [],
+		set topic(tagList: string) {
+			this.topic_list = tagList.split('␞');
 		},
-		set recipient_list(tagList: string) {
-			tagList.split('␞');
+		set recipient(tagList: string) {
+			this.recipient_list = tagList.split('␞');
 		}
 	};
-	defaultMetrics = { open_count: 0, clipboard_count: 0, send_count: 0 };
+	defaultMetrics = { open_count: 0, clipboard_count: 0, send_count: 0, read_count: 0 };
 	emailForm: FormData;
 
 	constructor(emailForm: FormData) {
@@ -37,8 +39,10 @@ class EmailForm {
 
 	validate() {
 		for (const field of Object.keys(this.inputFields)) {
+			// use setters to handle delimited strings
+			if (field.includes('list')) continue;
 			const value = this.emailForm.get(field);
-			if (value != null) this.inputFields[field] = value.toString();
+			if (value != null || value != undefined) this.inputFields[field] = value.toString();
 			else throw new Error(`${field} is empty`);
 		}
 	}
@@ -51,13 +55,12 @@ export const actions = {
 		const objectMapper = new PrismaClient();
 		const profileRequestID: string | undefined = formSubmission.get('profile')?.toString();
 
-		// TODO implement profile interface
 		if (profileRequestID) {
 			const response = await fetch(`${FINGERPRINTJS_URL}/events/${profileRequestID}`, {
 				headers: { 'Auth-API-Key': FINGERPRINTJS_SERVER_KEY }
 			});
 			const profile = await response.json();
-			formSubmission.set('author_id', profile.products.identification.data.visitorId);
+			formSubmission.set('added_by', profile.products.identification.data.visitorId);
 			formSubmission.delete('profile');
 		} else return fail(400, { name: 'profile', missing: true });
 
@@ -68,11 +71,13 @@ export const actions = {
 		} catch (error) {
 			fail(400, { name: error, missing: true });
 		}
-
-		// TODO resolve taglist setters to value
-		await objectMapper.email.create({ data: { ...email.inputFields, ...email.defaultMetrics } });
-
 		// TODO recipient, author, topic
+
+		// await objectMapper.author.create({data:{}})
+		console.log({ ...email.inputFields, ...email.defaultMetrics });
+		await objectMapper.email.create({
+			data: { ...email.inputFields, ...email.defaultMetrics }
+		});
 
 		return { success: true };
 	}

@@ -37,8 +37,8 @@
 			// `action` is the URL to which the form is posted
 			// `cancel()` will prevent the submission
 			for (const [tagName, list] of Object.entries({
-				recipient_list: recipientEmails,
-				topic_list: topics
+				recipient: recipientEmails,
+				topic: topics
 			})) {
 				post.set(tagName, list.join('␞'));
 			}
