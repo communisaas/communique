@@ -36,7 +36,10 @@
 			// `data` is its `FormData` object
 			// `action` is the URL to which the form is posted
 			// `cancel()` will prevent the submission
-			for (const [tagName, list] of Object.entries({ Recipient: recipientEmails, Topic: topics })) {
+			for (const [tagName, list] of Object.entries({
+				recipient_list: recipientEmails,
+				topic_list: topics
+			})) {
 				post.set(tagName, list.join('␞'));
 			}
 
@@ -50,6 +53,7 @@
 			post.set('profile', (await webProfile).requestId);
 
 			return async ({ result, update }) => {
+				console.log(result);
 				// `result` is an `ActionResult` object
 				// `update` is a function which triggers the logic that would be triggered if this callback wasn't set
 			};
@@ -60,7 +64,8 @@
 				<TagInput
 					bind:tagList={recipientEmails}
 					type="email"
-					name="Recipient"
+					name="recipient"
+					placeholder="Recipient"
 					style="h-14 w-fit"
 					tagStyle="px-1 py-1 rounded bg-larimarGreen-500"
 				>
@@ -72,7 +77,8 @@
 				<TagInput
 					bind:tagList={topics}
 					type="text"
-					name="Topic"
+					name="topic"
+					placeholder="Topic"
 					style="w-fit h-14"
 					tagStyle="px-1 py-1 rounded bg-larimarGreen-500"
 				>
@@ -92,7 +98,7 @@
 							e.preventDefault();
 						}
 					}}
-					name="Subject"
+					name="subject"
 					placeholder="Subject"
 					class="w-42 h-fit p-0.5 rounded"
 				/>

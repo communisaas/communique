@@ -16,43 +16,61 @@ export const load: PageLoad = () => {
 		profilerKey: FINGERPRINTJS_KEY
 	};
 };
+class EmailForm {
+	inputFields: Record<string, string | string[] | number> = {
+		subject: '',
+		body: '',
+		author_id: '',
+		set topic_list(tagList: string) {
+			tagList.split('␞');
+		},
+		set recipient_list(tagList: string) {
+			tagList.split('␞');
+		}
+	};
+	defaultMetrics = { open_count: 0, clipboard_count: 0, send_count: 0 };
+	emailForm: FormData;
+
+	constructor(emailForm: FormData) {
+		this.emailForm = emailForm;
+	}
+
+	validate() {
+		for (const field of Object.keys(this.inputFields)) {
+			const value = this.emailForm.get(field);
+			if (value != null) this.inputFields[field] = value.toString();
+			else throw new Error(`${field} is empty`);
+		}
+	}
+}
 
 /** @type {import('./$types').Actions} */
 export const actions = {
 	publish: async ({ cookies, request }: RequestEvent) => {
-		console.log(await request.formData());
 		const formSubmission = await request.formData();
 		const objectMapper = new PrismaClient();
 		const profileRequestID: string | undefined = formSubmission.get('profile')?.toString();
 
 		// TODO implement profile interface
-		let profile: any;
 		if (profileRequestID) {
-			profile = await fetch(`${FINGERPRINTJS_URL}/events/${profileRequestID}`, {
+			const response = await fetch(`${FINGERPRINTJS_URL}/events/${profileRequestID}`, {
 				headers: { 'Auth-API-Key': FINGERPRINTJS_SERVER_KEY }
 			});
-		} else return fail(400, { profileRequestID, missing: true });
+			const profile = await response.json();
+			formSubmission.set('author_id', profile.products.identification.data.visitorId);
+			formSubmission.delete('profile');
+		} else return fail(400, { name: 'profile', missing: true });
 
 		// TODO more email form validation
-		const validatedData = {
-			subject: formSubmission.get('Subject')?.toString() ?? '',
-			body: formSubmission.get('Letter')?.toString() ?? '',
-			topic_list: formSubmission.get('Topic')?.toString().split('␞') ?? [],
-			recipient_list: formSubmission.get('Recipient')?.toString().split('␞') ?? [],
-			author_id: profile.products.identification.data.visitorId,
-			open_count: 0,
-			clipboard_count: 0,
-			send_count: 0,
-			read_count: 0
-		};
-		Object.entries(validatedData).every(([name, field]) => {
-			// all fields should be defined
-			if (field.length === 0) return fail(400, { name, missing: true });
-		});
+		const email = new EmailForm(formSubmission);
+		try {
+			email.validate();
+		} catch (error) {
+			fail(400, { name: error, missing: true });
+		}
 
-		await objectMapper.email.create({
-			data: validatedData
-		});
+		// TODO resolve taglist setters to value
+		await objectMapper.email.create({ data: { ...email.inputFields, ...email.defaultMetrics } });
 
 		// TODO recipient, author, topic
 

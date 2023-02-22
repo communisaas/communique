@@ -1,5 +1,9 @@
 <script lang="ts">
-	export let type: 'text' | 'email', name: string, style: string, tagStyle: string;
+	export let type: 'text' | 'email',
+		name: string,
+		placeholder: string,
+		style: string,
+		tagStyle: string;
 	export let tagList: (string | FormDataEntryValue)[] = [];
 
 	let inputVisible: boolean = false;
@@ -58,7 +62,7 @@
 			required={inputVisible}
 			{name}
 			role="textbox"
-			placeholder={name}
+			{placeholder}
 			inputmode={type}
 			bind:this={inputField}
 			on:blur={(e) => {
