@@ -6,7 +6,7 @@ Let the collective voice rise.
 
 ## Stack
 
-- Frontend: [SvelteKit](https://kit.svelte.dev/)
+- Frontend: [SvelteKit](https://kit.svelte.dev/), [tailwindcss](https://tailwindcss.com/)
 - Database: [CockroachDB](https://www.cockroachlabs.com/docs/)
 - Object-relational mapping: [Prisma](https://www.prisma.io/cockroachdb)
 
