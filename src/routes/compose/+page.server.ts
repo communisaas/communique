@@ -19,10 +19,10 @@ export const load: PageLoad = () => {
 
 class EmailForm {
 	inputFields: Record<string, string | string[] | number> = {
-		subject: '',
-		body: '',
-		topic_list: [],
-		recipient_list: [],
+		subject: '' as string,
+		body: '' as string,
+		topic_list: [] as string[],
+		recipient_list: [] as string[],
 		set topic(tagList: string) {
 			this.topic_list = tagList.split('␞');
 		},
@@ -30,6 +30,7 @@ class EmailForm {
 			this.recipient_list = tagList.split('␞');
 		}
 	};
+
 	defaultMetrics = { open_count: 0, clipboard_count: 0, send_count: 0, read_count: 0 };
 	emailForm: FormData;
 
@@ -64,17 +65,15 @@ export const actions = {
 			formSubmission.delete('profileRequestId');
 		} else return fail(400, { name: 'profile', missing: true });
 
-		const email = new EmailForm(formSubmission);
+		const emailForm = new EmailForm(formSubmission);
 		try {
-			email.validate();
+			emailForm.validate();
 		} catch (error) {
 			fail(400, { name: error, missing: true });
 		}
 
-		await objectMapper.$transaction([
-			// TODO recipient, topic
-
-			objectMapper.author.upsert({
+		await objectMapper.$transaction(async (tx) => {
+			tx.author.upsert({
 				where: {
 					rowid: profile.visitorId
 				},
@@ -87,11 +86,39 @@ export const actions = {
 					open_email_count: 0,
 					is_registered: false
 				}
-			}),
-			// emailForm.inputFields.recipient_list.map(address => objectMapper.recipient.upsert({
-			// 	where: {}
-			// }))
-			objectMapper.email.create({
+			});
+			emailForm.inputFields.recipient_list.map((address) =>
+				tx.recipient.upsert({
+					where: { address },
+					create: {
+						address: address,
+						email_open_count: 0,
+						email_read_count: 0,
+						email_sent_count: 0
+					}
+				})
+			);
+
+			emailForm.inputFields.topic_list.map((topic) =>
+				tx.topic.upsert({
+					where: { name: topic },
+					create: {
+						name: topic,
+						email_count: 0,
+						last_updated: 0,
+						email_open_count: 0,
+						email_read_count: 0,
+						email_sent_count: 0
+					},
+					author: {
+						connect: {
+							rowid: profile.visitorId
+						}
+					}
+				})
+			);
+
+			tx.email.create({
 				data: {
 					...email.inputFields,
 					...email.defaultMetrics,
@@ -101,8 +128,8 @@ export const actions = {
 						}
 					}
 				}
-			})
-		]);
+			});
+		});
 
 		return { success: true };
 	}

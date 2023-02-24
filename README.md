@@ -14,4 +14,18 @@ Let the collective voice rise.
 
 1. Install [Node.js v18.x](https://nodejs.org/en/download/)
 2. Download dependencies into app directory with `npm install`
-3. Run development server on `localhost:5173` with `npm run dev`
+3. Define or stub environment variables listed below
+
+    ```yaml
+
+    TINYMCE_KEY: Public client token for TinyMCE editor
+
+    FINGERPRINTJS_KEY: Public client token for FingerprintJS
+    FINGERPRINTJS_SERVER_KEY: Private server API token for FingerprintJS
+    FINGERPRINTJS_URL: Base URL for FingerprintJS server API
+
+    DATABASE_URL: Cockroachdb connection URL for Prisma
+    
+    ```
+
+4. Run development server on `localhost:5173` with `npm run dev`
