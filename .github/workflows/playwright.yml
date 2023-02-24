@@ -10,6 +10,9 @@ jobs:
     env:
       TINYMCE_KEY: ${{ secrets.TINYMCE_KEY }}
       DATABASE_URL: ${{ secrets.database_url }}
+      FINGERPRINTJS_KEY: ${{ secrets.FINGERPRINTJS_KEY }}
+      FINGERPRINTJS_SERVER_KEY: ${{  secrets.FINGERPRINTJS_SERVER_KEY }}
+      FINGERPRINTJS_URL: ${{ secrets.FINGERPRINTJS_URL }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -24,6 +27,9 @@ jobs:
           cat <<EOF > .env
           TINYMCE_KEY="$TINYMCE_KEY"
           DATABASE_URL="$DATABASE_URL"
+          FINGERPRINTJS_KEY="$FINGERPRINTJS_KEY"
+          FINGERPRINTJS_SERVER_KEY="$FINGERPRINTJS_SERVER_KEY"
+          FINGERPRINTJS_URL="$FINGERPRINTJS_URL"
           EOF
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
