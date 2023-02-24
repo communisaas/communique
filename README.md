@@ -14,17 +14,17 @@ Let the collective voice rise.
 
 1. Install [Node.js v18.x](https://nodejs.org/en/download/)
 2. Download dependencies into app directory with `npm install`
-3. Define or stub environment variables listed below
+3. Define or stub environment variables listed below into a `.env` file at repo root
 
-    ```yaml
+    ```.env
 
-    TINYMCE_KEY: Public client token for TinyMCE editor
+    TINYMCE_KEY={Public client token for TinyMCE editor}
 
-    FINGERPRINTJS_KEY: Public client token for FingerprintJS
-    FINGERPRINTJS_SERVER_KEY: Private server API token for FingerprintJS
-    FINGERPRINTJS_URL: Base URL for FingerprintJS server API
+    FINGERPRINTJS_KEY={Public client token for FingerprintJS}
+    FINGERPRINTJS_SERVER_KEY={Private server API token for FingerprintJS}
+    FINGERPRINTJS_URL={Base URL for FingerprintJS server API}
 
-    DATABASE_URL: Cockroachdb connection URL for Prisma
+    DATABASE_URL={Cockroachdb connection URL for Prisma}
     
     ```
 
