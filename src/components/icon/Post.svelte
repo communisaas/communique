@@ -7,7 +7,7 @@
 		duration: number;
 		delay: number;
 	}
-	function scale(node: SVGGElement, { duration, delay }: AnimationTiming) {
+	function scalePaper(node: SVGGElement, { duration, delay }: AnimationTiming) {
 		return {
 			delay,
 			duration,
@@ -57,8 +57,8 @@
 		/>
 		{#if !hovered}
 			<g
-				out:scale|local={{ delay: 30, duration: 300 }}
-				in:scale|local={{ delay: 30, duration: 300 }}
+				out:scalePaper|local={{ delay: 30, duration: 300 }}
+				in:scalePaper|local={{ delay: 30, duration: 300 }}
 				filter="url(#filter0_d_104_9)"
 			>
 				<path

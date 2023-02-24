@@ -20,8 +20,6 @@
 	let composed: Writable<string> = writable('');
 	let postButtonHovered = writable(false);
 
-	const addIconClass = 'add bg-peacockFeather-600 h-6 w-6';
-
 	$: recipientEmails = [] as (string | FormDataEntryValue)[];
 	$: topics = [] as (string | FormDataEntryValue)[];
 </script>
@@ -69,10 +67,7 @@
 					style="h-14 w-fit"
 					tagStyle="px-1 py-1 rounded bg-larimarGreen-500"
 				>
-					<span class="relative w-12 shadow-artistBlue">
-						<AddRecipient />
-						<icon class={addIconClass} />
-					</span>
+					<AddRecipient />
 				</TagInput>
 				<TagInput
 					bind:tagList={topics}
@@ -82,10 +77,7 @@
 					style="w-fit h-14"
 					tagStyle="px-1 py-1 rounded bg-larimarGreen-500"
 				>
-					<span class="relative w-12 shadow-artistBlue">
-						<AddTopic />
-						<icon class={addIconClass} />
-					</span>
+					<AddTopic />
 				</TagInput>
 			</span>
 
@@ -117,41 +109,27 @@
 			on:mouseleave={() => ($postButtonHovered = false)}
 			on:blur={() => ($postButtonHovered = false)}
 		>
-			<Post hovered={$postButtonHovered} />Post
+			<span><Post hovered={$postButtonHovered} /></span>Post
 		</button>
 	</form>
 </section>
 
 <style>
-	.add {
-		position: absolute;
-		bottom: -0.125rem;
-		right: -0.25rem;
-		border-radius: 9999px;
-		color: #fff;
-		font-size: 1.5rem;
-		line-height: 1.5rem;
-		opacity: 75%;
-		filter: drop-shadow(0 rgb(0 0 0 / 0.4));
-		transform: scale(0.75);
-		transition: all 0.8s ease-in;
-	}
-	span:hover > .add {
-		opacity: 85%;
-		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
-		transform: scale(0.85);
-		transition: all 0.6s ease-out;
-	}
-
-	.add:after {
-		content: '+';
-	}
-
 	:global(.mce-content-body) {
 		padding: 0.125rem;
 	}
 	:global(.mce-content-body::before) {
 		padding: calc(0.125rem / 2) 0.125rem;
+	}
+
+	button[type='submit'] span {
+		transform: scale(0.9);
+		transition: 0.2s all ease-out;
+	}
+
+	button[type='submit']:hover span {
+		transform: scale(1);
+		transition: 0.2s all ease-in;
 	}
 	.gradient-background {
 		background: linear-gradient(

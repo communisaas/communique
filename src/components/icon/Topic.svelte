@@ -15,15 +15,3 @@
 		/>
 	</svg>
 </icon>
-
-<style>
-	svg {
-		filter: drop-shadow(2px 2px 1px rgb(0 0 0 / 0.4));
-		transition: 0.2s filter ease-out;
-	}
-
-	svg:hover {
-		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
-		transition: 0.2s filter ease-in;
-	}
-</style>

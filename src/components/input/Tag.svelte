@@ -23,6 +23,8 @@
 	}
 
 	$: if (inputVisible) inputField.focus();
+
+	const addIconClass = 'add bg-peacockFeather-600 h-6 w-6';
 </script>
 
 <ul
@@ -87,7 +89,10 @@
 			}}
 			class="flex justify-center items-center relative"
 		>
-			<slot />
+			<span class="relative w-12 shadow-artistBlue" class:active={inputVisible}>
+				<slot />
+				<icon class={addIconClass} />
+			</span>
 		</button>
 	</li>
 </ul>
@@ -96,6 +101,44 @@
 	input {
 		opacity: 0;
 		transition: all 0.2s;
+	}
+	button span {
+		filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));
+		transform: scale(0.9);
+		transition: 0.3s all ease-out;
+	}
+
+	button .active {
+		transform: scale(1);
+	}
+
+	button:hover span {
+		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
+		transform: scale(1);
+		transition: 0.3s all ease-in;
+	}
+	.add {
+		position: absolute;
+		bottom: -0.125rem;
+		right: -0.25rem;
+		border-radius: 9999px;
+		color: #fff;
+		font-size: 1.5rem;
+		line-height: 1.5rem;
+		opacity: 75%;
+		filter: drop-shadow(0 rgb(0 0 0 / 0.4));
+		transform: scale(0.75);
+		transition: all 0.8s ease-in;
+	}
+	span:hover > .add {
+		opacity: 85%;
+		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
+		transform: scale(0.85);
+		transition: all 0.6s ease-out;
+	}
+
+	.add:after {
+		content: '+';
 	}
 	.delete {
 		opacity: 0;
