@@ -10,11 +10,6 @@
 
 	import FingerprintJS from '@fingerprintjs/fingerprintjs-pro';
 
-	type ComposeSchema = {
-		profilerKey: string;
-		editorKey: string;
-	};
-
 	export let data: ComposeSchema;
 
 	let composed: Writable<string> = writable('');
@@ -35,8 +30,8 @@
 			// `action` is the URL to which the form is posted
 			// `cancel()` will prevent the submission
 			for (const [tagName, list] of Object.entries({
-				recipient: recipientEmails,
-				topic: topics
+				recipient_list: recipientEmails,
+				topic_list: topics
 			})) {
 				post.set(tagName, list.join('␞'));
 			}
@@ -52,8 +47,10 @@
 
 			return async ({ result, update }) => {
 				console.log(result);
+				update();
+
 				// `result` is an `ActionResult` object
-				// `update` is a function which triggers the logic that would be triggered if this callback wasn't set
+				// `update` runs default reset after form submission
 			};
 		}}
 	>

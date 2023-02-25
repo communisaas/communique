@@ -1,4 +1,3 @@
-import { browser } from '$app/environment';
 import { expect, test as base, chromium, type Page, type Locator } from '@playwright/test';
 
 let page: Page;

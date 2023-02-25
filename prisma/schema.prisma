@@ -31,7 +31,7 @@ model email {
   recipient_list  String[]
   rowid           String   @id(map: "email___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   added_by        String
-  author          author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "added_by___fkey")
+  author          author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
   issue           issue[]
 }
 
@@ -41,18 +41,19 @@ model issue {
   rowid       String @id(map: "issue___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email_id    String @db.Uuid
   added_by    String
-  author      author @relation(fields: [added_by], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "added_by___fkey")
+  author      author @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
   email       email  @relation(fields: [email_id], references: [rowid], onDelete: NoAction, map: "email_id___fkey")
 }
 
 model recipient {
-  address          String
+  address          String   @id(map: "recipient___pkey")
   email_open_count BigInt
   email_read_count BigInt
   email_sent_count BigInt
-  rowid            String @id(map: "recipient___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   added_by         String
-  author           author @relation(fields: [added_by], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "added_by___fkey")
+  email_count      BigInt
+  last_updated     DateTime @db.Timestamp(6)
+  author           author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
 }
 
 model topic {
@@ -63,5 +64,5 @@ model topic {
   email_read_count BigInt
   email_sent_count BigInt
   added_by         String
-  author           author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "added_by___fkey")
+  author           author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
 }

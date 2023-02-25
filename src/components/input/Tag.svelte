@@ -12,13 +12,11 @@
 	let inputField: HTMLInputElement, tagForm: HTMLFormElement;
 
 	function addTag(tag: string) {
-		console.log(tag);
 		if (!inputField.checkValidity()) {
 			inputField.reportValidity();
 			return;
 		}
 		tagList = [...tagList, tag];
-		console.log(tagList);
 		inputField.value = '';
 	}
 

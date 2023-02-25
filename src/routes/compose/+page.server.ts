@@ -18,18 +18,25 @@ export const load: PageLoad = () => {
 };
 
 class EmailForm {
-	inputFields: Record<string, string | string[] | number> = {
-		subject: '' as string,
-		body: '' as string,
-		topic_list: [] as string[],
-		recipient_list: [] as string[],
-		set topic(tagList: string) {
-			this.topic_list = tagList.split('␞');
-		},
-		set recipient(tagList: string) {
-			this.recipient_list = tagList.split('␞');
-		}
+	inputFields: EmailFormInput = {
+		subject: '',
+		body: '',
+		topic_list: [],
+		recipient_list: []
 	};
+
+	set subject(line: string) {
+		this.inputFields.subject = line;
+	}
+	set body(text: string) {
+		this.inputFields.body = text;
+	}
+	set topic_list(tagList: string) {
+		this.inputFields.topic_list = tagList.split('␞');
+	}
+	set recipient_list(tagList: string) {
+		this.inputFields.recipient_list = tagList.split('␞');
+	}
 
 	defaultMetrics = { open_count: 0, clipboard_count: 0, send_count: 0, read_count: 0 };
 	emailForm: FormData;
@@ -40,11 +47,10 @@ class EmailForm {
 
 	validate() {
 		for (const field of Object.keys(this.inputFields)) {
-			// use setters to handle delimited strings
-			if (field.includes('list')) continue;
 			const value = this.emailForm.get(field);
-			if (value != null || value != undefined) this.inputFields[field] = value.toString();
-			else throw new Error(`${field} is empty`);
+			if (value != null || value != undefined) {
+				(this as RawEmailForm)[field] = value.toString();
+			} else throw new Error(`${field} is empty`);
 		}
 	}
 }
@@ -73,7 +79,8 @@ export const actions = {
 		}
 
 		await objectMapper.$transaction(async (tx) => {
-			tx.author.upsert({
+			const updateTime = new Date().toISOString();
+			await tx.author.upsert({
 				where: {
 					rowid: profile.visitorId
 				},
@@ -87,41 +94,57 @@ export const actions = {
 					is_registered: false
 				}
 			});
-			emailForm.inputFields.recipient_list.map((address) =>
-				tx.recipient.upsert({
-					where: { address },
-					create: {
-						address: address,
-						email_open_count: 0,
-						email_read_count: 0,
-						email_sent_count: 0
-					}
-				})
-			);
 
-			emailForm.inputFields.topic_list.map((topic) =>
-				tx.topic.upsert({
-					where: { name: topic },
-					create: {
-						name: topic,
-						email_count: 0,
-						last_updated: 0,
-						email_open_count: 0,
-						email_read_count: 0,
-						email_sent_count: 0
-					},
-					author: {
-						connect: {
-							rowid: profile.visitorId
+			emailForm.inputFields.topic_list.map(
+				async (topic) =>
+					await tx.topic.upsert({
+						where: { name: topic },
+						create: {
+							name: topic,
+							last_updated: updateTime,
+							email_count: 1,
+							email_open_count: 0,
+							email_read_count: 0,
+							email_sent_count: 0,
+							author: {
+								connect: {
+									rowid: profile.visitorId
+								}
+							}
+						},
+						update: {
+							email_count: { increment: 1 },
+							last_updated: updateTime
 						}
-					}
-				})
+					})
 			);
-
-			tx.email.create({
+			emailForm.inputFields.recipient_list.map(
+				async (address) =>
+					await tx.recipient.upsert({
+						where: { address },
+						create: {
+							address: address,
+							last_updated: updateTime,
+							email_count: 1,
+							email_open_count: 0,
+							email_read_count: 0,
+							email_sent_count: 0,
+							author: {
+								connect: {
+									rowid: profile.visitorId
+								}
+							}
+						},
+						update: {
+							email_count: { increment: 1 },
+							last_updated: updateTime
+						}
+					})
+			);
+			await tx.email.create({
 				data: {
-					...email.inputFields,
-					...email.defaultMetrics,
+					...emailForm.inputFields,
+					...emailForm.defaultMetrics,
 					author: {
 						connect: {
 							rowid: profile.visitorId
