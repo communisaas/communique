@@ -5,7 +5,6 @@ const config = {
 		extend: {
 			colors: {
 				paper: 'hsl(224, 44%, 95%)',
-				gainsboro: '#E0E0E0',
 				larimarGreen: {
 					500: '#C9FFE2',
 					600: '#94D2BD'

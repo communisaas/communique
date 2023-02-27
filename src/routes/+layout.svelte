@@ -13,8 +13,7 @@
 
 	let store: Writable<CommuniqueLocalStorage>;
 	onMount(async () => {
-		store = (await import('./localStorage')).store;
-		console.log($store.selectedTopic);
+		store = (await import('$components/localStorage')).store;
 	});
 
 	$: topicNames = data.topicList.map((topic: topic) => topic.name);
@@ -25,7 +24,7 @@
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
 		<div class="grow">
-			<header class="block h-fit">
+			<header class="block h-fit py-2">
 				{#if store}
 					<TagSelector tagList={topicNames} bind:selected={$store.selectedTopic} />
 				{/if}

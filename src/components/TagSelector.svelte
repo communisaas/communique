@@ -1,13 +1,14 @@
 <script lang="ts">
 	export let tagList: string[];
-	export let selected: string;
+	export let selected: string = '';
+	export let style = '';
 	let highlighted: boolean = false;
 </script>
 
-<ul class="px-10 py-3 flex flex-row justify-end space-x-5">
+<ul class="px-10 py-1 flex flex-row justify-end gap-5">
 	{#each tagList as tag}
 		<input
-			class="px-2 py-1 rounded bg-larimarGreen-600"
+			class={style + ' px-2 py-1 rounded bg-larimarGreen-600'}
 			type="button"
 			value={tag}
 			name={tag}
@@ -24,6 +25,6 @@
 
 <style>
 	.highlighted {
-		border: 2px solid;
+		outline: 2px solid;
 	}
 </style>
