@@ -31,13 +31,7 @@
 	on:mouseenter={() => (deleteVisible = true)}
 	on:mouseleave={() => (deleteVisible = false)}
 	on:mousedown|preventDefault={(e) => {
-		if (inputField.value == '' && inputVisible && !deleteVisible) {
-			inputVisible = false;
-			inputField.blur();
-			e.stopPropagation();
-		} else {
-			inputVisible = true;
-		}
+		inputVisible = true;
 	}}
 >
 	{#each tagList as tag}

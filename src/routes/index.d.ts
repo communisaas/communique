@@ -1,3 +1,7 @@
 interface LayoutSchema {
-	topicList: string[];
+	topicList: topic[];
+}
+
+interface CommuniqueLocalStorage {
+	selectedTopic: string;
 }

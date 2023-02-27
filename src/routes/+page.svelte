@@ -6,7 +6,7 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<section>item</section>
-
+<!-- 
+<EmailSelector /> -->
 <style>
 </style>
