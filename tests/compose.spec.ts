@@ -35,10 +35,11 @@ base.describe('tag', () => {
 			await expect(input).toHaveCSS('width', '0px');
 			// toggle visibility
 			for (const visible of [true, false]) {
-				await tagInterface.getByRole('button').click();
 				if (visible) {
+					await tagInterface.getByRole('button').click();
 					await expect(input).not.toHaveCSS('width', '0px');
 				} else {
+					await page.click("input[name='subject']");
 					await expect(input).toHaveCSS('width', '0px');
 				}
 			}

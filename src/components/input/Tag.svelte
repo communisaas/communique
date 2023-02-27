@@ -59,7 +59,7 @@
 
 	<li class="flex flex-row place-items-center">
 		<input
-			required={inputVisible}
+			required={tagList.length <= 0}
 			{name}
 			role="textbox"
 			{placeholder}
