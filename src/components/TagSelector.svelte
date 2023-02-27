@@ -10,6 +10,7 @@
 			class="px-2 py-1 rounded bg-larimarGreen-600"
 			type="button"
 			value={tag}
+			name={tag}
 			on:mousedown={() => {
 				selected = tag;
 				highlighted = true;
