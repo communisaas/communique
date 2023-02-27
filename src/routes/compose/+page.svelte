@@ -47,7 +47,12 @@
 
 			return async ({ result, update }) => {
 				console.log(result);
-				update();
+				if (result.status == 200) {
+					// TODO submit confirmation
+					recipientEmails = [];
+					topics = [];
+					update();
+				}
 
 				// `result` is an `ActionResult` object
 				// `update` runs default reset after form submission

@@ -4,18 +4,18 @@ import {
 	FINGERPRINTJS_SERVER_KEY,
 	FINGERPRINTJS_URL
 } from '$env/static/private';
-import type { PageLoad } from '../$types';
 import type { RequestEvent } from './$types';
 
 import { PrismaClient } from '@prisma/client';
 import { fail } from '@sveltejs/kit';
 
-export const load: PageLoad = () => {
+/** @type {import('./$types').PageLoad} */
+export function load() {
 	return {
 		editorKey: TINYMCE_KEY,
 		profilerKey: FINGERPRINTJS_KEY
 	};
-};
+}
 
 class EmailForm {
 	inputFields: EmailFormInput = {

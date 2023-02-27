@@ -1,7 +1,12 @@
-<script>
+<script lang="ts">
 	import '../app.postcss';
 	import Navigation from '$components/Navigation.svelte';
 	import './styles.css';
+	import TagSelector from '$components/TagSelector.svelte';
+
+	export let data: LayoutSchema;
+
+	$: console.log(data);
 </script>
 
 <div class="app">
@@ -10,7 +15,7 @@
 
 		<div class="grow">
 			<header class="block py-[1.25rem]">
-				<h1 class="">Loudest emails in</h1>
+				<TagSelector tagList={data.topicList} />
 			</header>
 			<slot />
 		</div>
