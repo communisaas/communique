@@ -2,8 +2,6 @@
 	import EmailSelector from '$components/EmailSelector.svelte';
 
 	export let data: HomeSchema;
-
-	$: console.log(data);
 </script>
 
 <svelte:head>

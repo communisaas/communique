@@ -9,6 +9,7 @@
 	import { enhance } from '$app/forms';
 
 	import FingerprintJS from '@fingerprintjs/fingerprintjs-pro';
+	import DOMPurify from 'dompurify';
 
 	export let data: ComposeSchema;
 
@@ -34,6 +35,9 @@
 		})) {
 			post.set(tagName, list.join('␞'));
 		}
+
+		const letterInput = document.querySelector("input[name='body']");
+		// TODO validate & sanitize email body
 
 		const webProfile = (
 			await FingerprintJS.load({
@@ -104,6 +108,7 @@
 
 	<button
 		type="submit"
+		name="post"
 		class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-larimarGreen-600 text-white"
 		on:mouseenter={() => ($postButtonHovered = true)}
 		on:focus={() => ($postButtonHovered = true)}

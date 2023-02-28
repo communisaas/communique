@@ -68,41 +68,71 @@ base.describe('post', () => {
 		body: async ({}, use) => {
 			// TODO body placeholders
 			await use(`
-				<h1>Hello,</h1>
-				<p>thank you for reading!</p>
-				<span>Best regards,<i>{name}</i></span>
-
+				Hello,
+				thank you for reading!
+				Best regards, {name}
 			`);
-		},
-		postStatus: async ({ page }, use) => {
-			await page.route('**/compose/publish', (route) =>
-				route.fulfill({
-					status: 200,
-					body: 'accept'
-				})
-			);
 		}
+		// postStatus: async ({ page }, use) => {
+		// 	await page.route('**/compose/publish', (route) =>
+		// 		route.fulfill({
+		// 			status: 200,
+		// 			body: 'accept'
+		// 		})
+		// 	);
+		// }
+	});
+
+	test.afterEach(async () => {
+		// erase form
+		page.reload();
 	});
 
 	for (const placeholderText of ['Recipient', 'Topic']) {
 		test(`Missing ${placeholderText.toLowerCase()}s caught`, async ({
-			topic,
+			subject,
 			recipient,
-			body,
-			postStatus,
-			page
-		}) => {});
+			topic,
+			body
+		}) => {
+			await page.getByPlaceholder('Subject').type(subject);
+			// fill in one of two taglists
+			for (const tag of placeholderText == 'Recipient' ? topic : recipient) {
+				const oppositePlaceholder = placeholderText === 'Recipient' ? 'Topic' : 'Recipient';
+				await page.getByPlaceholder(oppositePlaceholder).type(tag);
+				await page.keyboard.press('Enter');
+			}
+			await page.locator('.mce-content-body').type(body);
+			await page.locator("button[name='post']").click();
+			// check if form focuses input to empty taglist input
+			await expect(
+				page.getByPlaceholder(placeholderText == 'Recipient' ? 'Recipient' : 'Topic')
+			).toBeFocused();
+		});
 	}
 
-	test(`Missing subject caught`, async ({ topic, recipient, body, postStatus, page }) => {});
+	test(`Missing subject caught`, async ({ topic, recipient, body }) => {
+		for (const [placeholderText, tags] of Object.entries({
+			Recipient: recipient,
+			Topic: topic
+		})) {
+			for (const tag of tags) {
+				await page.getByPlaceholder(placeholderText).type(tag);
+				await page.keyboard.press('Enter');
+			}
+		}
+		await page.locator('.mce-content-body').type(body);
+		await page.locator("button[name='post']").click();
+		// check if form focuses input to empty taglist input
+		await expect(page.getByPlaceholder('subject')).toBeFocused();
+	});
 
-	test(`Missing body caught`, async ({ topic, recipient, body, postStatus, page }) => {});
+	// test(`Missing body caught`, async ({ topic, recipient, body, page }) => {});
 
-	test(`Post success confirmation appears after response`, async ({
-		topic,
-		recipient,
-		body,
-		postStatus,
-		page
-	}) => {});
+	// test(`Post success confirmation appears after response`, async ({
+	// 	topic,
+	// 	recipient,
+	// 	body,
+	// 	page
+	// }) => {});
 });
