@@ -46,6 +46,7 @@
     "@fingerprintjs/fingerprintjs-pro": "^3.8.2",
     "@prisma/client": "^4.9.0",
     "@tinymce/tinymce-svelte": "^1.0.0",
+    "dompurify": "^3.0.0",
     "tinymce": "^6.3.1"
   }
 }

@@ -2,29 +2,40 @@
 	export let tagList: string[];
 	export let selected: string = '';
 	export let style = '';
-	let highlighted: boolean = false;
 </script>
 
 <ul class="px-10 py-1 flex flex-row justify-end gap-5">
 	{#each tagList as tag}
 		<input
-			class={style + ' px-2 py-1 rounded bg-larimarGreen-600'}
-			type="button"
+			readonly
+			class={'cursor-pointer text-center inline-block max-w-[6rem] px-2 py-1 rounded bg-larimarGreen-600 ' +
+				style}
 			value={tag}
 			name={tag}
-			on:mousedown={() => {
+			on:mousedown={(e) => {
 				selected = tag;
-				highlighted = true;
+				e.currentTarget.click();
 			}}
-			on:focus={() => (highlighted = true)}
-			on:blur={() => (highlighted = false)}
-			class:highlighted={selected === tag && highlighted}
 		/>
 	{/each}
 </ul>
 
 <style>
-	.highlighted {
-		outline: 2px solid;
+	input {
+		transition: 0.2s ease-out;
+	}
+	input:hover {
+		transform: translateY(-1px);
+		box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+		transition: 0.2s ease-in;
+	}
+	input:focus {
+		transform: translateY(0);
+		outline: auto -webkit-focus-ring-color;
+		transition: 0.2s ease-in;
+	}
+	input:focus {
+		box-shadow: unset;
+		transition: 0.2s ease-out;
 	}
 </style>

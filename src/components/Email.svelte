@@ -10,11 +10,15 @@
 	});
 
 	export let email: email;
+	export let selectedEmailID = '';
 
 	// TODO email card layout
 </script>
 
-<article class="w-80 h-44 p-2 rounded bg-paper shadow-artistBlue shadow-card">
+<article
+	on:mousedown={(e) => (selectedEmailID = email.rowid)}
+	class="w-80 h-44 p-2 rounded bg-paper shadow-artistBlue shadow-card"
+>
 	<h1>{email.subject}</h1>
 	<section class="flex flex-col">
 		<span>reads: {email.open_count}</span>
