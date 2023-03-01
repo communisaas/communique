@@ -96,7 +96,7 @@
 	}
 	button span {
 		filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));
-		transform: scale(0.9);
+		transform: scale(0.97);
 		transition: 0.3s all ease-out;
 	}
 	button .active {
