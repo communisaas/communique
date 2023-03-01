@@ -8,7 +8,7 @@ Let the collective voice rise.
 
 - Frontend: [SvelteKit](https://kit.svelte.dev/), [tailwindcss](https://tailwindcss.com/), [TinyMCE](https://www.tiny.cloud/docs/tinymce/6/)
 - Database: [CockroachDB](https://www.cockroachlabs.com/docs/)
-- Know-your-consumer/risk mitigation: [FingerprintJS](https://fingerprint.com/)
+- Know-your-consumer: [FingerprintJS](https://fingerprint.com/)
 - Object-relational mapping: [Prisma](https://www.prisma.io/cockroachdb)
 
 ## Running locally for development
