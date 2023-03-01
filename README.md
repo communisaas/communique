@@ -8,6 +8,7 @@ Let the collective voice rise.
 
 - Frontend: [SvelteKit](https://kit.svelte.dev/), [tailwindcss](https://tailwindcss.com/)
 - Database: [CockroachDB](https://www.cockroachlabs.com/docs/)
+- KYC & 
 - Object-relational mapping: [Prisma](https://www.prisma.io/cockroachdb)
 
 ## Running locally for development
