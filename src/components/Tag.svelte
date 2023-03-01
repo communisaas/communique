@@ -1,13 +1,17 @@
 <script lang="ts">
+	import { beforeUpdate } from 'svelte';
+
 	export let item: string;
 	export let selected: string = '';
 	export let style = '';
+
+	const contentLengthScalar = ((item.length - 1) / Math.sqrt(item.length)).toFixed(0);
 </script>
 
 <input
 	readonly
-	class={'cursor-pointer text-center inline-block max-w-[6rem] px-2 py-1 rounded bg-larimarGreen-600 ' +
-		style}
+	class="cursor-pointer text-center inline-block px-2 py-1 rounded bg-larimarGreen-600 {style} "
+	style:width="calc(5ch*{contentLengthScalar})"
 	value={item}
 	name={item}
 	on:mousedown={(e) => {

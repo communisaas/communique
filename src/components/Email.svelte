@@ -23,7 +23,7 @@
 	class="{style} w-80 h-44 p-2 rounded bg-paper shadow-artistBlue shadow-card"
 >
 	<h1>{item.subject}</h1>
-	<section class="flex flex-col">
+	<section class="flex flex-col bg-">
 		<span>reads: {item.open_count}</span>
 		<span>sends: {item.send_count}</span>
 	</section>
@@ -32,13 +32,13 @@
 			selectable={Tag}
 			items={item.topic_list}
 			bind:selected={$store.selectedTopic}
-			style="text-[10px]"
+			style="text-[12px]"
 		/>
 		<Selector
 			selectable={Tag}
 			items={item.recipient_list}
 			bind:selected={$store.selectedTopic}
-			style="text-[10px] bg-emerald-500"
+			style="text-[12px] bg-teal-500"
 		/>
 	{/if}
 </article>
