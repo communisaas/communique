@@ -22,11 +22,11 @@
 </script>
 
 <div class="app">
-	<main class="flex min-h-screen overflow-y-scroll">
+	<main class="flex min-h-screen">
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
-		<div class="grow">
-			<header class="block h-fit py-2">
+		<div class="grow overflow-scroll whitespace-nowrap">
+			<header class="flex h-fit py-2 pb-3.5 overflow-x-scroll">
 				{#if store}
 					<Selector selectable={Tag} items={topicNames} bind:selected={$store.selectedTopic} />
 				{/if}
