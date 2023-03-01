@@ -2,36 +2,45 @@
 	import type { email } from '@prisma/client';
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
-	import TagSelector from './TagSelector.svelte';
+	import Selector from './Selector.svelte';
+	import Tag from './Tag.svelte';
+	import TagSelector from './Tag.svelte';
 
 	let store: Writable<CommuniqueLocalStorage>;
 	onMount(async () => {
 		store = (await import('./localStorage')).store;
 	});
 
-	export let email: email;
-	export let selectedEmailID = '';
+	export let item: email;
+	export let selected = '';
+	export let style = '';
 
 	// TODO email card layout
 </script>
 
 <article
-	on:mousedown={(e) => (selectedEmailID = email.rowid)}
-	class="w-80 h-44 p-2 rounded bg-paper shadow-artistBlue shadow-card"
+	on:mousedown={(e) => (selected = item.rowid)}
+	class="{style} w-80 h-44 p-2 rounded bg-paper shadow-artistBlue shadow-card"
 >
-	<h1>{email.subject}</h1>
+	<h1>{item.subject}</h1>
 	<section class="flex flex-col">
-		<span>reads: {email.open_count}</span>
-		<span>sends: {email.send_count}</span>
+		<span>reads: {item.open_count}</span>
+		<span>sends: {item.send_count}</span>
 	</section>
 	{#if store}
-		<TagSelector
-			tagList={email.topic_list}
+		<Selector
+			selectable={Tag}
+			items={item.topic_list}
 			bind:selected={$store.selectedTopic}
 			style="text-[10px]"
 		/>
+		<Selector
+			selectable={Tag}
+			items={item.recipient_list}
+			bind:selected={$store.selectedTopic}
+			style="text-[10px] bg-emerald-500"
+		/>
 	{/if}
-	<TagSelector tagList={email.recipient_list} style="text-[10px] bg-emerald-500" />
 </article>
 
 <style>

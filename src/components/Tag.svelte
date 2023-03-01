@@ -1,24 +1,20 @@
 <script lang="ts">
-	export let tagList: string[];
+	export let item: string;
 	export let selected: string = '';
 	export let style = '';
 </script>
 
-<ul class="px-10 py-1 flex flex-row justify-end gap-5">
-	{#each tagList as tag}
-		<input
-			readonly
-			class={'cursor-pointer text-center inline-block max-w-[6rem] px-2 py-1 rounded bg-larimarGreen-600 ' +
-				style}
-			value={tag}
-			name={tag}
-			on:mousedown={(e) => {
-				selected = tag;
-				e.currentTarget.click();
-			}}
-		/>
-	{/each}
-</ul>
+<input
+	readonly
+	class={'cursor-pointer text-center inline-block max-w-[6rem] px-2 py-1 rounded bg-larimarGreen-600 ' +
+		style}
+	value={item}
+	name={item}
+	on:mousedown={(e) => {
+		selected = item;
+		e.currentTarget.click();
+	}}
+/>
 
 <style>
 	input {
