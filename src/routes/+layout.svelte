@@ -3,7 +3,6 @@
 	import './styles.css';
 
 	import Navigation from '$components/Navigation.svelte';
-	import TagSelector from '$components/Tag.svelte';
 
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
@@ -15,10 +14,13 @@
 
 	let store: Writable<CommuniqueLocalStorage>;
 	onMount(async () => {
-		store = (await import('$components/localStorage')).store;
+		store = (await import('$lib/localStorage')).store;
+		if ($store) $store.selectedTopic = topicNames[0];
 	});
 
 	$: topicNames = data.topicList.map((topic: topic) => topic.name);
+
+	$: if ($store) console.log($store.selectedTopic);
 </script>
 
 <div class="app">
@@ -26,8 +28,8 @@
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
 		<div class="grow overflow-scroll whitespace-nowrap">
-			<header class="flex h-fit py-2 pb-3.5 overflow-x-scroll">
-				{#if store}
+			<header class="flex h-fit py-2 pb-2 overflow-x-scroll">
+				{#if $store}
 					<Selector selectable={Tag} items={topicNames} bind:selected={$store.selectedTopic} />
 				{/if}
 			</header>

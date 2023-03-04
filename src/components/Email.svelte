@@ -4,11 +4,10 @@
 	import type { Writable } from 'svelte/store';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
-	import TagSelector from './Tag.svelte';
 
 	let store: Writable<CommuniqueLocalStorage>;
 	onMount(async () => {
-		store = (await import('./localStorage')).store;
+		store = (await import('$lib/localStorage')).store;
 	});
 
 	export let item: email;

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { beforeUpdate } from 'svelte';
-
 	export let item: string;
 	export let selected: string = '';
 	export let style = '';

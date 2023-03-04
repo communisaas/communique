@@ -9,6 +9,6 @@
 
 <ul class="px-10 py-1 flex flex-row justify-end gap-5">
 	{#each items as item}
-		<svelte:component this={selectable} {selected} {style} {item} />
+		<svelte:component this={selectable} bind:selected {style} {item} />
 	{/each}
 </ul>
