@@ -10,26 +10,35 @@
 	<div class="flex flex-col items-center  h-full bg-peacockFeather-500 shadow-nav z-50">
 		<nav class="flex flex-col">
 			{#each Object.entries(navLinks) as [route, icon]}
-				<a
-					class:pointer-events-none={$page.route.id == `${route}`}
-					class:active={$page.route.id == route}
-					href={route}><svelte:component this={icon} /></a
-				>
+				<span class:activeNav={$page.route.id == route}>
+					<a
+						class:activeLink={$page.route.id == route}
+						class:pointer-events-none={$page.route.id == `${route}`}
+						href={route}><svelte:component this={icon} /></a
+					>
+				</span>
 			{/each}
 		</nav>
 	</div>
 </aside>
 
 <style>
-	a {
+	span {
 		width: 100%;
-		padding: 1.5rem 0.5rem;
-		opacity: 100%;
+		padding: 1rem 0.5rem;
 		transition: all 0.2s ease-in;
 	}
-	.active {
-		transition: all 0.2s ease-out;
+	a {
+		opacity: 100%;
+	}
+	.activeLink {
+		transition: all 0.1s ease-out;
 		filter: contrast(0.4);
 		border-radius: 1%;
+	}
+
+	.activeNav {
+		transition: all 0.1s ease-out;
+		border-right: 0.25rem solid theme('colors.larimarGreen.600');
 	}
 </style>
