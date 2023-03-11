@@ -14,6 +14,8 @@
 	export let selected = '';
 	export let style = '';
 
+	export const index = 0;
+
 	// TODO email card layout
 </script>
 
@@ -30,13 +32,13 @@
 		<Selector
 			selectable={Tag}
 			items={item.topic_list}
-			bind:selected={$store.selectedTopic}
+			bind:selected={$store.topic}
 			style="text-[12px]"
 		/>
 		<Selector
 			selectable={Tag}
 			items={item.recipient_list}
-			bind:selected={$store.selectedTopic}
+			bind:selected={$store.topic}
 			style="text-[12px] bg-teal-500"
 		/>
 	{/if}

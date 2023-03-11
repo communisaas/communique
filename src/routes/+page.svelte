@@ -20,9 +20,11 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<h1>Loudest voices in {$store ? $store.selectedTopic : '{PLACEHOLDER}'}</h1>
+<h1>Loudest voices in {$store ? $store.topic.name : '{PLACEHOLDER}'}</h1>
 
-<Selector selectable={Email} items={data.emailList} />
+{#if store}
+	<Selector selectable={Email} items={data.emailList} bind:selected={$store.email} />
+{/if}
 
 <style>
 	h1 {

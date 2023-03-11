@@ -5,6 +5,14 @@ interface LayoutSchema {
 interface HomeSchema {
 	emailList: email[];
 }
+
+interface Selectable {
+	name: string;
+	type: 'email' | 'topic' | 'address';
+	index?: number;
+}
+
 interface CommuniqueLocalStorage {
-	selectedTopic: string;
+	topic: Selectable;
+	email: Selectable;
 }

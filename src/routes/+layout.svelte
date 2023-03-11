@@ -15,12 +15,13 @@
 	let store: Writable<CommuniqueLocalStorage>;
 	onMount(async () => {
 		store = (await import('$lib/localStorage')).store;
-		if ($store) $store.selectedTopic = topicNames[0];
+		console.log($store);
+		if ($store) $store.topic.name = topicNames[0];
 	});
 
 	$: topicNames = data.topicList.map((topic: topic) => topic.name);
 
-	$: if ($store) console.log($store.selectedTopic);
+	$: if ($store) console.log($store.topic);
 </script>
 
 <div class="app">
@@ -30,7 +31,7 @@
 		<div class="grow overflow-scroll whitespace-nowrap">
 			<header class="flex h-fit py-2 pb-2 overflow-x-scroll">
 				{#if $store}
-					<Selector selectable={Tag} items={topicNames} bind:selected={$store.selectedTopic} />
+					<Selector selectable={Tag} items={topicNames} bind:selected={$store.topic} />
 				{/if}
 			</header>
 			<section class="gradient-background py-8">

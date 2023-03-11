@@ -1,6 +1,6 @@
 <script lang="ts">
 	export let item: string;
-	export let selected: string = '';
+	export let selected: Selectable;
 	export let style = '';
 
 	const contentLengthScalar = ((item.length - 1) / Math.sqrt(item.length)).toFixed(0);
@@ -13,7 +13,7 @@
 	value={item}
 	name={item}
 	on:mousedown={(e) => {
-		selected = item;
+		selected.name = item;
 		e.currentTarget.click();
 	}}
 />
