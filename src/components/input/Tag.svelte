@@ -5,7 +5,6 @@
 		style: string,
 		tagStyle: string;
 	export let tagList: (string | FormDataEntryValue)[] = [];
-	export const index = 0;
 
 	let inputVisible: boolean = false;
 	let deleteVisible: boolean = false;

@@ -5,9 +5,9 @@
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
 
-	let store: Writable<CommuniqueLocalStorage>;
+	let store: Writable<CommuniqueStorage>;
 	onMount(async () => {
-		store = (await import('$lib/localStorage')).store;
+		store = (await import('$lib/sessionStorage')).store;
 	});
 
 	export let item: email;

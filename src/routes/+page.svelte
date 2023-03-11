@@ -4,10 +4,10 @@
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 
-	let store: Writable<CommuniqueLocalStorage>;
+	let store: Writable<UserState>;
 
 	onMount(async () => {
-		store = (await import('$lib/localStorage')).store;
+		store = (await import('$lib/sessionStorage')).store;
 	});
 
 	export let data: HomeSchema;

@@ -12,7 +12,7 @@ interface Selectable {
 	index?: number;
 }
 
-interface CommuniqueLocalStorage {
+interface UserState {
 	topic: Selectable;
 	email: Selectable;
 }

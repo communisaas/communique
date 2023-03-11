@@ -2,6 +2,7 @@
 	export let item: string;
 	export let selected: Selectable;
 	export let style = '';
+	export let index: number;
 
 	const contentLengthScalar = ((item.length - 1) / Math.sqrt(item.length)).toFixed(0);
 </script>
@@ -12,6 +13,7 @@
 	style:width="calc(5ch*{contentLengthScalar})"
 	value={item}
 	name={item}
+	tabindex={index}
 	on:mousedown={(e) => {
 		selected.name = item;
 		e.currentTarget.click();

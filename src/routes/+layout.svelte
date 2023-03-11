@@ -12,16 +12,13 @@
 
 	export let data: LayoutSchema;
 
-	let store: Writable<CommuniqueLocalStorage>;
+	let store: Writable<UserState>;
 	onMount(async () => {
-		store = (await import('$lib/localStorage')).store;
-		console.log($store);
-		if ($store) $store.topic.name = topicNames[0];
+		store = (await import('$lib/sessionStorage')).store;
+		if ($store) $store.topic = { name: topicNames[0], type: 'topic' };
 	});
 
 	$: topicNames = data.topicList.map((topic: topic) => topic.name);
-
-	$: if ($store) console.log($store.topic);
 </script>
 
 <div class="app">
