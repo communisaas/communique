@@ -24,16 +24,10 @@
 	{#if store}
 		<Panel
 			header={`Loudest voices in ${$store ? $store.topic.name : '{PLACEHOLDER}'}`}
+			headerAlign="right"
 			selectable={Email}
 			items={data.emailList}
 			bind:selected={$store.email}
 		/>
 	{/if}
 </section>
-
-<style>
-	h1 {
-		text-align: left;
-		margin: 0em 1em;
-	}
-</style>
