@@ -20,104 +20,106 @@
 	$: topics = [] as (string | FormDataEntryValue)[];
 </script>
 
-<form
-	class="flex flex-col gap-y-5 rounded-full"
-	method="POST"
-	action="?/publish"
-	use:enhance={async ({ form, data: post, action, cancel }) => {
-		// `form` is the `<form>` element
-		// `data` is its `FormData` object
-		// `action` is the URL to which the form is posted
-		// `cancel()` will prevent the submission
-		for (const [tagName, list] of Object.entries({
-			recipient_list: recipientEmails,
-			topic_list: topics
-		})) {
-			post.set(tagName, list.join('␞'));
-		}
-
-		const letterInput = document.querySelector("input[name='body']");
-		// TODO validate & sanitize email body
-
-		const webProfile = (
-			await FingerprintJS.load({
-				apiKey: data.profilerKey,
-				endpoint: 'https://post.communi.email'
-			})
-		).get();
-
-		post.set('profileRequestID', (await webProfile).requestId);
-
-		return async ({ result, update }) => {
-			console.log(result);
-			if (result.status == 200) {
-				// TODO submit confirmation
-				recipientEmails = [];
-				topics = [];
-				update();
+<section class="gradient-background py-8">
+	<form
+		class="flex flex-col gap-y-5 rounded-full"
+		method="POST"
+		action="?/publish"
+		use:enhance={async ({ form, data: post, action, cancel }) => {
+			// `form` is the `<form>` element
+			// `data` is its `FormData` object
+			// `action` is the URL to which the form is posted
+			// `cancel()` will prevent the submission
+			for (const [tagName, list] of Object.entries({
+				recipient_list: recipientEmails,
+				topic_list: topics
+			})) {
+				post.set(tagName, list.join('␞'));
 			}
 
-			// `result` is an `ActionResult` object
-			// `update` runs default reset after form submission
-		};
-	}}
->
-	<div class="ml-20 flex flex-col w-fit h-full gap-x-20 gap-y-3">
-		<span class="flex flex-row gap-x-5">
-			<TagInput
-				bind:tagList={recipientEmails}
-				type="email"
-				name="recipient"
-				placeholder="Recipient"
-				style="h-14 w-fit"
-				tagStyle="px-1 py-1 rounded bg-larimarGreen-500"
-			>
-				<AddRecipient />
-			</TagInput>
-			<TagInput
-				bind:tagList={topics}
-				type="text"
-				name="topic"
-				placeholder="Topic"
-				style="w-fit h-14"
-				tagStyle="px-1 py-1 rounded bg-larimarGreen-500"
-			>
-				<AddTopic />
-			</TagInput>
-		</span>
+			const letterInput = document.querySelector("input[name='body']");
+			// TODO validate & sanitize email body
 
-		<span class="px-1 py-1 w-fit rounded bg-larimarGreen-600 shadow-artistBlue shadow-card">
-			<input
-				required
-				type="text"
-				on:keypress={(e) => {
-					if (e.key == 'Enter') {
-						e.preventDefault();
-					}
-				}}
-				name="subject"
-				placeholder="Subject"
-				class="w-42 h-fit p-0.5 rounded"
-			/>
-		</span>
-	</div>
+			const webProfile = (
+				await FingerprintJS.load({
+					apiKey: data.profilerKey,
+					endpoint: 'https://post.communi.email'
+				})
+			).get();
 
-	<span class="py-8">
-		<Editor apiKey={data.editorKey} content={composed} />
-	</span>
+			post.set('profileRequestID', (await webProfile).requestId);
 
-	<button
-		type="submit"
-		name="post"
-		class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-larimarGreen-600 text-white"
-		on:mouseenter={() => ($postButtonHovered = true)}
-		on:focus={() => ($postButtonHovered = true)}
-		on:mouseleave={() => ($postButtonHovered = false)}
-		on:blur={() => ($postButtonHovered = false)}
+			return async ({ result, update }) => {
+				console.log(result);
+				if (result.status == 200) {
+					// TODO submit confirmation
+					recipientEmails = [];
+					topics = [];
+					update();
+				}
+
+				// `result` is an `ActionResult` object
+				// `update` runs default reset after form submission
+			};
+		}}
 	>
-		<span><Post hovered={$postButtonHovered} /></span>Post
-	</button>
-</form>
+		<div class="ml-20 flex flex-col w-fit h-full gap-x-20 gap-y-3">
+			<span class="flex flex-row gap-x-5">
+				<TagInput
+					bind:tagList={recipientEmails}
+					type="email"
+					name="recipient"
+					placeholder="Recipient"
+					style="h-14 w-fit"
+					tagStyle="px-1 py-1 rounded bg-larimarGreen-500"
+				>
+					<AddRecipient />
+				</TagInput>
+				<TagInput
+					bind:tagList={topics}
+					type="text"
+					name="topic"
+					placeholder="Topic"
+					style="w-fit h-14"
+					tagStyle="px-1 py-1 rounded bg-larimarGreen-500"
+				>
+					<AddTopic />
+				</TagInput>
+			</span>
+
+			<span class="px-1 py-1 w-fit rounded bg-larimarGreen-600 shadow-artistBlue shadow-card">
+				<input
+					required
+					type="text"
+					on:keypress={(e) => {
+						if (e.key == 'Enter') {
+							e.preventDefault();
+						}
+					}}
+					name="subject"
+					placeholder="Subject"
+					class="w-42 h-fit p-0.5 rounded"
+				/>
+			</span>
+		</div>
+
+		<span class="py-8">
+			<Editor apiKey={data.editorKey} content={composed} />
+		</span>
+
+		<button
+			type="submit"
+			name="post"
+			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-larimarGreen-600 text-white"
+			on:mouseenter={() => ($postButtonHovered = true)}
+			on:focus={() => ($postButtonHovered = true)}
+			on:mouseleave={() => ($postButtonHovered = false)}
+			on:blur={() => ($postButtonHovered = false)}
+		>
+			<span><Post hovered={$postButtonHovered} /></span>Post
+		</button>
+	</form>
+</section>
 
 <style>
 	:global(.mce-content-body) {
@@ -135,5 +137,13 @@
 	button[type='submit']:hover span {
 		transform: scale(1);
 		transition: 0.2s all ease-in;
+	}
+
+	.gradient-background {
+		background: linear-gradient(
+			90deg,
+			theme('colors.peacockFeather.500'),
+			theme('colors.larimarGreen.600')
+		);
 	}
 </style>
