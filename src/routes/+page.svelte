@@ -13,6 +13,7 @@
 	export let data: HomeSchema;
 
 	// TODO loading placeholders
+	// TODO switch panel header between selected topic & address context
 </script>
 
 <svelte:head>
@@ -20,14 +21,22 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<section class="flex flex-col">
+<div class="flex flex-col gap-y-10">
 	{#if store}
 		<Panel
 			header={`Loudest voices in ${$store ? $store.topic.name : '{PLACEHOLDER}'}`}
-			headerAlign="right"
+			alignment="right"
+			selectable={Email}
+			items={data.emailList}
+			bind:selected={$store.email}
+		/>
+
+		<Panel
+			header={`Loudest voices in ${$store ? $store.topic.name : '{PLACEHOLDER}'}`}
+			alignment="left"
 			selectable={Email}
 			items={data.emailList}
 			bind:selected={$store.email}
 		/>
 	{/if}
-</section>
+</div>

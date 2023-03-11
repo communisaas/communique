@@ -28,24 +28,17 @@
 		<div class="grow overflow-scroll whitespace-nowrap">
 			<header class="flex h-fit py-2 pb-2 overflow-x-scroll">
 				{#if $store}
-					<Selector selectable={Tag} items={topicNames} bind:selected={$store.topic} />
+					<Selector
+						selectable={Tag}
+						items={topicNames}
+						bind:selected={$store.topic}
+						alignment="center"
+					/>
 				{/if}
 			</header>
-			<section class="gradient-background py-8">
-				<slot />
-			</section>
+			<slot />
 		</div>
 	</main>
 
 	<footer />
 </div>
-
-<style>
-	.gradient-background {
-		background: linear-gradient(
-			90deg,
-			theme('colors.peacockFeather.500'),
-			theme('colors.larimarGreen.600')
-		);
-	}
-</style>
