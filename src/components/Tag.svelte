@@ -4,13 +4,13 @@
 	export let style = '';
 	export let index: number;
 
-	const contentLengthScalar = ((item.length - 1) / Math.sqrt(item.length)).toFixed(0);
+	const contentLengthScalar = Math.sqrt(item.length).toFixed(0);
 </script>
 
 <input
 	readonly
 	class="cursor-pointer text-center inline-block px-2 py-1 rounded bg-larimarGreen-600 {style} "
-	style:width="calc(5ch*{contentLengthScalar})"
+	style:width="calc(2.25em*{contentLengthScalar})"
 	value={item}
 	name={item}
 	tabindex={index}

@@ -14,6 +14,9 @@
 
 <section class={`flex flex-col pb-5 gradient-background`}>
 	<h1 style={'text-align: ' + alignment}>{header}</h1>
+	<span class="control">
+		<slot />
+	</span>
 	<Selector {selectable} {items} {alignment} bind:selected />
 </section>
 
