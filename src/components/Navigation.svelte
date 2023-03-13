@@ -14,6 +14,7 @@
 					<a
 						class:activeLink={$page.route.id == route}
 						class:pointer-events-none={$page.route.id == `${route}`}
+						class="min-h-full min-w-full"
 						href={route}><svelte:component this={icon} /></a
 					>
 				</span>

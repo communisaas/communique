@@ -21,34 +21,45 @@
 <button
 	on:mousedown={(e) => (selected = item.rowid)}
 	tabindex={index}
-	class="{style} w-80 h-44 p-2 rounded bg-paper shadow-artistBlue shadow-card"
+	class="{style} p-2 rounded bg-paper shadow-artistBlue shadow-card"
 >
-	<h1>{item.subject}</h1>
-	<section class="flex flex-col bg-">
-		<span>reads: {item.open_count}</span>
-		<span>sends: {item.send_count}</span>
+	<section class="flex flex-col w-60">
+		<h1>{item.subject}</h1>
+		<div class="stats">
+			<span>reads: {item.open_count}</span>
+			<span>sends: {item.send_count}</span>
+		</div>
+
+		{#if store}
+			<Selector
+				selectable={Tag}
+				items={item.topic_list}
+				bind:selected={$store.topic}
+				style="text-[12px]"
+				alignment="right"
+			/>
+			<Selector
+				selectable={Tag}
+				items={item.recipient_list}
+				bind:selected={$store.topic}
+				style="text-[12px] bg-teal-500"
+				alignment="right"
+			/>
+		{/if}
 	</section>
-	{#if store}
-		<Selector
-			selectable={Tag}
-			items={item.topic_list}
-			bind:selected={$store.topic}
-			style="text-[12px]"
-			alignment="right"
-		/>
-		<Selector
-			selectable={Tag}
-			items={item.recipient_list}
-			bind:selected={$store.topic}
-			style="text-[12px] bg-teal-500"
-			alignment="right"
-		/>
-	{/if}
 </button>
 
 <style>
 	h1 {
 		font-size: 1.4rem;
 		text-align: start;
+		font-weight: 600;
+	}
+
+	.stats {
+		text-align: start;
+		display: flex;
+		flex-direction: column;
+		padding-left: 1em;
 	}
 </style>

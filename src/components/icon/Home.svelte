@@ -25,12 +25,13 @@
 
 <style>
 	svg {
-		filter: drop-shadow(2px 2px 1px rgb(0 0 0 / 0.4));
-		transition: 0.2s filter ease-out;
+		transform: scale(0.95);
+		transition: 0.2s all ease-out;
 	}
 
 	svg:hover {
-		filter: drop-shadow(4px 4px 3px rgb(0 0 0 / 0.4));
-		transition: 0.2s filter ease-in;
+		transform: scale(1);
+		filter: drop-shadow(rgba(0, 0, 0, 0.16) 2px 2px 4px);
+		transition: 0.2s all ease-in;
 	}
 </style>

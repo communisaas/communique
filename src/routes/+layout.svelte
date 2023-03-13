@@ -26,7 +26,7 @@
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
 		<div class="grow overflow-scroll whitespace-nowrap">
-			<header class="flex h-fit py-2 pb-2 overflow-x-scroll">
+			<header class="flex h-fit py-2 px-3 pb-2 overflow-x-scroll">
 				{#if $store}
 					<Selector
 						selectable={Tag}

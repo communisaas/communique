@@ -87,7 +87,7 @@
 				</TagInput>
 			</span>
 
-			<span class="px-1 py-1 w-fit rounded bg-larimarGreen-600 shadow-artistBlue shadow-card">
+			<span class="px-1 py-1 w-fit rounded bg-larimarGreen-600">
 				<input
 					required
 					type="text"

@@ -27,7 +27,7 @@
 
 <ul
 	class="{style} max-w-fit px-3 py-1 h-full flex flex-row place-items-center justify-center 
-		flex-wrap gap-2 rounded bg-larimarGreen-600 shadow-artistBlue shadow-card cursor-pointer"
+		flex-wrap gap-2 rounded bg-larimarGreen-600 cursor-pointer"
 	on:mouseenter={() => (deleteVisible = true)}
 	on:mouseleave={() => (deleteVisible = false)}
 	on:mousedown|preventDefault={(e) => {

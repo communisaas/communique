@@ -7,9 +7,11 @@
 	export let alignment: string;
 
 	export let style: string = '';
+
+	// TODO overflowing items
 </script>
 
-<ul class="px-10 py-1 flex flex-row gap-5" style="justify-content: {alignment}">
+<ul class="px-1 py-1 flex flex-row gap-5" style="justify-content: {alignment}">
 	{#each items as item, index}
 		<svelte:component this={selectable} bind:selected {style} {item} {index} />
 	{/each}
