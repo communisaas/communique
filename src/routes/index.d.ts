@@ -1,18 +1,33 @@
 interface LayoutSchema {
-	topicList: topic[];
+	loudestTopics: topic[];
 }
 
 interface HomeSchema {
-	emailList: email[];
+	templateList: Panel[];
+}
+
+interface Expandable {
+	type: 'panel';
+}
+
+type SelectableKey = 'email' | 'topic' | 'recipient' | 'spotlight';
+interface Panel extends Expandable {
+	header: string;
+	selectableName: SelectableKey;
+	alignment: 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent';
+	cardList: email[];
 }
 
 interface Selectable {
 	name: string;
-	type: 'email' | 'topic' | 'address';
+	type: SelectableKey;
 	index?: number;
 }
 
 interface UserState {
 	topic: Selectable;
 	email: Selectable;
+	recipient: Selectable;
+	spotlight: Selectable;
+	[key: SelectableKey];
 }

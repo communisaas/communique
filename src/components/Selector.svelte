@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ComponentType } from 'svelte';
 
-	export let items: string[];
+	export let items: Selectable[] | string[];
 	export let selectable: ComponentType;
 	export let selected: Selectable;
 	export let alignment: string;

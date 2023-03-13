@@ -15,10 +15,12 @@
 	let store: Writable<UserState>;
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		if ($store) $store.topic = { name: topicNames[0], type: 'topic' };
+		if ($store) {
+			$store.topic = { name: topicNames[0], type: 'topic' };
+		}
 	});
 
-	$: topicNames = data.topicList.map((topic: topic) => topic.name);
+	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
 </script>
 
 <div class="app">

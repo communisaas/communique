@@ -7,7 +7,7 @@
 
 	export let selectable: ComponentType;
 	export let selected: Selectable;
-	export let items: string[];
+	export let items: Selectable[];
 
 	// TODO expand mode, expose gradient background props
 </script>

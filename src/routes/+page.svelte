@@ -1,6 +1,7 @@
 <script type="ts">
 	import Email from '$components/Email.svelte';
 	import Panel from '$components/Panel.svelte';
+	import type { recipient } from '@prisma/client';
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 
@@ -8,6 +9,15 @@
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
+
+		if ($store) {
+			$store.recipient = {
+				name: data.templateList.filter((panel) => panel.selectableName === 'recipient')[0]
+					.cardList[0].recipient_list[0], // recipient panel defaults to address with recently most reads
+				type: 'recipient'
+			};
+			$store.spotlight = { name: 'custom', type: 'recipient' };
+		}
 	});
 
 	export let data: HomeSchema;
@@ -23,20 +33,14 @@
 
 <div class="flex flex-col gap-y-10">
 	{#if store}
-		<Panel
-			header={`Loudest voices in ${$store ? $store.topic.name : '{PLACEHOLDER}'}`}
-			alignment="right"
-			selectable={Email}
-			items={data.emailList}
-			bind:selected={$store.email}
-		/>
-
-		<Panel
-			header={`Loudest voices in ${$store ? $store.topic.name : '{PLACEHOLDER}'}`}
-			alignment="left"
-			selectable={Email}
-			items={data.emailList}
-			bind:selected={$store.email}
-		/>
+		{#each data.templateList as panel}
+			<Panel
+				header={`${panel.header} ${$store ? $store.topic.name : '{PLACEHOLDER}'}`}
+				alignment={panel.alignment}
+				selectable={Email}
+				items={panel.cardList}
+				bind:selected={$store[panel.selectableName]}
+			/>
+		{/each}
 	{/if}
 </div>

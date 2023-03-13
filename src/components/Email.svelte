@@ -21,7 +21,7 @@
 <button
 	on:mousedown={(e) => (selected = item.rowid)}
 	tabindex={index}
-	class="{style} p-2 rounded bg-paper shadow-artistBlue shadow-card"
+	class="{style} p-2 rounded bg-paper"
 >
 	<section class="flex flex-col w-60">
 		<h1>{item.subject}</h1>
@@ -50,6 +50,17 @@
 </button>
 
 <style>
+	button {
+		transition: 0.2s ease-out;
+	}
+	button:hover {
+		transform: translateY(-1px);
+		box-shadow: rgba(0, 0, 0, 0.16) 3px 3px 4px;
+		transition: 0.2s ease-in;
+	}
+	button:active {
+		transform: translateY(1px);
+	}
 	h1 {
 		font-size: 1.4rem;
 		text-align: start;
