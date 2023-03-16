@@ -12,12 +12,10 @@
 
 <style>
 	svg {
-		transform: scale(0.95);
 		transition: 0.2s all ease-out;
 	}
 
 	svg:hover {
-		transform: scale(1);
 		filter: drop-shadow(rgba(0, 0, 0, 0.16) 2px 2px 4px);
 		transition: 0.2s all ease-in;
 	}

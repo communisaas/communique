@@ -1,7 +1,6 @@
 <script type="ts">
 	import Email from '$components/Email.svelte';
 	import Panel from '$components/Panel.svelte';
-	import type { recipient } from '@prisma/client';
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 

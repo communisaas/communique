@@ -3,9 +3,12 @@ import { PrismaClient } from '@prisma/client';
 const objectMapper = new PrismaClient();
 
 /** @type {import('./$types').LayoutServerLoad} */
-export async function load({ parent }) {
+export async function load({ parent, setHeaders }) {
 	// TODO: compound queries
 	// TODO: re-render on selectable change
+	setHeaders({
+		'cache-control': 'public, max-age=3600'
+	});
 	const { loudestTopics } = await parent();
 	const loudestTopicEmails = objectMapper.email.findMany({
 		where: {
