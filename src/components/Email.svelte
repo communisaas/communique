@@ -11,7 +11,7 @@
 	});
 
 	export let item: email;
-	export let selected = '';
+	export let selected: Selectable;
 	export let style = '';
 	export let index = 0;
 
@@ -19,7 +19,7 @@
 </script>
 
 <button
-	on:mousedown={(e) => (selected = item.rowid)}
+	on:mousedown={(e) => (selected.name = item.rowid)}
 	tabindex={index}
 	class="{style} p-2 rounded bg-paper"
 >
@@ -41,7 +41,7 @@
 			<Selector
 				selectable={Tag}
 				items={item.recipient_list}
-				bind:selected={$store.topic}
+				bind:selected={$store.recipient}
 				style="text-[12px] bg-teal-500"
 				alignment="right"
 			/>

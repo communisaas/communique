@@ -5,11 +5,11 @@
 	import Navigation from '$components/Navigation.svelte';
 
 	import { onMount } from 'svelte';
-	import type { Writable } from 'svelte/store';
 	import type { topic } from '@prisma/client';
 	import Selector from '$components/Selector.svelte';
 	import Tag from '$components/Tag.svelte';
 	import { navigating } from '$app/stores';
+	import type { Writable } from 'svelte/store';
 
 	export let data: LayoutSchema;
 

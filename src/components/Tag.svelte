@@ -15,6 +15,7 @@
 	name={item}
 	tabindex={index}
 	on:mousedown={(e) => {
+		e.stopImmediatePropagation();
 		selected.name = item;
 		e.currentTarget.click();
 	}}

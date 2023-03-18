@@ -41,21 +41,21 @@ export async function load({ parent, setHeaders }) {
 		templateList: [
 			{
 				type: 'panel',
-				selectableName: 'topic',
+				selectable: 'topic',
 				header: 'Loudest voices in',
 				alignment: 'right',
 				cardList: await loudestTopicEmails
 			},
 			{
 				type: 'panel',
-				selectableName: 'spotlight',
+				selectable: 'spotlight',
 				header: 'Spotlight on',
 				alignment: 'left',
 				cardList: await spotlightEmails
 			},
 			{
 				type: 'panel',
-				selectableName: 'recipient',
+				selectable: 'recipient',
 				header: 'Mail sent to',
 				alignment: 'right',
 				cardList: await biggestRecipientEmails
