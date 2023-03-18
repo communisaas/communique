@@ -26,8 +26,8 @@
 	<main class="flex min-h-screen">
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
-		<div class="grow overflow-scroll whitespace-nowrap">
-			<header class="flex h-fit py-2 px-3 pb-2 overflow-x-scroll bg-peacockFeather-600">
+		<div class="grow whitespace-nowrap">
+			<header class="flex h-fit py-2 px-3 pb-2 bg-peacockFeather-600">
 				{#if $store}
 					<Selector
 						selectable={Tag}
