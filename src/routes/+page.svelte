@@ -40,7 +40,7 @@
 				alignment={panel.alignment}
 				selectable={Email}
 				items={panel.cardList}
-				bind:selected={$store[panel.selectable]}
+				bind:selected={$store.email}
 			/>
 		{/each}
 	{/if}
