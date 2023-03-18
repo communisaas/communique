@@ -8,15 +8,12 @@
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-
-		if ($store) {
-			$store.recipient = {
-				name: data.templateList.filter((panel) => panel.selectable === 'recipient')[0].cardList[0]
-					.recipient_list[0], // recipient panel defaults to address with recently most reads
-				type: 'recipient'
-			};
-			$store.spotlight = { name: 'custom', type: 'recipient' };
-		}
+		$store.recipient = {
+			name: data.templateList.filter((panel) => panel.selectable === 'recipient')[0].cardList[0]
+				.recipient_list[0], // recipient panel defaults to address with recently most reads
+			type: 'recipient'
+		};
+		$store.spotlight = { name: 'custom', type: 'recipient' };
 	});
 
 	export let data: HomeSchema;
@@ -36,7 +33,9 @@
 	{#if store}
 		{#each data.templateList as panel}
 			<Panel
-				header={`${panel.header} ${$store ? $store[panel.selectable].name : '{PLACEHOLDER}'}`}
+				header={`${panel.header} ${
+					panel.selectable in $store ? $store[panel.selectable].name : 'Loading...'
+				}`}
 				alignment={panel.alignment}
 				selectable={Email}
 				items={panel.cardList}
