@@ -137,9 +137,9 @@ button:focus:not(:focus-visible) {
 *::-webkit-scrollbar-thumb:hover {
 	border: 5px solid transparent;
 	background-clip: content-box;
-	background-color: gray;
+	background-color: theme('colors.paper.600');
 }
 *::-webkit-scrollbar-thumb:active {
 	background-clip: content-box;
-	background-color: theme('colors.peacockFeather.500');
+	background-color: theme('colors.larimarGreen.600');
 }

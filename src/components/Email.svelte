@@ -22,7 +22,7 @@
 		scrollPosition.header.x = scrollPosition.header.remainingWidth == 0 ? 0 : 1;
 	});
 
-	$: console.log(scrollPosition);
+	// TODO drag-to-scroll
 </script>
 
 <button on:mousedown={(e) => (selected.name = item.rowid)} class="{style} p-2 rounded bg-paper-500">
