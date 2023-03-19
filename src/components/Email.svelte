@@ -13,16 +13,11 @@
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';
-	export let index = 0;
 
 	// TODO email card layout
 </script>
 
-<button
-	on:mousedown={(e) => (selected.name = item.rowid)}
-	tabindex={index}
-	class="{style} p-2 rounded bg-paper"
->
+<button on:mousedown={(e) => (selected.name = item.rowid)} class="{style} p-2 rounded bg-paper">
 	<section class="flex flex-col w-60">
 		<h1>{item.subject}</h1>
 		<div class="stats">
