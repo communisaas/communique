@@ -100,27 +100,6 @@ button:focus:not(:focus-visible) {
 	white-space: nowrap;
 }
 
-.scrollable:hover {
-	overflow-x: scroll;
-	/* prevent scrollbar from changing container dimensions in webkit */
-	overflow-x: overlay;
-}
-.scrollable::before {
-	background: linear-gradient(to right, transparent 90%, theme('colors.paper.500') 97%);
-}
-.scrolled::before {
-	background: linear-gradient(
-		to right,
-		var(--color-bg-2) 3%,
-		transparent 10%,
-		transparent 90%,
-		var(--color-bg-2) 97%
-	);
-}
-.scrolled__max::before {
-	background: linear-gradient(to right, var(--color-bg-2) 3%, transparent 10%);
-}
-
 *::-webkit-scrollbar {
 	height: auto;
 	width: auto;

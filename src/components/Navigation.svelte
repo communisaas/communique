@@ -26,7 +26,6 @@
 		width: 100%;
 		position: relative;
 	}
-
 	a::before {
 		content: '';
 		display: block;
@@ -46,16 +45,13 @@
 		border-right: 4px solid theme('colors.larimarGreen.600');
 		transform: scale(1);
 	}
-
-	.active {
-		filter: contrast(0.4);
-	}
-
 	a > :global(icon) {
 		padding: 1em 0.5em;
 		display: block;
 	}
-
+	.active {
+		filter: contrast(0.4);
+	}
 	.active a::before {
 		border-right: 4px solid theme('colors.larimarGreen.600');
 		display: block;

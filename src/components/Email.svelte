@@ -22,7 +22,7 @@
 		scrollPosition.header.x = scrollPosition.header.remainingWidth == 0 ? 0 : 1;
 	});
 
-	// TODO drag-to-scroll
+	// TODO hover-to-scroll
 </script>
 
 <button on:mousedown={(e) => (selected.name = item.rowid)} class="{style} p-2 rounded bg-paper-500">
@@ -31,6 +31,9 @@
 			<h1
 				title={scrollPosition.header.x > 0 ? item.subject : null}
 				bind:this={header}
+				on:wheel={(e) => {
+					header.scrollLeft += e.deltaY * 0.15;
+				}}
 				on:scroll={() => {
 					scrollPosition.header.x = header.scrollLeft + 1;
 				}}
@@ -65,17 +68,20 @@
 	</section>
 </button>
 
-<style>
+<style lang="scss">
 	button {
 		transition: 0.2s ease-out;
-	}
-	button:hover {
-		transform: translateY(-1px);
-		box-shadow: rgba(0, 0, 0, 0.16) 3px 3px 4px;
-		transition: 0.2s ease-in;
-	}
-	button:active {
-		transform: translateY(1px);
+		&:hover {
+			transform: scale(1.01);
+			box-shadow: theme('colors.peacockFeather.600') 0 0 2px 2px;
+			transition: 0.1s ease-in;
+		}
+		&:active {
+			transform: scale(1);
+			box-shadow: unset;
+			transition: 0.1s ease-in-out;
+			box-shadow: theme('colors.paper.700') 0 0 2px 2px;
+		}
 	}
 	h1 {
 		font-size: 1.4rem;
@@ -84,22 +90,43 @@
 		overflow: hidden;
 		white-space: nowrap;
 		width: auto;
-		height: auto;
 		padding-bottom: 4px;
+		&::before {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			height: 100%;
+			width: 100%;
+			pointer-events: none;
+		}
 	}
-	h1::before {
-		content: '';
-		position: absolute;
-		bottom: 0;
-		height: 100%;
-		width: 100%;
-		pointer-events: none;
-	}
-
 	.stats {
 		text-align: start;
 		display: flex;
 		flex-direction: column;
 		padding-left: 1em;
+	}
+	.scrollable {
+		&:hover {
+			overflow-x: scroll;
+			/* prevent scrollbar from changing container dimensions in webkit */
+			overflow-x: overlay;
+		}
+		&::before {
+			background: linear-gradient(to right, transparent 90%, var(--color-bg-2) 97%);
+			transform: scaleX(1.01);
+		}
+	}
+	.scrolled::before {
+		background: linear-gradient(
+			to right,
+			var(--color-bg-2) 3%,
+			transparent 10%,
+			transparent 90%,
+			var(--color-bg-2) 97%
+		);
+	}
+	.scrolled__max::before {
+		background: linear-gradient(to right, var(--color-bg-2) 3%, transparent 10%);
 	}
 </style>

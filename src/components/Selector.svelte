@@ -12,8 +12,7 @@
 </script>
 
 <ul
-	class="px-1 py-1 flex flex-row gap-5 overflow-scroll"
-	class:scrollable={true}
+	class="px-1 py-1 flex gap-5 overflow-x-auto whitespace-nowrap"
 	style="justify-content: {alignment}"
 >
 	{#each items as item}
