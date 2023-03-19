@@ -18,22 +18,22 @@ export async function load({ parent, setHeaders }) {
 		},
 		take: 10
 	});
-	const biggestRecipients = await objectMapper.recipient.findMany({
-		orderBy: [
-			{
-				email_read_count: 'desc'
-			}
-		],
-		take: 3
-	});
-	const biggestRecipientEmails = objectMapper.email.findMany({
-		where: {
-			recipient_list: {
-				has: biggestRecipients[0].address
-			}
-		},
-		take: 10
-	});
+	// const biggestRecipients = await objectMapper.recipient.findMany({
+	// 	orderBy: [
+	// 		{
+	// 			email_read_count: 'desc'
+	// 		}
+	// 	],
+	// 	take: 3
+	// });
+	// const biggestRecipientEmails = objectMapper.email.findMany({
+	// 	where: {
+	// 		recipient_list: {
+	// 			has: biggestRecipients[0].address
+	// 		}
+	// 	},
+	// 	take: 10
+	// });
 	const spotlightEmails = objectMapper.email.findMany({
 		take: 10
 	});
@@ -52,13 +52,6 @@ export async function load({ parent, setHeaders }) {
 				header: 'Spotlight on',
 				alignment: 'left',
 				cardList: await spotlightEmails
-			},
-			{
-				type: 'panel',
-				selectable: 'recipient',
-				header: 'Mail sent to',
-				alignment: 'right',
-				cardList: await biggestRecipientEmails
 			}
 		]
 	};

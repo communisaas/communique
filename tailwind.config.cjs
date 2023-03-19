@@ -4,7 +4,11 @@ const config = {
 	theme: {
 		extend: {
 			colors: {
-				paper: 'hsl(224, 44%, 95%)',
+				paper: {
+					500: 'hsl(224, 44%, 95%)',
+					600: 'hsl(209, 36%, 86%)',
+					700: 'rgb(202, 216, 228)'
+				},
 				larimarGreen: {
 					500: '#C9FFE2',
 					600: '#94D2BD'

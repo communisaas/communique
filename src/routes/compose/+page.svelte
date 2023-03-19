@@ -131,12 +131,12 @@
 
 	button[type='submit'] span {
 		transform: scale(0.9);
-		transition: 0.2s all ease-out;
+		transition: 0.1s all ease-out;
 	}
 
 	button[type='submit']:hover span {
 		transform: scale(1);
-		transition: 0.2s all ease-in;
+		transition: 0.1s all ease-in;
 	}
 
 	.gradient-background {

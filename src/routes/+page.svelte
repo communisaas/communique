@@ -8,12 +8,13 @@
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		$store.recipient = {
-			name: data.templateList.filter((panel) => panel.selectable === 'recipient')[0].cardList[0]
-				.recipient_list[0], // recipient panel defaults to address with recently most reads
-			type: 'recipient'
-		};
+		// $store.recipient = {
+		// 	name: data.templateList.filter((panel) => panel.selectable === 'recipient')[0].cardList[0]
+		// 		.recipient_list[0], // recipient panel defaults to address with recently most reads
+		// 	type: 'recipient'
+		// };
 		$store.spotlight = { name: 'custom', type: 'recipient' };
+		$store.email = { name: '', type: 'email' };
 	});
 
 	export let data: HomeSchema;

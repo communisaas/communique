@@ -12,7 +12,7 @@
 	// TODO expand mode, expose gradient background props
 </script>
 
-<section class={`flex flex-col pb-5 px-5 gradient-background`}>
+<section class="flex flex-col pb-5 px-5 gradient-background">
 	<h1 style={'text-align: ' + alignment}>{header}</h1>
 	<span class="control">
 		<slot />

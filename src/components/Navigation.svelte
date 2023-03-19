@@ -24,7 +24,6 @@
 <style>
 	span {
 		width: 100%;
-		transition: all 0.1s ease-in;
 		position: relative;
 	}
 
@@ -32,7 +31,7 @@
 		content: '';
 		display: block;
 		position: absolute;
-		transition: all 0.1s ease-in;
+		transition: all 0.05s ease-in;
 		transform-origin: right;
 		transform: scale(0);
 		top: 0;
