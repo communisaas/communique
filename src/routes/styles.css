@@ -99,3 +99,47 @@ button:focus:not(:focus-visible) {
 	width: 1px;
 	white-space: nowrap;
 }
+
+.scrollable:hover {
+	overflow-x: scroll;
+	/* prevent scrollbar from changing container dimensions in webkit */
+	overflow-x: overlay;
+}
+.scrollable::before {
+	background: linear-gradient(to right, transparent 90%, theme('colors.paper.500') 97%);
+}
+.scrolled::before {
+	background: linear-gradient(
+		to right,
+		var(--color-bg-2) 3%,
+		transparent 10%,
+		transparent 90%,
+		var(--color-bg-2) 97%
+	);
+}
+.scrolled__max::before {
+	background: linear-gradient(to right, var(--color-bg-2) 3%, transparent 10%);
+}
+
+*::-webkit-scrollbar {
+	height: auto;
+	width: auto;
+}
+*::-webkit-scrollbar-track {
+	background-color: transparent;
+}
+*::-webkit-scrollbar-thumb {
+	background-color: theme('colors.paper.700');
+	border-radius: 20px;
+	border: 6px solid transparent;
+	background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+	border: 5px solid transparent;
+	background-clip: content-box;
+	background-color: gray;
+}
+*::-webkit-scrollbar-thumb:active {
+	background-clip: content-box;
+	background-color: theme('colors.peacockFeather.500');
+}

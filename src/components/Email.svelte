@@ -29,6 +29,7 @@
 	<section class="flex flex-col w-60 relative">
 		<span class="relative pb-2">
 			<h1
+				title={scrollPosition.header.x > 0 ? item.subject : null}
 				bind:this={header}
 				on:scroll={() => {
 					scrollPosition.header.x = header.scrollLeft + 1;
@@ -94,51 +95,11 @@
 		width: 100%;
 		pointer-events: none;
 	}
-	h1::-webkit-scrollbar {
-		top: -10px;
-	}
-	h1::-webkit-scrollbar-track {
-		background-color: transparent;
-	}
-	h1::-webkit-scrollbar-thumb {
-		background-color: theme('colors.paper.700');
-		border-radius: 20px;
-		border: 6px solid transparent;
-		background-clip: content-box;
-	}
-	h1::-webkit-scrollbar-thumb:hover {
-		border: 5px solid transparent;
-		background-clip: content-box;
-		background-color: gray;
-	}
-	h1::-webkit-scrollbar-thumb:active {
-		background-clip: content-box;
-		background-color: theme('colors.peacockFeather.500');
-	}
+
 	.stats {
 		text-align: start;
 		display: flex;
 		flex-direction: column;
 		padding-left: 1em;
-	}
-	.scrollable:hover {
-		overflow-x: scroll;
-		/* prevent scrollbar from changing container dimensions in webkit */
-		overflow-x: overlay;
-	}
-	.scrollable::before {
-		background: linear-gradient(to right, transparent 90%, theme('colors.paper.500') 97%);
-	}
-	.scrolled::before {
-		background: linear-gradient(
-			to right,
-			var(--color-bg-2) 3%,
-			transparent 10%,
-			transparent 90%,
-			var(--color-bg-2) 97%
-		);
-	}
-	.scrolled__max::before {
-		background: linear-gradient(to right, var(--color-bg-2) 3%, transparent 10%);
 	}
 </style>
