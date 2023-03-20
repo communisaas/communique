@@ -4,8 +4,7 @@ const objectMapper = new PrismaClient();
 
 /** @type {import('./$types').LayoutServerLoad} */
 export async function load({ parent, setHeaders }) {
-	// TODO: compound queries
-	// TODO: re-render on selectable change
+	// TODO: compound queries, lazy load
 	setHeaders({
 		'cache-control': 'public, max-age=3600'
 	});

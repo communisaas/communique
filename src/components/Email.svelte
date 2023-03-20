@@ -56,6 +56,7 @@
 				bind:selected={$store.topic}
 				style="text-[12px]"
 				alignment="right"
+				overflow="scroll"
 			/>
 			<Selector
 				selectable={Tag}
@@ -63,6 +64,7 @@
 				bind:selected={$store.recipient}
 				style="text-[12px] bg-teal-500"
 				alignment="right"
+				overflow="scroll"
 			/>
 		{/if}
 	</section>

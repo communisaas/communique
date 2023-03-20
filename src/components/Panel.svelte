@@ -3,7 +3,7 @@
 	import type { ComponentType } from 'svelte';
 
 	export let header: string;
-	export let alignment: 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent';
+	export let alignment: 'right' | 'left';
 
 	export let selectable: ComponentType;
 	export let selected: Selectable;
@@ -13,7 +13,7 @@
 </script>
 
 <section class="flex flex-col pb-5 px-5 gradient-background">
-	<h1 style={'text-align: ' + alignment}>{header}</h1>
+	<h1 style="text-align: {alignment}">{header}</h1>
 	<span class="control">
 		<slot />
 	</span>
