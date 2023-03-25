@@ -3,7 +3,7 @@
 	export let selected: Selectable;
 	export let style = '';
 
-	const contentLengthScalar = Math.sqrt(item.length).toFixed(0);
+	const contentLengthScalar = Math.sqrt(item.length + 1) * Math.sqrt(1.5);
 </script>
 
 <input

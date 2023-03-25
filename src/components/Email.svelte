@@ -32,9 +32,9 @@
 				title={scrollPosition.header.x > 0 ? item.subject : null}
 				bind:this={header}
 				on:wheel={(e) => {
-					header.scrollLeft += e.deltaY * 0.15;
+					header.scrollLeft += e.deltaY * 0.33;
 				}}
-				on:scroll={() => {
+				on:scroll|preventDefault={() => {
 					scrollPosition.header.x = header.scrollLeft + 1;
 				}}
 				class:scrollable={scrollPosition.header.x > 0}
@@ -54,7 +54,7 @@
 				selectable={Tag}
 				items={item.topic_list}
 				bind:selected={$store.topic}
-				style="text-[12px]"
+				itemStyle="text-[12px]"
 				alignment="right"
 				overflow="scroll"
 			/>
@@ -62,7 +62,7 @@
 				selectable={Tag}
 				items={item.recipient_list}
 				bind:selected={$store.recipient}
-				style="text-[12px] bg-teal-500"
+				itemStyle="text-[12px] bg-teal-500"
 				alignment="right"
 				overflow="scroll"
 			/>
@@ -109,6 +109,11 @@
 		padding-left: 1em;
 	}
 	.scrollable {
+		scrollbar-width: none;
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
 		&:hover {
 			overflow-x: scroll;
 			/* prevent scrollbar from changing container dimensions in webkit */

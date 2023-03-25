@@ -4,10 +4,12 @@
 	export let items: Selectable[] | string[];
 	export let selectable: ComponentType;
 	export let selected: Selectable;
-	export let alignment: 'right' | 'left';
+	export let alignment: 'right' | 'left' | 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let overflow: 'scroll' | 'hidden' | 'visible' = 'hidden';
 
-	export let style: string = '';
+	export let itemStyle: string = '';
+
+	const listStyle = `px-1 py-1 flex flex-row-reverse gap-5 overflow-x-hidden hover:overflow-x-${overflow} whitespace-nowrap`;
 
 	// TODO overflowing items
 	let scrollPosition = { list: { x: 0, remainingWidth: 0 } };
@@ -23,8 +25,8 @@
 
 <ul
 	bind:this={list}
-	class="px-1 py-1 flex flex-row-reverse gap-5 overflow-x-hidden hover:overflow-x-{overflow} whitespace-nowrap"
-	style="justify-content:{alignment}"
+	class={listStyle}
+	style="justify-content:{alignment};"
 	on:wheel={(e) => {
 		e.currentTarget.scrollLeft += e.deltaY * 0.15;
 	}}
@@ -33,6 +35,6 @@
 	}}
 >
 	{#each items as item}
-		<svelte:component this={selectable} bind:selected {style} {item} />
+		<svelte:component this={selectable} bind:selected style={itemStyle} {item} />
 	{/each}
 </ul>
