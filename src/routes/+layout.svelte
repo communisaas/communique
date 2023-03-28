@@ -9,14 +9,20 @@
 	import Selector from '$components/Selector.svelte';
 	import Tag from '$components/Tag.svelte';
 	import { navigating } from '$app/stores';
-	import type { Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 
 	export let data: LayoutSchema;
 
 	let store: Writable<UserState>;
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		$store.topic = { name: topicNames[0], type: 'topic' };
+		$store.topic = writable({ name: topicNames[0], type: 'topic' });
+		$store.recipient = writable({
+			name: '',
+			type: 'recipient'
+		});
+		$store.spotlight = writable({ name: 'custom', type: 'recipient' });
+		$store.email = writable({ name: '', type: 'email' });
 	});
 
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);

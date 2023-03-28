@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const objectMapper = new PrismaClient();
+import objectMapper from '$lib/database';
 
 /** @type {import('./$types').LayoutServerLoad} */
 export async function load({ setHeaders }) {

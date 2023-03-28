@@ -1,12 +1,13 @@
 <script lang="ts">
 	import Selector from './Selector.svelte';
 	import type { ComponentType } from 'svelte';
+	import type { Writable } from 'svelte/store';
 
 	export let header: string;
 	export let alignment: 'right' | 'left' | 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 
 	export let selectable: ComponentType;
-	export let selected: Selectable;
+	export let selected: Writable<Selectable>;
 	export let items: Selectable[];
 
 	// TODO expand mode, expose gradient background props
