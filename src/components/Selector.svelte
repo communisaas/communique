@@ -30,7 +30,7 @@
 	on:wheel={(e) => {
 		e.currentTarget.scrollLeft += e.deltaY * 0.15;
 	}}
-	on:scroll={(e) => {
+	on:scroll|preventDefault={(e) => {
 		scrollPosition.list.x = e.currentTarget.scrollLeft + 1;
 	}}
 >
