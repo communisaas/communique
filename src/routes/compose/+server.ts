@@ -1,21 +1,8 @@
-import {
-	TINYMCE_KEY,
-	FINGERPRINTJS_KEY,
-	FINGERPRINTJS_SERVER_KEY,
-	FINGERPRINTJS_URL
-} from '$env/static/private';
+import { FINGERPRINTJS_SERVER_KEY, FINGERPRINTJS_URL } from '$env/static/private';
 import type { RequestEvent } from './$types';
 
-import { PrismaClient } from '@prisma/client';
+import objectMapper from '$lib/database';
 import { fail } from '@sveltejs/kit';
-
-/** @type {import('./$types').PageLoad} */
-export function load() {
-	return {
-		editorKey: TINYMCE_KEY,
-		profilerKey: FINGERPRINTJS_KEY
-	};
-}
 
 class EmailForm {
 	inputFields: EmailFormInput = {
@@ -59,7 +46,6 @@ class EmailForm {
 export const actions = {
 	publish: async ({ cookies, request }: RequestEvent) => {
 		const formSubmission = await request.formData();
-		const objectMapper = new PrismaClient();
 		const profileRequestID: string | undefined = formSubmission.get('profileRequestID')?.toString();
 
 		const response = await fetch(`${FINGERPRINTJS_URL}/events/${profileRequestID}`, {
