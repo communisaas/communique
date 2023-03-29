@@ -1,8 +1,6 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
-
 	export let item: string;
-	export let selected: Writable<Selectable>;
+	export let selected: Selectable;
 	export let style = '';
 
 	const contentLengthScalar = Math.sqrt(item.length + 1) * Math.sqrt(1.5);
@@ -15,7 +13,7 @@
 	value={item}
 	title={item}
 	on:mousedown|stopPropagation={(e) => {
-		$selected.name = item;
+		selected.name = item;
 	}}
 />
 

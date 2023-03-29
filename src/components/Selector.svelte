@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { onMount, type ComponentType } from 'svelte';
-	import type { Writable } from 'svelte/store';
 
 	export let items: Selectable[] | string[];
 	export let selectable: ComponentType;
-	export let selected: Writable<Selectable>;
+	export let selected: Selectable;
 	export let alignment: 'right' | 'left' | 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let overflow: 'scroll' | 'hidden' | 'visible' = 'hidden';
 

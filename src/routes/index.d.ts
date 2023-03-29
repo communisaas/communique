@@ -25,9 +25,9 @@ interface Selectable {
 }
 
 interface UserState {
-	topic: Writable<Selectable>;
-	email: Writable<Selectable>;
-	recipient: Writable<Selectable>;
-	spotlight: Writable<Selectable>;
+	topic: Selectable;
+	email: Selectable;
+	recipient: Selectable;
+	spotlight: Selectable;
 	[key: string];
 }

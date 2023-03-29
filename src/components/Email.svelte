@@ -8,7 +8,7 @@
 	let store: Writable<UserState>;
 
 	export let item: email;
-	export let selected: Writable<Selectable>;
+	export let selected: Selectable;
 	export let style = '';
 
 	// TODO email card layout
@@ -25,10 +25,7 @@
 	// TODO hover-to-scroll
 </script>
 
-<button
-	on:mousedown={(e) => ($selected.name = item.rowid)}
-	class="{style} p-2 rounded bg-paper-500"
->
+<button on:mousedown={(e) => (selected.name = item.rowid)} class="{style} p-2 rounded bg-paper-500">
 	<section class="flex flex-col w-60 relative">
 		<span class="relative pb-2">
 			<h1
