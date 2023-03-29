@@ -1,10 +1,9 @@
 interface LayoutSchema {
 	loudestTopics: topic[];
+	template: Panel[];
 }
 
-interface HomeSchema {
-	templateList: Panel[];
-}
+interface HomeSchema extends LayoutSchema {}
 
 interface Expandable {
 	type: 'panel';

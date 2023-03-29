@@ -1,9 +1,16 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
+
 	export let item: string;
 	export let selected: Selectable;
 	export let style = '';
 
 	const contentLengthScalar = Math.sqrt(item.length + 1) * Math.sqrt(1.5);
+
+	const dispatch = createEventDispatcher();
+	function dispatchSelected(selected: Selectable) {
+		dispatch('select', selected);
+	}
 </script>
 
 <input
@@ -12,8 +19,9 @@
 	style:width="calc(2em*{contentLengthScalar})"
 	value={item}
 	title={item}
-	on:mousedown|stopPropagation={(e) => {
-		selected.name = item;
+	on:mousedown|stopPropagation={() => {
+		if (selected.name != item) selected.name = item;
+		dispatchSelected(selected);
 	}}
 />
 

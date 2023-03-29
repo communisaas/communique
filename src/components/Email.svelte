@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { email } from '@prisma/client';
-	import { onMount } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
@@ -22,10 +22,19 @@
 		scrollPosition.header.x = scrollPosition.header.remainingWidth == 0 ? 0 : 1;
 	});
 
-	// TODO hover-to-scroll
+	const dispatch = createEventDispatcher();
+	function dispatchSelected(selected: Selectable) {
+		dispatch('select', selected);
+	}
 </script>
 
-<button on:mousedown={(e) => (selected.name = item.rowid)} class="{style} p-2 rounded bg-paper-500">
+<button
+	on:mousedown={(e) => {
+		if (selected.name != item.rowid) selected.name = item.rowid;
+		dispatchSelected(selected);
+	}}
+	class="{style} p-2 rounded bg-paper-500"
+>
 	<section class="flex flex-col w-60 relative">
 		<span class="relative pb-2">
 			<h1
@@ -57,6 +66,7 @@
 				itemStyle="text-[12px]"
 				alignment="right"
 				overflow="scroll"
+				on:select
 			/>
 			<Selector
 				selectable={Tag}
@@ -65,6 +75,7 @@
 				itemStyle="text-[12px] bg-teal-500"
 				alignment="right"
 				overflow="scroll"
+				on:select
 			/>
 		{/if}
 	</section>

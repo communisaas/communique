@@ -13,13 +13,26 @@
 
 	export let data: LayoutSchema;
 
-	let store: Writable<UserState>;
+	let store: Writable<UserState>, lastStore: Writable<UserState>;
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 		$store.topic = { name: topicNames[0], type: 'topic' };
+		$store.recipient = {
+			name: '',
+			type: 'recipient'
+		};
+		$store.spotlight = { name: 'custom', type: 'recipient' };
+		$store.email = { name: '', type: 'email' };
 	});
 
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
+
+	$: fetchSelectedItems($store);
+
+	function fetchSelectedItems(storage: UserState) {
+		// console.log(data.template);
+		// console.log(storage);
+	}
 </script>
 
 <div class="app">
