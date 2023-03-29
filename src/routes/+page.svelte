@@ -1,6 +1,7 @@
 <script type="ts">
 	import Email from '$components/Email.svelte';
 	import Panel from '$components/Panel.svelte';
+	import { handleSelect } from '$lib/selectable';
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 
@@ -14,8 +15,7 @@
 
 	// TODO loading placeholders
 	// TODO switch panel header between selected topic & address context
-
-	$: panels = data.template;
+	// TODO unbind email card list from layout data
 </script>
 
 <svelte:head>
@@ -25,16 +25,16 @@
 
 <div class="flex flex-col gap-y-10">
 	{#if store}
-		{#each panels as panel}
+		{#each Object.values(data.template) as panel}
 			<Panel
 				header={`${panel.header} ${
-					panel.selectable in $store ? $store[panel.selectable].name : 'Loading...'
+					panel.focus in $store ? $store[panel.focus].name : 'Loading...'
 				}`}
 				alignment={panel.alignment}
 				selectable={Email}
 				items={panel.cardList}
 				bind:selected={$store.email}
-				on:select={(e) => console.log(e.detail)}
+				on:select={async (e) => (data.template.primary.cardList = await handleSelect(e))}
 			/>
 		{/each}
 	{/if}

@@ -1,6 +1,11 @@
 interface LayoutSchema {
 	loudestTopics: topic[];
-	template: Panel[];
+	template: Layout;
+}
+
+interface Layout {
+	primary: Panel;
+	secondary: Panel;
 }
 
 interface HomeSchema extends LayoutSchema {}
@@ -11,7 +16,7 @@ interface Expandable {
 
 interface Panel extends Expandable {
 	header: string;
-	selectable: SelectableKey;
+	focus: SelectableKey;
 	alignment: 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent';
 	cardList: email[];
 }

@@ -4,8 +4,11 @@
 	import type { Writable } from 'svelte/store';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
+	import type { DispatchOptions } from 'svelte/internal';
 
 	let store: Writable<UserState>;
+
+	const dispatch = createEventDispatcher();
 
 	export let item: email;
 	export let selected: Selectable;
@@ -21,17 +24,14 @@
 		// only set valid position if element is scrollable
 		scrollPosition.header.x = scrollPosition.header.remainingWidth == 0 ? 0 : 1;
 	});
-
-	const dispatch = createEventDispatcher();
-	function dispatchSelected(selected: Selectable) {
-		dispatch('select', selected);
-	}
 </script>
 
 <button
-	on:mousedown={(e) => {
-		if (selected.name != item.rowid) selected.name = item.rowid;
-		dispatchSelected(selected);
+	on:mousedown={() => {
+		if (selected.name != item.rowid) {
+			selected.name = item.rowid;
+			dispatch('select', selected);
+		}
 	}}
 	class="{style} p-2 rounded bg-paper-500"
 >

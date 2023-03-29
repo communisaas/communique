@@ -37,21 +37,21 @@ export async function load({ setHeaders }) {
 	});
 	return {
 		loudestTopics,
-		template: [
-			{
+		template: {
+			primary: {
 				type: 'panel',
-				selectable: 'topic',
+				focus: 'topic',
 				header: 'Loudest voices in',
 				alignment: 'right',
 				cardList: await loudestTopicEmails
 			},
-			{
+			secondary: {
 				type: 'panel',
-				selectable: 'spotlight',
+				focus: 'spotlight',
 				header: 'Spotlight on',
 				alignment: 'left',
 				cardList: await spotlightEmails
 			}
-		]
+		}
 	};
 }

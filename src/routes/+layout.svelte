@@ -10,6 +10,7 @@
 	import Tag from '$components/Tag.svelte';
 	import { navigating } from '$app/stores';
 	import type { Writable } from 'svelte/store';
+	import { handleSelect } from '$lib/selectable';
 
 	export let data: LayoutSchema;
 
@@ -47,6 +48,7 @@
 						items={topicNames}
 						bind:selected={$store.topic}
 						alignment="center"
+						on:select={async (e) => (data.template.primary.cardList = await handleSelect(e))}
 					/>
 				{/if}
 			</header>

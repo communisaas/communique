@@ -1,16 +1,12 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-
+	import { createEventDispatcher, onMount, type DispatchOptions } from 'svelte/internal';
 	export let item: string;
 	export let selected: Selectable;
 	export let style = '';
 
-	const contentLengthScalar = Math.sqrt(item.length + 1) * Math.sqrt(1.5);
-
 	const dispatch = createEventDispatcher();
-	function dispatchSelected(selected: Selectable) {
-		dispatch('select', selected);
-	}
+
+	const contentLengthScalar = Math.sqrt(item.length + 1) * Math.sqrt(1.5);
 </script>
 
 <input
@@ -20,8 +16,10 @@
 	value={item}
 	title={item}
 	on:mousedown|stopPropagation={() => {
-		if (selected.name != item) selected.name = item;
-		dispatchSelected(selected);
+		if (selected.name != item) {
+			selected.name = item;
+			dispatch('select', selected);
+		}
 	}}
 />
 
