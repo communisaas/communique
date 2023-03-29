@@ -24,16 +24,10 @@
 		};
 		$store.spotlight = { name: 'custom', type: 'recipient' };
 		$store.email = { name: '', type: 'email' };
+		$store.template = data.template;
 	});
 
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
-
-	$: fetchSelectedItems($store);
-
-	function fetchSelectedItems(storage: UserState) {
-		// console.log(data.template);
-		// console.log(storage);
-	}
 </script>
 
 <div class="app">
@@ -48,7 +42,7 @@
 						items={topicNames}
 						bind:selected={$store.topic}
 						alignment="center"
-						on:select={async (e) => (data.template.primary.cardList = await handleSelect(e))}
+						on:select={async (e) => ($store.template.primary.cardList = await handleSelect(e))}
 					/>
 				{/if}
 			</header>

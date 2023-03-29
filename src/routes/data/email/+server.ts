@@ -12,7 +12,7 @@ export async function GET({ url }) {
 	const emailList = await objectMapper.email.findMany({
 		where: {
 			...Array.from(url.searchParams.entries()).reduce(
-				(filter: { [field: string]: { has?: string } }, [field, value]: string[]) => {
+				(filter: { [field: string]: { has: string } }, [field, value]: string[]) => {
 					filter[emailFieldMap[field as keyof typeof emailFieldMap]] = {
 						has: value
 					};

@@ -33,5 +33,6 @@ interface UserState {
 	email: Selectable;
 	recipient: Selectable;
 	spotlight: Selectable;
+	template: Layout;
 	[key: string];
 }

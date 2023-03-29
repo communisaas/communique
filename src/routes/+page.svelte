@@ -11,11 +11,8 @@
 		store = (await import('$lib/sessionStorage')).store;
 	});
 
-	export let data: HomeSchema;
-
 	// TODO loading placeholders
 	// TODO switch panel header between selected topic & address context
-	// TODO unbind email card list from layout data
 </script>
 
 <svelte:head>
@@ -25,7 +22,7 @@
 
 <div class="flex flex-col gap-y-10">
 	{#if store}
-		{#each Object.values(data.template) as panel}
+		{#each Object.values($store.template) as panel}
 			<Panel
 				header={`${panel.header} ${
 					panel.focus in $store ? $store[panel.focus].name : 'Loading...'
@@ -34,7 +31,7 @@
 				selectable={Email}
 				items={panel.cardList}
 				bind:selected={$store.email}
-				on:select={async (e) => (data.template.primary.cardList = await handleSelect(e))}
+				on:select={async (e) => ($store.template.primary.cardList = await handleSelect(e))}
 			/>
 		{/each}
 	{/if}
