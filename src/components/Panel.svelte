@@ -13,8 +13,8 @@
 </script>
 
 <section class="flex flex-col relative pb-5 px-5 gradient-background">
-	<span class="header" style="align: {alignment}"
-		><h1 style="text-align: {alignment}">{header}</h1></span
+	<span class="tab__{alignment}" style="align-self: {alignment}"
+		><h1 style="text-align: {alignment}; ">{header}</h1></span
 	>
 	<span class="control">
 		<slot />
@@ -23,23 +23,36 @@
 </section>
 
 <style lang="scss">
-	.header {
-		position: relative;
-		width: fit-content;
-		margin-left: -1.25rem;
-		margin-bottom: 1rem;
-		align-self: right;
-		filter: drop-shadow(-1px 2px 1px theme('colors.larimarGreen.600'));
-		& h1 {
-			text-align: right;
-			vertical-align: middle;
-			padding: 0.5rem 1rem;
-			color: white;
-			display: flex;
-			justify-content: center;
-			padding-right: 3rem;
-			background-color: theme('colors.peacockFeather.600');
-			clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
+	h1 {
+		background-color: theme('colors.peacockFeather.600');
+		color: white;
+	}
+	.tab {
+		&__start {
+			margin-left: -1.25rem;
+			margin-bottom: 1rem;
+			filter: drop-shadow(-1px 2px 1px theme('colors.larimarGreen.600'));
+			& h1 {
+				text-align: right;
+				vertical-align: middle;
+				padding: 0.5rem 1rem;
+				display: flex;
+				padding-right: 3rem;
+				clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
+			}
+		}
+		&__end {
+			margin-right: -1.25rem;
+			margin-bottom: 1rem;
+			filter: drop-shadow(-1px 2px 1px theme('colors.larimarGreen.600'));
+			& h1 {
+				text-align: right;
+				vertical-align: middle;
+				padding: 0.5rem 1rem;
+				display: flex;
+				padding-left: 3rem;
+				clip-path: polygon(0 0, 100% 0, 100% 100%, 10% 100%);
+			}
 		}
 	}
 
