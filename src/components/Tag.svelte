@@ -9,7 +9,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	$: contentLengthScalar = Math.sqrt(item.length + 1) * Math.sqrt(1.5);
+	$: contentLengthScalar = Math.sqrt(item.length / 1.5) * Math.SQRT2;
 
 	let scrollPosition = { tag: { x: 0, remainingWidth: 0 } };
 	let tag: HTMLInputElement;
