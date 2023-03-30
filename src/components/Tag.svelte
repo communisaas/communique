@@ -1,12 +1,25 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount, type DispatchOptions } from 'svelte/internal';
+	import type { Writable } from 'svelte/store';
 	export let item: string;
 	export let selected: Selectable;
 	export let style = '';
 
+	let store: Writable<UserState>;
+
 	const dispatch = createEventDispatcher();
 
-	const contentLengthScalar = Math.sqrt(item.length + 1) * Math.sqrt(1.5);
+	$: contentLengthScalar = Math.sqrt(item.length + 1) * Math.sqrt(1.5);
+
+	let scrollPosition = { tag: { x: 0, remainingWidth: 0 } };
+	let tag: HTMLInputElement;
+
+	onMount(async () => {
+		store = (await import('$lib/sessionStorage')).store;
+		scrollPosition.tag.remainingWidth = tag.scrollWidth - tag.clientWidth;
+		// only set valid position if element is scrollable
+		scrollPosition.tag.x = scrollPosition.tag.remainingWidth == 0 ? 0 : 1;
+	});
 </script>
 
 <input
@@ -14,7 +27,8 @@
 	class="cursor-pointer text-center px-2 py-1 rounded bg-larimarGreen-600 {style} "
 	style:width="calc(2em*{contentLengthScalar})"
 	value={item}
-	title={item}
+	title={scrollPosition.tag.x > 0 ? item : null}
+	bind:this={tag}
 	on:mousedown|stopPropagation={() => {
 		if (selected.name != item) {
 			selected.name = item;

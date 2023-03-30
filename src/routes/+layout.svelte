@@ -39,9 +39,10 @@
 				{#if $store}
 					<Selector
 						selectable={Tag}
+						target="email"
 						items={topicNames}
-						bind:selected={$store.topic}
 						alignment="center"
+						bind:selected={$store.topic}
 						on:select={async (e) => ($store.template.primary.cardList = await handleSelect(e))}
 					/>
 				{/if}

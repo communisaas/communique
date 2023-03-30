@@ -17,7 +17,7 @@
 	<span class="control">
 		<slot />
 	</span>
-	<Selector {selectable} {items} {alignment} bind:selected on:select />
+	<Selector {selectable} {items} {alignment} target={selected.type} bind:selected on:select />
 </section>
 
 <style lang="scss">

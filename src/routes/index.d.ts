@@ -8,7 +8,9 @@ interface Layout {
 	secondary: Panel;
 }
 
-interface HomeSchema extends LayoutSchema {}
+interface FieldMap {
+	[field: string]: string;
+}
 
 interface Expandable {
 	type: 'panel';
@@ -25,6 +27,7 @@ type SelectableKey = 'email' | 'topic' | 'recipient' | 'spotlight';
 interface Selectable {
 	name: string;
 	type: SelectableKey;
+	target?: SelectableKey;
 	index?: number;
 }
 

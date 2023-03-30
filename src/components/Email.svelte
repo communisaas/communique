@@ -4,15 +4,14 @@
 	import type { Writable } from 'svelte/store';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
-	import type { DispatchOptions } from 'svelte/internal';
-
-	let store: Writable<UserState>;
-
-	const dispatch = createEventDispatcher();
 
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';
+
+	let store: Writable<UserState>;
+
+	const dispatch = createEventDispatcher();
 
 	// TODO email card layout
 	let scrollPosition = { header: { x: 0, remainingWidth: 0 } };
@@ -40,10 +39,10 @@
 			<h1
 				title={scrollPosition.header.x > 0 ? item.subject : null}
 				bind:this={header}
-				on:wheel={(e) => {
+				on:wheel|preventDefault={(e) => {
 					header.scrollLeft += e.deltaY * 0.33;
 				}}
-				on:scroll|preventDefault={() => {
+				on:scroll={() => {
 					scrollPosition.header.x = header.scrollLeft + 1;
 				}}
 				class:scrollable={scrollPosition.header.x > 0}
@@ -62,19 +61,21 @@
 			<Selector
 				selectable={Tag}
 				items={item.topic_list}
-				bind:selected={$store.topic}
-				itemStyle="text-[12px]"
+				itemStyle="text-[11px]"
 				alignment="right"
 				overflow="scroll"
+				target="email"
+				bind:selected={$store.topic}
 				on:select
 			/>
 			<Selector
 				selectable={Tag}
 				items={item.recipient_list}
-				bind:selected={$store.recipient}
-				itemStyle="text-[12px] bg-teal-500"
+				itemStyle="text-[11px] bg-teal-500"
 				alignment="right"
 				overflow="scroll"
+				target="email"
+				bind:selected={$store.recipient}
 				on:select
 			/>
 		{/if}
