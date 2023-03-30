@@ -13,7 +13,7 @@
 </script>
 
 <section class="flex flex-col relative pb-5 px-5 gradient-background">
-	<span class="tab__{alignment}" style="align-self: {alignment}"
+	<span class="tab tab__{alignment}" style="align-self: {alignment}"
 		><h1 style="text-align: {alignment}; ">{header}</h1></span
 	>
 	<span class="control">
@@ -23,15 +23,23 @@
 </section>
 
 <style lang="scss">
+	section {
+		box-shadow: 0 2.5px 1px theme('colors.peacockFeather.500');
+		transition: all 0.175s ease-in-out;
+		&:hover {
+			box-shadow: 0 2.5px 1px theme('colors.peacockFeather.600');
+		}
+	}
 	h1 {
 		background-color: theme('colors.peacockFeather.600');
 		color: white;
 	}
 	.tab {
+		filter: drop-shadow(-1px 2px 1px theme('colors.larimarGreen.600'));
+
 		&__start {
 			margin-left: -1.25rem;
 			margin-bottom: 1rem;
-			filter: drop-shadow(-1px 2px 1px theme('colors.larimarGreen.600'));
 			& h1 {
 				text-align: right;
 				vertical-align: middle;
@@ -44,7 +52,6 @@
 		&__end {
 			margin-right: -1.25rem;
 			margin-bottom: 1rem;
-			filter: drop-shadow(-1px 2px 1px theme('colors.larimarGreen.600'));
 			& h1 {
 				text-align: right;
 				vertical-align: middle;
