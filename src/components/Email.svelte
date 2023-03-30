@@ -8,14 +8,13 @@
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';
-	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent' = 'start';
 
 	let store: Writable<UserState>;
 
 	const dispatch = createEventDispatcher();
 
 	// TODO email card layout
-	let scrollPosition = { header: { x: 0, remainingWidth: 0 } };
+	$: scrollPosition = { header: { x: 0, remainingWidth: 0 } };
 	let header: HTMLHeadingElement;
 
 	onMount(async () => {
