@@ -14,15 +14,22 @@
 	const dispatch = createEventDispatcher();
 
 	// TODO email card layout
-	$: scrollPosition = { header: { x: 0, remainingWidth: 0 } };
+	$: scrollPosition = { x: 0, remainingWidth: 0 };
 	let header: HTMLHeadingElement;
+	let scrollable: boolean, scrolled: boolean;
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		scrollPosition.header.remainingWidth = header.scrollWidth - header.clientWidth;
-		// only set valid position if element is scrollable
-		scrollPosition.header.x = scrollPosition.header.remainingWidth == 0 ? 0 : 1;
+		scrollPosition.remainingWidth = header.scrollWidth - header.clientWidth;
 	});
+
+	$: {
+		if (item && header) {
+			scrollPosition.remainingWidth = header.scrollWidth - header.clientWidth;
+			scrollable = scrollPosition.remainingWidth > 0;
+			scrolled = scrollPosition.x > 1;
+		}
+	}
 </script>
 
 <button
@@ -37,17 +44,15 @@
 	<section class="flex flex-col w-60 relative">
 		<span class="relative pb-2">
 			<h1
-				title={scrollPosition.header.x > 0 ? item.subject : null}
+				title={scrollPosition.x > 0 ? item.subject : null}
 				bind:this={header}
 				on:wheel|preventDefault={(e) => {
-					header.scrollLeft += e.deltaY * 0.33;
+					header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
+					scrollPosition.x = header.scrollLeft + 1;
 				}}
-				on:scroll={() => {
-					scrollPosition.header.x = header.scrollLeft + 1;
-				}}
-				class:scrollable={scrollPosition.header.x > 0}
-				class:scrolled={scrollPosition.header.x > 1}
-				class:scrolled__max={scrollPosition.header.remainingWidth < scrollPosition.header.x}
+				class:scrollable
+				class:scrolled
+				class:scrolled__max={scrollable && scrollPosition.remainingWidth < scrollPosition.x}
 			>
 				{item.subject}
 			</h1>
@@ -111,7 +116,6 @@
 			bottom: 0;
 			height: 100%;
 			width: 100%;
-			pointer-events: none;
 		}
 	}
 	.stats {

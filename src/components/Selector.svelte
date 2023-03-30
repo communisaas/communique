@@ -14,43 +14,38 @@
 	} gap-3 overflow-x-hidden hover:overflow-x-${overflow} whitespace-nowrap`;
 
 	// TODO overflowing items
-	let scrollPosition = { list: { x: 0, remainingWidth: 0 } };
+	let scrollPosition = { x: 0, remainingWidth: 0 };
 
 	let list: HTMLUListElement;
-
+	let scrollable: boolean, scrolled: boolean;
 	onMount(async () => {
 		selected.target = target;
-		scrollPosition.list.remainingWidth = list.scrollWidth - list.clientWidth;
-		// only set valid position if element is scrollable
-		scrollPosition.list.x = scrollPosition.list.remainingWidth == 0 ? 0 : 1;
 	});
 
-	$: console.log(scrollPosition);
+	$: {
+		if (items && list) {
+			// update if new list litems
+			scrollPosition.remainingWidth = list.scrollWidth - list.clientWidth;
+			scrollable = scrollPosition.remainingWidth == 0 ? false : true;
+			scrolled = scrollPosition.x > 1;
+		}
+	}
 </script>
 
 <div class="relative z-0">
 	<ul
 		bind:this={list}
 		class={listStyle}
-		class:scrollable={scrollPosition.list.x > 0}
-		class:scrolled={scrollPosition.list.x > 1}
-		class:scrolled__max={scrollPosition.list.remainingWidth - scrollPosition.list.x <= 1}
+		class:scrollable
+		class:scrolled
+		class:scrolled__max={scrolled && scrollPosition.remainingWidth - scrollPosition.x <= 1}
 		on:wheel|preventDefault={(e) => {
-			e.currentTarget.scrollLeft += e.deltaY * 0.15;
-		}}
-		on:scroll={(e) => {
-			scrollPosition.list.x = Math.abs(e.currentTarget.scrollLeft + 1);
+			list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
+			scrollPosition.x = list.scrollLeft + 1;
 		}}
 	>
 		{#each items as item}
-			<svelte:component
-				this={selectable}
-				bind:selected
-				style={itemStyle}
-				{item}
-				{alignment}
-				on:select
-			/>
+			<svelte:component this={selectable} bind:selected style={itemStyle} {item} on:select />
 		{/each}
 	</ul>
 </div>

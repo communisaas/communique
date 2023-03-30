@@ -11,15 +11,22 @@
 
 	$: contentLengthScalar = Math.sqrt(item.length / 1.5) * Math.SQRT2;
 
-	let scrollPosition = { tag: { x: 0, remainingWidth: 0 } };
+	let scrollPosition = { x: 0, remainingWidth: 0 };
 	let tag: HTMLInputElement;
-
+	let scrollable: boolean, scrolled: boolean;
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		scrollPosition.tag.remainingWidth = tag.scrollWidth - tag.clientWidth;
-		// only set valid position if element is scrollable
-		scrollPosition.tag.x = scrollPosition.tag.remainingWidth == 0 ? 0 : 1;
+		scrollPosition.remainingWidth = tag.scrollWidth - tag.clientWidth;
 	});
+
+	$: {
+		if (item && tag) {
+			// update if new list litems
+			scrollPosition.remainingWidth = tag.scrollWidth - tag.clientWidth;
+			scrollable = scrollPosition.remainingWidth == 0 ? false : true;
+			scrolled = scrollPosition.x > 1;
+		}
+	}
 </script>
 
 <input
@@ -27,7 +34,7 @@
 	class="cursor-pointer text-center px-2 py-1 rounded bg-larimarGreen-600 {style} "
 	style:width="calc(2em*{contentLengthScalar})"
 	value={item}
-	title={scrollPosition.tag.x > 0 ? item : null}
+	title={scrollPosition.x > 0 ? item : null}
 	bind:this={tag}
 	on:mousedown|stopPropagation={() => {
 		if (selected.name != item) {
