@@ -42,14 +42,14 @@ export async function load({ setHeaders: setHeaders }) {
 				type: 'panel',
 				focus: 'topic',
 				header: 'Loudest voices in',
-				alignment: 'right',
+				alignment: 'end',
 				cardList: await loudestTopicEmails
 			},
 			secondary: {
 				type: 'panel',
 				focus: 'spotlight',
 				header: 'Spotlight on',
-				alignment: 'left',
+				alignment: 'start',
 				cardList: await spotlightEmails
 			}
 		}

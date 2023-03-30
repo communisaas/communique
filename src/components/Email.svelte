@@ -8,6 +8,7 @@
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';
+	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent' = 'start';
 
 	let store: Writable<UserState>;
 
@@ -32,7 +33,7 @@
 			dispatch('select', selected);
 		}
 	}}
-	class="{style} p-2 rounded bg-paper-500"
+	class="{style} p-2 m-1 rounded bg-paper-500"
 >
 	<section class="flex flex-col w-60 relative">
 		<span class="relative pb-2">
@@ -62,7 +63,7 @@
 				selectable={Tag}
 				items={item.topic_list}
 				itemStyle="text-[11px]"
-				alignment="right"
+				alignment="start"
 				overflow="scroll"
 				target="email"
 				bind:selected={$store.topic}
@@ -72,7 +73,7 @@
 				selectable={Tag}
 				items={item.recipient_list}
 				itemStyle="text-[11px] bg-teal-500"
-				alignment="right"
+				alignment="start"
 				overflow="scroll"
 				target="email"
 				bind:selected={$store.recipient}

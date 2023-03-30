@@ -3,7 +3,7 @@
 	import type { ComponentType } from 'svelte';
 
 	export let header: string;
-	export let alignment: 'right' | 'left' | 'start' | 'end' | 'center' | 'justify' | 'match-parent';
+	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 
 	export let selectable: ComponentType;
 	export let selected: Selectable;
@@ -13,7 +13,9 @@
 </script>
 
 <section class="flex flex-col relative pb-5 px-5 gradient-background">
-	<span class="header"><h1 style="text-align: {alignment}">{header}</h1></span>
+	<span class="header" style="align: {alignment}"
+		><h1 style="text-align: {alignment}">{header}</h1></span
+	>
 	<span class="control">
 		<slot />
 	</span>
@@ -26,6 +28,7 @@
 		width: fit-content;
 		margin-left: -1.25rem;
 		margin-bottom: 1rem;
+		align-self: right;
 		filter: drop-shadow(-1px 2px 1px theme('colors.larimarGreen.600'));
 		& h1 {
 			text-align: right;

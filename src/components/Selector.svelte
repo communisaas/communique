@@ -5,11 +5,13 @@
 	export let selectable: ComponentType;
 	export let selected: Selectable;
 	export let target: SelectableKey;
-	export let alignment: 'right' | 'left' | 'start' | 'end' | 'center' | 'justify' | 'match-parent';
+	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let overflow: 'scroll' | 'hidden' | 'visible' = 'hidden';
 	export let itemStyle: string = '';
 
-	const listStyle = `py-1 flex flex-row-reverse gap-5 overflow-x-hidden hover:overflow-x-${overflow} whitespace-nowrap`;
+	const listStyle = `py-1 flex ${
+		alignment == 'end' ? 'flex-row-reverse' : 'flex-row'
+	} gap-3 overflow-x-hidden hover:overflow-x-${overflow} whitespace-nowrap`;
 
 	// TODO overflowing items
 	let scrollPosition = { list: { x: 0, remainingWidth: 0 } };
@@ -30,7 +32,6 @@
 	<ul
 		bind:this={list}
 		class={listStyle}
-		style="justify-content:{alignment};"
 		class:scrollable={scrollPosition.list.x > 0}
 		class:scrolled={scrollPosition.list.x > 1}
 		class:scrolled__max={scrollPosition.list.remainingWidth - scrollPosition.list.x <= 1}
@@ -42,15 +43,20 @@
 		}}
 	>
 		{#each items as item}
-			<svelte:component this={selectable} bind:selected style={itemStyle} {item} on:select />
+			<svelte:component
+				this={selectable}
+				bind:selected
+				style={itemStyle}
+				{item}
+				{alignment}
+				on:select
+			/>
 		{/each}
 	</ul>
 </div>
 
 <style lang="scss">
 	.scrollable {
-		overflow: hidden;
-		white-space: nowrap;
 		width: auto;
 
 		&::before {
@@ -60,8 +66,8 @@
 			height: 100%;
 			width: 100%;
 			pointer-events: none;
-			background: linear-gradient(to right, var(--color-bg-2) 3%, transparent 10%);
-			transform: scaleX(1.02);
+			background: linear-gradient(to right, transparent 90%, var(--color-bg-2) 97%);
+			transform: scaleX(1.01);
 			z-index: 10;
 		}
 	}
@@ -73,12 +79,13 @@
 			transparent 90%,
 			var(--color-bg-2) 97%
 		);
-		transform: scaleX(1.02);
+		transform: scaleX(1.01);
 
 		z-index: 10;
 	}
 	.scrolled__max::before {
-		background: linear-gradient(to right, transparent 97%, var(--color-bg-2) 100%);
+		background: linear-gradient(to right, var(--color-bg-2) 3%, transparent 10%);
+
 		z-index: 10;
 	}
 </style>
