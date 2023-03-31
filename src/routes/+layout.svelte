@@ -43,7 +43,10 @@
 						items={topicNames}
 						alignment="center"
 						bind:selected={$store.topic}
-						on:select={async (e) => ($store.template.primary.cardList = await handleSelect(e))}
+						on:select={async (e) => {
+							$store.template.primary.cardList = await handleSelect(e);
+							$store.template.primary.focus = e.detail.name;
+						}}
 					/>
 				{/if}
 			</header>
