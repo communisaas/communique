@@ -1,7 +1,7 @@
 import objectMapper from '$lib/database';
 
 /** @type {import('./$types').LayoutServerLoad} */
-export async function load({ setHeaders: setHeaders }) {
+export async function load({ setHeaders }) {
 	// TODO: compound queries, lazy load
 	const loudestTopics = await objectMapper.topic.findMany({ take: 10 });
 
@@ -16,22 +16,6 @@ export async function load({ setHeaders: setHeaders }) {
 		},
 		take: 10
 	});
-	// const biggestRecipients = await objectMapper.recipient.findMany({
-	// 	orderBy: [
-	// 		{
-	// 			email_read_count: 'desc'
-	// 		}
-	// 	],
-	// 	take: 3
-	// });
-	// const biggestRecipientEmails = objectMapper.email.findMany({
-	// 	where: {
-	// 		recipient_list: {
-	// 			has: biggestRecipients[0].address
-	// 		}
-	// 	},
-	// 	take: 10
-	// });
 	const spotlightEmails = objectMapper.email.findMany({
 		take: 10
 	});

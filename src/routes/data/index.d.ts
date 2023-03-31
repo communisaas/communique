@@ -12,6 +12,6 @@ interface Criteria {
 }
 
 interface Operator {
-	has?: string | undefined;
-	equals?: string | undefined;
+	has?: string;
+	equals?: string | number;
 }

@@ -60,5 +60,43 @@
 		</div>
 	</main>
 
-	<footer />
+	<footer class="bg-gray-900 text-white py-6">
+		<div class="container mx-auto flex flex-wrap justify-between">
+			<div class="w-full md:w-1/3 mb-4 md:mb-0">
+				<div class="flex justify-start md:justify-center">
+					<h4 class="font-bold text-lg mb-2 mr-2">Communique</h4>
+					<span class="border-l border-gray-600 pl-2">
+						<p class="text-sm text-gray-400">
+							Because changing the world is too important to be left on read.
+						</p>
+					</span>
+				</div>
+			</div>
+			<div class="w-full md:w-1/3 text-center mb-4 md:mb-0">
+				<h4 class="font-bold text-lg mb-2">Get Involved</h4>
+				<ul class="list-reset">
+					<li><a href="#" class="text-teal-400 hover:text-teal-500">Write templates</a></li>
+					<li><a href="#" class="text-teal-400 hover:text-teal-500">Find legislators</a></li>
+					<li><a href="#" class="text-teal-400 hover:text-teal-500">Donate</a></li>
+				</ul>
+			</div>
+			<div class="w-full md:w-1/3 text-center md:text-right">
+				<h4 class="font-bold text-lg mb-2">Connect</h4>
+				<ul class="list-reset">
+					<li><a href="#" class="text-teal-400 hover:text-teal-500">Email us</a></li>
+					<li><a href="#" class="text-teal-400 hover:text-teal-500">Twitter</a></li>
+					<li><a href="#" class="text-teal-400 hover:text-teal-500">Instagram</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="text-gray-400 text-sm mt-6 flex justify-center items-center">
+			<span class="mr-2">&copy; 2023 Communique DAO. All rights reserved.</span>
+			<span class="border-l border-gray-600 pl-2 ml-2">
+				<a href="#" class="text-teal-400 hover:text-teal-500">Terms of Use</a>
+			</span>
+			<span class="border-l border-gray-600 pl-2 ml-2">
+				<a href="#" class="text-teal-400 hover:text-teal-500">Privacy Policy</a>
+			</span>
+		</div>
+	</footer>
 </div>

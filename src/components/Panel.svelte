@@ -42,6 +42,7 @@
 		}}
 	/>
 </section>
+
 {#if store && expand}
 	<aside bind:this={expandable} tabindex="-1">{$store[selected.type].name}</aside>
 {/if}
@@ -49,7 +50,7 @@
 <style lang="scss">
 	section {
 		box-shadow: 0 2.5px 1px theme('colors.peacockFeather.500');
-		transition: all 0.175s ease-in-out;
+		transition: all 0.5s ease-in-out;
 		&:hover {
 			box-shadow: 0 2.5px 1px theme('colors.peacockFeather.600');
 		}
