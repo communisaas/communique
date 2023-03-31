@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Selector from './Selector.svelte';
-	import { createEventDispatcher, type ComponentType } from 'svelte';
-	import { handleSelect } from '$lib/selectable';
+	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
+	import type { Writable } from 'svelte/store';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
@@ -14,7 +14,11 @@
 	let expandable: HTMLElement;
 	const dispatch = createEventDispatcher();
 
-	// TODO expose gradient background props
+	let store: Writable<UserState>;
+
+	onMount(async () => {
+		store = (await import('$lib/sessionStorage')).store;
+	});
 </script>
 
 <section class="flex flex-col relative pb-5 px-5 gradient-background">
@@ -32,15 +36,14 @@
 		bind:selected
 		on:select={(e) => {
 			expand = true;
-			console.log('focused');
 			if (e.detail.type !== selected.type) {
 				dispatch('select', e.detail);
 			}
 		}}
 	/>
 </section>
-{#if expand}
-	<aside bind:this={expandable} tabindex="-1">item</aside>
+{#if store && expand}
+	<aside bind:this={expandable} tabindex="-1">{$store[selected.type].name}</aside>
 {/if}
 
 <style lang="scss">
@@ -54,6 +57,7 @@
 	h1 {
 		background-color: theme('colors.peacockFeather.600');
 		color: white;
+		width: fit-content;
 	}
 	.tab {
 		filter: drop-shadow(-1px 2px 1px theme('colors.larimarGreen.600'));
@@ -66,7 +70,7 @@
 				vertical-align: middle;
 				padding: 0.5rem 1rem;
 				display: flex;
-				padding-right: 3rem;
+				padding-right: calc(1.5em + 10pt);
 				clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
 			}
 		}
@@ -78,7 +82,7 @@
 				vertical-align: middle;
 				padding: 0.5rem 1rem;
 				display: flex;
-				padding-left: 3rem;
+				padding-left: calc(1.5em + 10pt);
 				clip-path: polygon(0 0, 100% 0, 100% 100%, 10% 100%);
 			}
 		}

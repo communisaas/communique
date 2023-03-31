@@ -39,11 +39,13 @@
 						switch (e.detail.type) {
 							case 'recipient':
 								$store.template.primary.header = 'Most read emails sent to';
-								$store;
+								e.detail.name = e.detail.name.split('@')[0];
 								break;
 							case 'topic':
 								$store.template.primary.header = 'Loudest voices in';
+								break;
 						}
+						$store.template.primary.focus = e.detail.name;
 					}}
 				/>{/key}
 		{/each}

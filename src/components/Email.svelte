@@ -36,8 +36,8 @@
 	on:mousedown={() => {
 		if (selected.name != item.rowid) {
 			selected.name = item.rowid;
-			dispatch('select', selected);
 		}
+		dispatch('select', selected);
 	}}
 	class="{style} p-2 m-1 rounded bg-paper-500"
 >

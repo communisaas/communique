@@ -39,8 +39,8 @@
 	on:mousedown|stopPropagation={() => {
 		if (selected.name != item) {
 			selected.name = item;
-			dispatch('select', selected);
 		}
+		dispatch('select', selected);
 	}}
 />
 
