@@ -35,9 +35,11 @@
 		target={selected.type}
 		bind:selected
 		on:select={(e) => {
-			expand = true;
+			// if selected item is targeting the panel selectable
 			if (e.detail.type !== selected.type) {
 				dispatch('select', e.detail);
+			} else {
+				expand = true;
 			}
 		}}
 	/>
