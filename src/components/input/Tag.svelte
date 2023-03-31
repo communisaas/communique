@@ -20,7 +20,7 @@
 		inputField.value = '';
 	}
 
-	$: if (inputVisible) inputField.focus();
+	$: if (inputVisible) inputField.selectable();
 
 	const addIconClass = 'add bg-peacockFeather-600 h-6 w-6';
 </script>

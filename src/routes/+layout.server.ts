@@ -40,15 +40,17 @@ export async function load({ setHeaders: setHeaders }) {
 		template: {
 			primary: {
 				type: 'panel',
-				focus: 'topic',
+				selectable: 'topic',
 				header: 'Loudest voices in',
+				focus: loudestTopics[0].name,
 				alignment: 'end',
 				cardList: await loudestTopicEmails
 			},
 			secondary: {
 				type: 'panel',
-				focus: 'spotlight',
+				selectable: 'spotlight',
 				header: 'Spotlight on',
+				focus: 'custom',
 				alignment: 'start',
 				cardList: await spotlightEmails
 			}

@@ -4,6 +4,7 @@
 	import { handleSelect } from '$lib/selectable';
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
+	import Layout from './+layout.svelte';
 
 	let store: Writable<UserState>;
 
@@ -13,6 +14,7 @@
 
 	// TODO loading placeholders
 	// TODO switch panel header between selected topic & address context
+	$: console.log($store);
 </script>
 
 <svelte:head>
@@ -22,17 +24,28 @@
 
 <div class="flex flex-col gap-y-10">
 	{#if store}
-		{#each Object.values($store.template) as panel}
-			<Panel
-				header={`${panel.header} ${
-					panel.focus in $store ? $store[panel.focus].name : 'Loading...'
-				}`}
-				alignment={panel.alignment}
-				selectable={Email}
-				items={panel.cardList}
-				bind:selected={$store.email}
-				on:select={async (e) => ($store.template.primary.cardList = await handleSelect(e))}
-			/>
+		{#each Object.entries($store.template) as [order, panel]}
+			{#key panel.header}
+				<Panel
+					header={`${panel.header} ${
+						panel.selectable in $store ? $store.template[order].focus : 'Loading...'
+					}`}
+					alignment={panel.alignment}
+					selectable={Email}
+					items={panel.cardList}
+					bind:selected={$store.email}
+					on:select={async (e) => {
+						$store.template.primary.cardList = await handleSelect(e);
+						switch (e.detail.type) {
+							case 'recipient':
+								$store.template.primary.header = 'Most read emails sent to';
+								$store;
+								break;
+							case 'topic':
+								$store.template.primary.header = 'Loudest voices in';
+						}
+					}}
+				/>{/key}
 		{/each}
 	{/if}
 </div>

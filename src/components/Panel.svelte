@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Selector from './Selector.svelte';
-	import type { ComponentType } from 'svelte';
+	import { createEventDispatcher, type ComponentType } from 'svelte';
+	import { handleSelect } from '$lib/selectable';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
@@ -9,7 +10,11 @@
 	export let selected: Selectable;
 	export let items: Selectable[];
 
-	// TODO expand mode, expose gradient background props
+	let expand: boolean;
+	let expandable: HTMLElement;
+	const dispatch = createEventDispatcher();
+
+	// TODO expose gradient background props
 </script>
 
 <section class="flex flex-col relative pb-5 px-5 gradient-background">
@@ -19,8 +24,24 @@
 	<span class="control">
 		<slot />
 	</span>
-	<Selector {selectable} {items} {alignment} target={selected.type} bind:selected on:select />
+	<Selector
+		{selectable}
+		{items}
+		{alignment}
+		target={selected.type}
+		bind:selected
+		on:select={(e) => {
+			expand = true;
+			console.log('focused');
+			if (e.detail.type !== selected.type) {
+				dispatch('select', e.detail);
+			}
+		}}
+	/>
 </section>
+{#if expand}
+	<aside bind:this={expandable} tabindex="-1">item</aside>
+{/if}
 
 <style lang="scss">
 	section {
