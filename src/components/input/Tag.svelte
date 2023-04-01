@@ -12,12 +12,20 @@
 	let inputField: HTMLInputElement, tagForm: HTMLFormElement;
 
 	function addTag(tag: string) {
-		if (!inputField.checkValidity()) {
+		if (!inputField.checkValidity() || inputField.value == '') {
 			inputField.reportValidity();
 			return;
 		}
-		tagList = [...tagList, tag];
 		inputField.value = '';
+		if (tagList.includes(tag)) {
+			inputField.setCustomValidity(
+				`${name.replace(name[0], name[0].toLocaleUpperCase())} already entered.`
+			);
+			inputField.reportValidity();
+		} else {
+			tagList = [...tagList, tag];
+		}
+		console.log(tagList);
 	}
 
 	$: if (inputVisible) inputField.focus();
@@ -65,6 +73,8 @@
 			}}
 			on:focus={() => (inputVisible = true)}
 			on:keydown|self={(e) => {
+				// clear earlier validation errors
+				inputField.setCustomValidity('');
 				if (e.key == 'Enter') {
 					e.preventDefault();
 					addTag(inputField.value);
