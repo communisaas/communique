@@ -45,7 +45,14 @@
 		}}
 	>
 		{#each items as item}
-			<svelte:component this={selectable} bind:selected style={itemStyle} {item} on:select />
+			<svelte:component
+				this={selectable}
+				bind:selected
+				style={itemStyle}
+				{item}
+				on:select
+				on:blur
+			/>
 		{/each}
 	</ul>
 </div>

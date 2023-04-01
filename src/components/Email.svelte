@@ -20,7 +20,7 @@
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		scrollPosition.remainingWidth = header.scrollWidth - header.clientWidth;
+		if (header) scrollPosition.remainingWidth = header.scrollWidth - header.clientWidth;
 	});
 
 	$: {
@@ -39,6 +39,7 @@
 		}
 		dispatch('select', selected);
 	}}
+	on:blur
 	class="{style} p-2 m-1 rounded bg-paper-500"
 >
 	<section class="flex flex-col w-60 relative">

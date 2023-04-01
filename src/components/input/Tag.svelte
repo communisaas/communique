@@ -34,32 +34,33 @@
 </script>
 
 <ul
-	class="{style} max-w-fit px-3 py-1 h-full flex flex-row place-items-center justify-center 
-		flex-wrap gap-2 rounded bg-larimarGreen-600 cursor-pointer"
+	class="{style} max-w-fit px-3 py-1 h-fit flex flex-row place-items-center items-center justify-center 
+		rounded bg-larimarGreen-600 cursor-pointer flex-wrap"
 	on:mouseenter={() => (deleteVisible = true)}
 	on:mouseleave={() => (deleteVisible = false)}
 	on:mousedown|preventDefault={(e) => {
 		inputVisible = true;
 	}}
 >
-	{#each tagList as tag}
-		<li class="relative text-xs {tagStyle} group">
-			<button
-				type="button"
-				on:mousedown={(e) => {
-					tagList = tagList.filter((item) => item != tag);
-					if (!inputVisible) e.stopImmediatePropagation();
-				}}
-				on:focus={() => (deleteVisible = true)}
-				on:blur={() => (deleteVisible = false)}
-				class="delete absolute -top-1 -left-2 rounded-full bg-amber-600 w-4 h-4"
-				class:show={deleteVisible}
-			/>
-			{tag}
-		</li>
-	{/each}
-
-	<li class="flex flex-row place-items-center">
+	<li class="flex flex-row gap-3 justify-center flex-wrap max-w-40 items-center">
+		{#each tagList as tag}
+			<li class="relative text-xs {tagStyle} group">
+				<button
+					type="button"
+					on:mousedown={(e) => {
+						tagList = tagList.filter((item) => item != tag);
+						if (!inputVisible) e.stopImmediatePropagation();
+					}}
+					on:focus={() => (deleteVisible = true)}
+					on:blur={() => (deleteVisible = false)}
+					class="delete absolute -top-1 -left-2 rounded-full bg-amber-600 w-4 h-4"
+					class:show={deleteVisible}
+				>
+					&#215;
+				</button>
+				{tag}
+			</li>
+		{/each}
 		<input
 			required={tagList.length <= 0}
 			{name}
@@ -84,25 +85,28 @@
 			class:show={inputVisible}
 			{type}
 		/>
-		<button
-			type="submit"
-			on:click|preventDefault={() => {
-				inputVisible ? addTag(inputField.value) : (inputVisible = true);
-			}}
-			class="flex justify-center items-center relative"
-		>
-			<span class="relative w-12 shadow-artistBlue" class:active={inputVisible}>
-				<slot />
-				<icon class={addIconClass} />
-			</span>
-		</button>
 	</li>
+
+	<button
+		type="submit"
+		on:click|preventDefault={() => {
+			inputVisible ? addTag(inputField.value) : (inputVisible = true);
+		}}
+		class="flex justify-center items-center relative py-1"
+	>
+		<span class="relative w-12 shadow-artistBlue" class:active={inputVisible}>
+			<slot />
+			<icon class={addIconClass} />
+		</span>
+	</button>
 </ul>
 
-<style>
+<style lang="scss">
 	input {
 		opacity: 0;
 		transition: all 0.2s;
+		width: 0;
+		height: 0;
 	}
 	button span {
 		filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));
@@ -143,25 +147,28 @@
 		opacity: 0;
 		transform: scale(0);
 		transition: opacity 0.2s, transform 0.2s, visibility 0s 0.2s;
-	}
-	.delete::before {
-		content: '\D7';
 		color: #fff;
 		font-size: 1rem;
 		line-height: 1rem;
 		opacity: 95%;
-		text-shadow: rgba(0, 0, 0, 0.25) 0px 2px 2px;
+		text-shadow: rgba(0, 0, 0, 0.25) 0 2px 2px;
+		&.show:hover {
+			transform: scale(1.35);
+			text-shadow: rgba(0, 0, 0, 0.25) 0 1px 1px;
+		}
+		&.show {
+			transform: scale(1);
+			transition: opacity 0.2s, transform 0.2s, visibility 0s 0.2s;
+		}
 	}
+
 	.show {
 		visibility: visible;
 		opacity: 1;
 	}
 	input.show {
 		width: 5rem;
+		height: 1.5rem;
 		transition: all 0.2s;
-	}
-	.delete.show {
-		transform: scale(1);
-		transition: opacity 0.2s, transform 0.2s, visibility 0s 0.2s;
 	}
 </style>

@@ -10,15 +10,18 @@
 	export let selected: Selectable;
 	export let items: Selectable[];
 
-	let expand: boolean;
 	let expandable: HTMLElement;
 	const dispatch = createEventDispatcher();
 
 	let store: Writable<UserState>;
+	let actionButton: HTMLInputElement;
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 	});
+
+	$: expand = false;
+	$: if (document) console.log(document.activeElement);
 </script>
 
 <section class="flex flex-col relative pb-5 px-5 gradient-background">
@@ -40,13 +43,23 @@
 				dispatch('select', e.detail);
 			} else {
 				expand = true;
+				actionButton.focus();
+				console.log(focus());
 			}
 		}}
+		on:blur={() => (expand = false)}
 	/>
 </section>
 
-{#if store && expand}
-	<aside bind:this={expandable} tabindex="-1">{$store[selected.type].name}</aside>
+{#if store}
+	<aside class:invisible={!expand} bind:this={expandable}>
+		<input
+			value={$store[selected.type].name}
+			bind:this={actionButton}
+			type="button"
+			on:blur={() => (expand = false)}
+		/>
+	</aside>
 {/if}
 
 <style lang="scss">

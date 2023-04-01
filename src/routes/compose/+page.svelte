@@ -63,8 +63,8 @@
 			};
 		}}
 	>
-		<div class="ml-20 flex flex-col w-fit h-full gap-x-20 gap-y-3">
-			<span class="flex flex-row gap-x-5">
+		<div class="ml-20 mr-20 flex flex-col w-fit h-full max-md:w-18 gap-x-20 gap-y-3">
+			<span class="flex flex-row flex-wrap gap-5 ">
 				<TagInput
 					bind:tagList={recipientEmails}
 					type="email"
