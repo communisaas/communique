@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
+
 	export let type: 'text' | 'email',
 		name: string,
 		placeholder: string,
@@ -25,10 +28,22 @@
 		} else {
 			tagList = [...tagList, tag];
 		}
-		console.log(tagList);
 	}
 
 	$: if (inputVisible) inputField.focus();
+
+	let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
+	let inputValueWidth: number, placeholderWidth: number;
+	onMount(() => {
+		canvas = document.createElement('canvas');
+		context = canvas.getContext('2d') as CanvasRenderingContext2D;
+		if (context) {
+			// TODO measure input width smoothly using in-dom placeholder
+			context.font = getComputedStyle(inputField).font;
+			inputValueWidth = context.measureText(placeholder).width + 6;
+			placeholderWidth = inputValueWidth;
+		}
+	});
 
 	const addIconClass = 'add bg-peacockFeather-600 h-6 w-6';
 </script>
@@ -71,6 +86,7 @@
 			on:blur={(e) => {
 				inputVisible = false;
 				e.currentTarget.value = '';
+				inputValueWidth = placeholderWidth + 6;
 			}}
 			on:focus={() => (inputVisible = true)}
 			on:keydown|self={(e) => {
@@ -79,8 +95,18 @@
 				if (e.key == 'Enter') {
 					e.preventDefault();
 					addTag(inputField.value);
+					inputValueWidth = placeholderWidth + 6;
 				}
 			}}
+			on:input={() => {
+				const currentValueWidth = context.measureText(inputField.value).width;
+				if (currentValueWidth > placeholderWidth) {
+					inputValueWidth = currentValueWidth + 6;
+				} else {
+					inputValueWidth = placeholderWidth + 6;
+				}
+			}}
+			style="width: {inputVisible ? inputValueWidth : 0}px;"
 			class="space-x-2 rounded h-full bg-larimarGreen-500 shadow-artistBlue shadow-card w-0 focus:p-0.5"
 			class:show={inputVisible}
 			{type}
@@ -167,7 +193,7 @@
 		opacity: 1;
 	}
 	input.show {
-		width: 5rem;
+		width: 4.55rem;
 		height: 1.5rem;
 		transition: all 0.2s;
 	}

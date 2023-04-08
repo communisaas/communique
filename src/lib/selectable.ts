@@ -11,19 +11,19 @@ export async function handleSelect(e: CustomEvent) {
 	switch ((e.detail.type | e.detail.target) as number) {
 		case 'recipient' | 'email': {
 			const dataURL = new URL('/data/email', get(page).url);
-			dataURL.searchParams.append(e.detail.type, e.detail.name);
+			dataURL.searchParams.append(e.detail.type, e.detail.id);
 
 			return await (await fetch(dataURL.toString())).json();
 		}
 		case 'email' | 'email': {
 			const dataURL = new URL('/data/email', get(page).url);
-			dataURL.searchParams.append(e.detail.type, e.detail.name);
+			dataURL.searchParams.append(e.detail.type, e.detail.id);
 
 			return await (await fetch(dataURL.toString())).json();
 		}
 		case 'topic' | 'email': {
 			const dataURL = new URL('/data/topic', get(page).url);
-			dataURL.searchParams.append(e.detail.type, e.detail.name);
+			dataURL.searchParams.append(e.detail.type, e.detail.id);
 
 			return await (await fetch(dataURL.toString())).json();
 		}

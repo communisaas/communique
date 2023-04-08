@@ -9,7 +9,7 @@
 	export let overflow: 'scroll' | 'hidden' | 'visible' = 'hidden';
 	export let itemStyle: string = '';
 
-	const listStyle = `py-1 flex ${
+	const listStyle = `p-1 flex ${
 		alignment == 'end' ? 'flex-row-reverse' : 'flex-row'
 	} gap-3 overflow-x-hidden hover:overflow-x-${overflow} whitespace-nowrap`;
 

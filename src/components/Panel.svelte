@@ -2,6 +2,7 @@
 	import Selector from './Selector.svelte';
 	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
 	import type { Writable } from 'svelte/store';
+	import Reader from './Reader.svelte';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
@@ -10,24 +11,28 @@
 	export let selected: Selectable;
 	export let items: Selectable[];
 
-	let expandable: HTMLElement;
+	let actionButton: HTMLInputElement;
+
 	const dispatch = createEventDispatcher();
 
 	let store: Writable<UserState>;
-	let actionButton: HTMLInputElement;
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 	});
 
 	$: expand = false;
-	$: if (document) console.log(document.activeElement);
 </script>
 
-<section class="flex flex-col relative pb-5 px-5 gradient-background">
-	<span class="tab tab__{alignment}" style="align-self: {alignment}"
-		><h1 style="text-align: {alignment}; ">{header}</h1></span
-	>
+<section
+	class:section__active={expand}
+	class="flex flex-col relative pb-5 px-5 gradient-background"
+>
+	<span class="tab tab__{alignment}" style="align-self: {alignment}">
+		<h1 style="text-align: {alignment}; ">
+			{header}
+		</h1>
+	</span>
 	<span class="control">
 		<slot />
 	</span>
@@ -44,23 +49,13 @@
 			} else {
 				expand = true;
 				actionButton.focus();
-				console.log(focus());
 			}
 		}}
 		on:blur={() => (expand = false)}
 	/>
 </section>
 
-{#if store}
-	<aside class:invisible={!expand} bind:this={expandable}>
-		<input
-			value={$store[selected.type].name}
-			bind:this={actionButton}
-			type="button"
-			on:blur={() => (expand = false)}
-		/>
-	</aside>
-{/if}
+<Reader bind:actionButton {alignment} {expand} {selected} />
 
 <style lang="scss">
 	section {
@@ -68,6 +63,9 @@
 		transition: all 0.5s ease-in-out;
 		&:hover {
 			box-shadow: 0 2.5px 1px theme('colors.peacockFeather.600');
+		}
+		&__active {
+			box-shadow: 0 2.5px 1px theme('colors.artistBlue');
 		}
 	}
 	h1 {

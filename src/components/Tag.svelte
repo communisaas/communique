@@ -9,36 +9,30 @@
 
 	const dispatch = createEventDispatcher();
 
-	$: contentLengthScalar = Math.sqrt(item.length / 1.5) * Math.SQRT2;
-
-	let scrollPosition = { x: 0, remainingWidth: 0 };
 	let tag: HTMLInputElement;
-	let scrollable: boolean, scrolled: boolean;
+	let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
+	let tagWidth: number;
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		scrollPosition.remainingWidth = tag.scrollWidth - tag.clientWidth;
-	});
 
-	$: {
-		if (item && tag) {
-			// update if new list litems
-			scrollPosition.remainingWidth = tag.scrollWidth - tag.clientWidth;
-			scrollable = scrollPosition.remainingWidth == 0 ? false : true;
-			scrolled = scrollPosition.x > 1;
+		canvas = document.createElement('canvas');
+		context = canvas.getContext('2d') as CanvasRenderingContext2D;
+		if (context) {
+			context.font = getComputedStyle(tag).font;
+			tagWidth = context.measureText(item).width + 20;
 		}
-	}
+	});
 </script>
 
 <input
 	readonly
 	class="cursor-pointer text-center px-2 py-1 rounded bg-larimarGreen-600 {style} "
-	style:width="calc(2em*{contentLengthScalar})"
+	style:width="{tagWidth}px"
 	value={item}
-	title={scrollPosition.x > 0 ? item : null}
 	bind:this={tag}
 	on:mousedown|stopPropagation={() => {
-		if (selected.name != item) {
-			selected.name = item;
+		if (selected.id != item) {
+			selected.id = item;
 		}
 		dispatch('select', selected);
 	}}

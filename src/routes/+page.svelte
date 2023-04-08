@@ -38,14 +38,14 @@
 						$store.template.primary.cardList = await handleSelect(e);
 						switch (e.detail.type) {
 							case 'recipient':
-								$store.template.primary.header = 'Most read emails sent to';
-								e.detail.name = e.detail.name.split('@')[0];
+								$store.template.primary.header = 'Most emails sent to';
+								e.detail.id = e.detail.id.split('@')[0];
 								break;
 							case 'topic':
 								$store.template.primary.header = 'Loudest voices in';
 								break;
 						}
-						$store.template.primary.focus = e.detail.name;
+						$store.template.primary.focus = e.detail.id;
 					}}
 				/>{/key}
 		{/each}

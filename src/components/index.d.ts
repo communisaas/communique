@@ -11,7 +11,7 @@ interface Panel extends Expandable {
 
 type SelectableKey = 'email' | 'topic' | 'recipient' | 'spotlight';
 interface Selectable {
-	name: string;
+	id: string;
 	type: SelectableKey;
 	target?: SelectableKey;
 	index?: number;

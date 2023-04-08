@@ -17,13 +17,13 @@
 	let store: Writable<UserState>, lastStore: Writable<UserState>;
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		$store.topic = { name: topicNames[0], type: 'topic' };
+		$store.topic = { id: topicNames[0], type: 'topic' };
 		$store.recipient = {
-			name: '',
+			id: '',
 			type: 'recipient'
 		};
-		$store.spotlight = { name: 'custom', type: 'recipient' };
-		$store.email = { name: '', type: 'email' };
+		$store.spotlight = { id: 'custom', type: 'recipient' };
+		$store.email = { id: '', type: 'email' };
 		$store.template = data.template;
 	});
 
@@ -32,9 +32,9 @@
 
 <div class="app">
 	<main class="flex min-h-screen max-w-[100vw]">
-		<div class="grow-0 shrink-0 w-20 "><Navigation /></div>
+		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
-		<div class="grow whitespace-nowrap ">
+		<div class="grow whitespace-nowrap">
 			<header class="flex h-fit py-2 px-3 pb-2 bg-peacockFeather-600">
 				{#if $store}
 					<Selector
@@ -45,7 +45,7 @@
 						bind:selected={$store.topic}
 						on:select={async (e) => {
 							$store.template.primary.cardList = await handleSelect(e);
-							$store.template.primary.focus = e.detail.name;
+							$store.template.primary.focus = e.detail.id;
 						}}
 					/>
 				{/if}

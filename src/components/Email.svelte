@@ -34,8 +34,8 @@
 
 <button
 	on:mousedown={() => {
-		if (selected.name != item.rowid) {
-			selected.name = item.rowid;
+		if (selected.id != item.rowid) {
+			selected.id = item.rowid;
 		}
 		dispatch('select', selected);
 	}}
