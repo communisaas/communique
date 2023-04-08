@@ -27,10 +27,11 @@ model email {
   open_count      BigInt
   clipboard_count BigInt
   send_count      BigInt
-  read_count      Json
+  read_count      BigInt
   recipient_list  String[]
   rowid           String   @id(map: "email___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   added_by        String
+  shortid         String?
   author          author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
   issue           issue[]
 }
