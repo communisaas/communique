@@ -9,7 +9,6 @@
 	import { enhance } from '$app/forms';
 
 	import FingerprintJS from '@fingerprintjs/fingerprintjs-pro';
-	import DOMPurify from 'dompurify';
 
 	export let data: ComposeSchema;
 

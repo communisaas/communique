@@ -1,14 +1,8 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import type { email } from '@prisma/client';
-	import {
-		createEventDispatcher,
-		onMount,
-		type ComponentType,
-		beforeUpdate,
-		afterUpdate
-	} from 'svelte';
+	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
+	import DOMPurify from 'dompurify';
 
 	export let expand = false;
 	export let email: email;
@@ -25,9 +19,9 @@
 
 {#if store && email}
 	<aside class:invisible={!expand} bind:this={expandable} on:mousedown|preventDefault>
-		<input value={email.rowid} bind:this={actionButton} type="button" on:blur />
+		<input value="Copy to clipboard" bind:this={actionButton} type="button" on:blur />
 		<div>
-			{@html email.body}
+			{@html DOMPurify.sanitize(email.body)}
 		</div>
 	</aside>
 {/if}
