@@ -43,14 +43,14 @@
 			const webProfile = (
 				await FingerprintJS.load({
 					apiKey: data.profilerKey,
-					endpoint: 'https://post.communi.email'
+					endpoint: data.profilerURL,
+					scriptUrlPattern: data.profilerScriptURL
 				})
 			).get();
 
 			post.set('profileRequestID', (await webProfile).requestId);
 
 			return async ({ result, update }) => {
-				console.log(result);
 				if (result.status == 200) {
 					// TODO submit confirmation
 					recipientEmails = [];

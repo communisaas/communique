@@ -5,8 +5,6 @@ import { page } from '$app/stores';
 import { get } from 'svelte/store';
 
 export async function handleSelect(e: CustomEvent) {
-	console.log(e.detail);
-
 	// selector | to select
 	switch ((e.detail.type | e.detail.target) as number) {
 		case 'recipient' | 'email': {

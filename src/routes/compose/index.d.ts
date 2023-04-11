@@ -1,5 +1,7 @@
 interface ComposeSchema {
 	profilerKey: string;
+	profilerURL: string;
+	profilerScriptURL: string;
 	editorKey: string;
 }
 

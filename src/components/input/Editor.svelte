@@ -56,6 +56,7 @@
 <style>
 	:global(.tox-editor-header) {
 		box-shadow: rgba(0, 0, 0, 0.16) 0px 2px 4px !important;
+		margin: 0 2em !important;
 		transition: box-shadow 0.2s ease-out;
 	}
 	:global(.tox-editor-header:hover) {

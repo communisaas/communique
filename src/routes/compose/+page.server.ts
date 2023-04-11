@@ -1,5 +1,11 @@
-import { TINYMCE_KEY, FINGERPRINTJS_KEY } from '$env/static/private';
-import { FINGERPRINTJS_SERVER_KEY, FINGERPRINTJS_URL } from '$env/static/private';
+import { TINYMCE_KEY } from '$env/static/private';
+import {
+	FINGERPRINTJS_SERVER_KEY,
+	FINGERPRINTJS_URL,
+	FINGERPRINTJS_KEY,
+	FINGERPRINTJS_SCRIPTURL,
+	FINGERPRINTJS_APIURL
+} from '$env/static/private';
 import type { RequestEvent } from './$types';
 
 import objectMapper from '$lib/database';
@@ -49,7 +55,7 @@ export const actions = {
 		const formSubmission = await request.formData();
 		const profileRequestID: string | undefined = formSubmission.get('profileRequestID')?.toString();
 
-		const response = await fetch(`${FINGERPRINTJS_URL}/events/${profileRequestID}`, {
+		const response = await fetch(`${FINGERPRINTJS_APIURL}/events/${profileRequestID}`, {
 			headers: { 'Auth-API-Key': FINGERPRINTJS_SERVER_KEY }
 		});
 
@@ -149,6 +155,8 @@ export const actions = {
 export function load() {
 	return {
 		editorKey: TINYMCE_KEY,
-		profilerKey: FINGERPRINTJS_KEY
+		profilerKey: FINGERPRINTJS_KEY,
+		profilerURL: FINGERPRINTJS_URL,
+		profilerScriptURL: FINGERPRINTJS_SCRIPTURL
 	};
 }
