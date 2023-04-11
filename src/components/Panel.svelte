@@ -2,8 +2,6 @@
 	import Selector from './Selector.svelte';
 	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
 	import type { Writable } from 'svelte/store';
-	import Reader from './Reader.svelte';
-	import type { email } from '@prisma/client';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
@@ -12,16 +10,12 @@
 	export let selected: Selectable;
 	export let items: Selectable[];
 
-	let actionButton: HTMLInputElement;
-	$: currentEmail = {} as email;
-
 	const dispatch = createEventDispatcher();
 
 	let store: Writable<UserState>;
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		currentEmail = (await (await fetch(`data/${selected.type}/${selected.id}`)).json())[0];
 	});
 
 	$: expand = false;
@@ -56,12 +50,6 @@
 				// if selected item is targeting the panel selectable
 				if (e.detail.type === selected.type) {
 					expand = true;
-					fetch(`data/${selected.type}/${selected.id}`)
-						.then((res) => res.json())
-						.then((data) => {
-							currentEmail = data[0];
-							console.log(currentEmail);
-						});
 				} else {
 					dispatch('select', e.detail);
 					// actionButton.focus();
@@ -70,8 +58,6 @@
 			on:blur
 		/>
 	</section>
-
-	<Reader bind:actionButton {alignment} {expand} email={currentEmail} />
 {/if}
 
 <style lang="scss">
@@ -80,9 +66,6 @@
 		transition: all 0.5s ease-in-out;
 		&:hover {
 			box-shadow: 0 2.5px 1px theme('colors.peacockFeather.600');
-		}
-		&__active {
-			box-shadow: 0 2.5px 1px theme('colors.artistBlue');
 		}
 	}
 	h1 {

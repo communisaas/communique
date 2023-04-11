@@ -10,7 +10,6 @@
 	} from 'svelte';
 	import type { Writable } from 'svelte/store';
 
-	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let expand = false;
 	export let email: email;
 	export let actionButton: HTMLInputElement;

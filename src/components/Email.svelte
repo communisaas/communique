@@ -4,6 +4,7 @@
 	import type { Writable } from 'svelte/store';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
+	import Reader from './Reader.svelte';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -16,6 +17,7 @@
 	// TODO email card layout
 	$: scrollPosition = { x: 0, remainingWidth: 0 };
 	let header: HTMLHeadingElement;
+	let actionButton: HTMLInputElement;
 	let scrollable: boolean, scrolled: boolean;
 
 	onMount(async () => {
@@ -30,6 +32,9 @@
 			scrolled = scrollPosition.x > 1;
 		}
 	}
+
+	$: currentEmail = {} as email;
+	$: expand = false;
 </script>
 
 <button
@@ -37,9 +42,18 @@
 		if (selected.id != item.rowid) {
 			selected.id = item.rowid;
 		}
+		expand = true;
+		fetch(`data/${selected.type}/${selected.id}`)
+			.then((res) => res.json())
+			.then((data) => {
+				currentEmail = data;
+				console.log(currentEmail);
+			});
 		dispatch('select', selected);
 	}}
-	on:blur
+	on:blur={() => {
+		expand = false;
+	}}
 	class="{style} p-2 m-1 rounded bg-paper-500 w-[95%] max-w-4xl"
 >
 	<section class="flex flex-col relative w-4xl">
@@ -85,6 +99,7 @@
 				bind:selected={$store.recipient}
 				on:select
 			/>
+			<Reader bind:actionButton {expand} email={currentEmail} />
 		{/if}
 	</section>
 </button>

@@ -18,5 +18,5 @@ export async function GET({ params }) {
 		}
 	};
 	const email = await find('email', options);
-	return new Response(JSON.stringify(email));
+	return new Response(JSON.stringify(email[0]));
 }
