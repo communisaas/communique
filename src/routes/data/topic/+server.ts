@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { findMany } from '$lib/database';
+import { find } from '$lib/database';
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url }) {
@@ -21,7 +21,7 @@ export async function GET({ url }) {
 		),
 		take: 10
 	};
-	const topicList = await findMany('topic', options);
+	const topicList = await find('topic', options);
 
 	return new Response(JSON.stringify(topicList));
 }
