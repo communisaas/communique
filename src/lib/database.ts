@@ -2,10 +2,16 @@ import { PrismaClient } from '@prisma/client';
 
 const objectMapper = new PrismaClient();
 
-export function findMany(table: string, options: Query) {
+export function find(table: string, options: Query, scope: 'unique' | 'many' = 'many') {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore indexing type error
-	return objectMapper[table].findMany({ ...options });
+	const currentTable = objectMapper[table];
+	switch (scope) {
+		case 'unique':
+			return currentTable.findUnique({ ...options });
+		case 'many':
+			return currentTable.findMany({ ...options });
+	}
 }
 
 // patch BigInt to serialize JSON as string

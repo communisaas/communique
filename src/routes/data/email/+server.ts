@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { findMany } from '$lib/database';
+import { find } from '$lib/database';
 
 const emailFieldMap: FieldMap = {
 	topic: 'topic_list',
@@ -28,13 +28,12 @@ export async function GET({ url }) {
 				}
 				if (!criteria) throw Error('Invalid field name');
 				filter[fieldName] = criteria;
-				console.log(filter);
 				return filter;
 			},
 			{} as Criteria
 		),
 		take: 10
 	};
-	const emailList = await findMany('email', options);
+	const emailList = await find('email', options);
 	return new Response(JSON.stringify(emailList));
 }

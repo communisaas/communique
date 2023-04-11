@@ -3,15 +3,16 @@ interface FieldMap {
 }
 
 interface Query {
-	where: Criteria;
-	take: number;
+	where: Criteria | Operator;
+	take?: number;
 }
 
 interface Criteria {
-	[field: string]: Operator;
+	[field: string]: Operator | undefined;
 }
 
 interface Operator {
 	has?: string;
 	equals?: string | number;
+	OR?: Criteria[];
 }

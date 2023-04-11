@@ -15,7 +15,6 @@ export async function GET({ url }) {
 				}
 				if (!criteria) throw Error('Invalid field name');
 				filter[field] = criteria;
-				console.log(filter);
 				return filter;
 			},
 			{} as Criteria
@@ -24,6 +23,5 @@ export async function GET({ url }) {
 	};
 	const topicList = await findMany('topic', options);
 
-	console.log(topicList);
 	return new Response(JSON.stringify(topicList));
 }
