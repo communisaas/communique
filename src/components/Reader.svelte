@@ -1,30 +1,34 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
+	import type { email } from '@prisma/client';
+	import {
+		createEventDispatcher,
+		onMount,
+		type ComponentType,
+		beforeUpdate,
+		afterUpdate
+	} from 'svelte';
 	import type { Writable } from 'svelte/store';
 
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let expand = false;
-	export let selected: Selectable;
+	export let email: email;
 	export let actionButton: HTMLInputElement;
 
 	let expandable: HTMLElement;
-	const dispatch = createEventDispatcher();
 
 	let store: Writable<UserState>;
-
-	let detail = fetch(`data/${selected.type}/`);
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 	});
-
-	$: if (document) console.log(document.activeElement);
-	$: console.log($page);
 </script>
 
-{#if store}
+{#if store && email}
 	<aside class:invisible={!expand} bind:this={expandable} on:mousedown|preventDefault>
-		<input value={$store[selected.type].id} bind:this={actionButton} type="button" />
+		<input value={email.rowid} bind:this={actionButton} type="button" on:blur />
+		<div>
+			{@html email.body}
+		</div>
 	</aside>
 {/if}

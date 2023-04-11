@@ -8,10 +8,12 @@
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let overflow: 'scroll' | 'hidden' | 'visible' = 'hidden';
 	export let itemStyle: string = '';
+	export let selectorStyle: string = '';
 
 	const listStyle = `p-1 flex ${
-		alignment == 'end' ? 'flex-row-reverse' : 'flex-row'
-	} gap-3 overflow-x-hidden hover:overflow-x-${overflow} whitespace-nowrap`;
+		alignment == 'end' ? 'flex-row-reverse items-end' : 'flex-row'
+	} gap-3 overflow-x-hidden hover:overflow-x-${overflow} 
+	whitespace-nowrap ${selectorStyle}`;
 
 	// TODO overflowing items
 	let scrollPosition = { x: 0, remainingWidth: 0 };
@@ -39,9 +41,12 @@
 		class:scrollable
 		class:scrolled
 		class:scrolled__max={scrolled && scrollPosition.remainingWidth - scrollPosition.x <= 1}
-		on:wheel|preventDefault={(e) => {
+		on:wheel={(e) => {
 			list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
 			scrollPosition.x = list.scrollLeft + 1;
+			if (scrollable) {
+				e.preventDefault();
+			}
 		}}
 	>
 		{#each items as item}

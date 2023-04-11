@@ -30,8 +30,8 @@
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
 </script>
 
-<div class="app">
-	<main class="flex min-h-screen max-w-[100vw]">
+<div class="app min-w-fit flex flex-col max-w-[100vw]">
+	<main class="flex min-h-screen ">
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
 		<div class="grow whitespace-nowrap">
@@ -45,6 +45,7 @@
 						bind:selected={$store.topic}
 						on:select={async (e) => {
 							$store.template.primary.cardList = await handleSelect(e);
+							$store.template.primary.header = 'Loudest voices in';
 							$store.template.primary.focus = e.detail.id;
 						}}
 					/>
@@ -61,9 +62,9 @@
 	</main>
 
 	<footer class="bg-gray-900 text-white py-6">
-		<div class="container mx-auto flex flex-wrap justify-between">
+		<div class="container mx-auto flex flex-wrap justify-between px-4">
 			<div class="w-full md:w-1/3 mb-4 md:mb-0">
-				<div class="flex justify-start md:justify-center">
+				<div class="flex justify-center md:justify-start">
 					<h4 class="font-bold text-lg mb-2 mr-2">Communique</h4>
 					<span class="border-l border-gray-600 pl-2">
 						<p class="text-sm text-gray-400">

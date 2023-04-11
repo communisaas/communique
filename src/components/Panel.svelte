@@ -3,6 +3,7 @@
 	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import Reader from './Reader.svelte';
+	import type { email } from '@prisma/client';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
@@ -12,6 +13,7 @@
 	export let items: Selectable[];
 
 	let actionButton: HTMLInputElement;
+	$: currentEmail = {} as email;
 
 	const dispatch = createEventDispatcher();
 
@@ -19,43 +21,58 @@
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
+		currentEmail = (await (await fetch(`data/${selected.type}/${selected.id}`)).json())[0];
 	});
 
 	$: expand = false;
+	$: console.log(expand);
 </script>
 
-<section
-	class:section__active={expand}
-	class="flex flex-col relative pb-5 px-5 gradient-background"
->
-	<span class="tab tab__{alignment}" style="align-self: {alignment}">
-		<h1 style="text-align: {alignment}; ">
-			{header}
-		</h1>
-	</span>
-	<span class="control">
-		<slot />
-	</span>
-	<Selector
-		{selectable}
-		{items}
-		{alignment}
-		target={selected.type}
-		bind:selected
-		on:select={(e) => {
-			// if selected item is targeting the panel selectable
-			if (e.detail.type !== selected.type) {
-				dispatch('select', e.detail);
-			} else {
-				expand = true;
-				actionButton.focus();
-			}
+{#if store}
+	<section
+		class:section__active={expand}
+		class="flex flex-col relative pb-5 px-5 gradient-background"
+		on:blur={(e) => {
+			expand = false;
+			console.log(e);
 		}}
-		on:blur={() => (expand = false)}
-	/>
-</section>
+	>
+		<span class="tab tab__{alignment}" style="align-self: {alignment}">
+			<h1 style="text-align: {alignment}; ">
+				{header}
+			</h1>
+		</span>
+		<span class="control">
+			<slot />
+		</span>
+		<Selector
+			{selectable}
+			{items}
+			{alignment}
+			selectorStyle="flex-col"
+			target={selected.type}
+			bind:selected
+			on:select={(e) => {
+				// if selected item is targeting the panel selectable
+				if (e.detail.type === selected.type) {
+					expand = true;
+					fetch(`data/${selected.type}/${selected.id}`)
+						.then((res) => res.json())
+						.then((data) => {
+							currentEmail = data[0];
+							console.log(currentEmail);
+						});
+				} else {
+					dispatch('select', e.detail);
+					// actionButton.focus();
+				}
+			}}
+			on:blur
+		/>
+	</section>
 
-<Reader bind:actionButton {alignment} {expand} {selected} />
+	<Reader bind:actionButton {alignment} {expand} email={currentEmail} />
+{/if}
 
 <style lang="scss">
 	section {

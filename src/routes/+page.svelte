@@ -14,7 +14,6 @@
 
 	// TODO loading placeholders
 	// TODO switch panel header between selected topic & address context
-	$: console.log($store);
 </script>
 
 <svelte:head>

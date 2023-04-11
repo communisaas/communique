@@ -40,25 +40,26 @@
 		dispatch('select', selected);
 	}}
 	on:blur
-	class="{style} p-2 m-1 rounded bg-paper-500"
+	class="{style} p-2 m-1 rounded bg-paper-500 w-[95%] max-w-4xl"
 >
-	<section class="flex flex-col w-60 relative">
+	<section class="flex flex-col relative w-4xl">
 		{#if store}
-			<span class="relative ">
-				<h1
-					title={scrollPosition.x > 0 ? item.subject : null}
-					bind:this={header}
-					on:wheel|preventDefault={(e) => {
-						header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-						scrollPosition.x = header.scrollLeft + 1;
-					}}
-					class:scrollable
-					class:scrolled
-					class:scrolled__max={scrollable && scrollPosition.remainingWidth < scrollPosition.x}
-				>
-					{item.subject}
-				</h1>
-			</span>
+			<h1
+				title={scrollPosition.x > 0 ? item.subject : null}
+				bind:this={header}
+				on:wheel={(e) => {
+					header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
+					scrollPosition.x = header.scrollLeft + 1;
+					if (scrollable) {
+						e.preventDefault();
+					}
+				}}
+				class:scrollable
+				class:scrolled
+				class:scrolled__max={scrollable && scrollPosition.remainingWidth < scrollPosition.x}
+			>
+				{item.subject}
+			</h1>
 			<Selector
 				selectable={Tag}
 				items={item.topic_list}
@@ -107,9 +108,9 @@
 		font-size: 1.4rem;
 		text-align: start;
 		font-weight: 600;
-		overflow: hidden;
 		white-space: nowrap;
-		width: auto;
+		overflow-x: scroll;
+		min-width: 100%;
 		&::before {
 			content: '';
 			position: absolute;
