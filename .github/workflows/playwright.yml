@@ -13,6 +13,8 @@ jobs:
       FINGERPRINTJS_KEY: ${{ secrets.FINGERPRINTJS_KEY }}
       FINGERPRINTJS_SERVER_KEY: ${{  secrets.FINGERPRINTJS_SERVER_KEY }}
       FINGERPRINTJS_URL: ${{ secrets.FINGERPRINTJS_URL }}
+      FINGERPRINTJS_APIURL: ${{ secrets.FINGERPRINTJS_APIURL }}
+      FINGERPRINTJS_SCRIPTURL: ${{ secrets.FINGERPRINTJS_SCRIPTURL }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
