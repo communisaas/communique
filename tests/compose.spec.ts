@@ -20,7 +20,7 @@ base.describe('tag', () => {
 			},
 			tagInterface: async ({}, use) => {
 				await use(
-					page.getByRole('listitem').filter({
+					page.getByRole('list').filter({
 						has: page.getByPlaceholder(placeholderText)
 					})
 				);

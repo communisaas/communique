@@ -114,7 +114,7 @@
 	</li>
 
 	<button
-		type="submit"
+		name={`Add ${name}`}
 		on:click|preventDefault={() => {
 			inputVisible ? addTag(inputField.value) : (inputVisible = true);
 		}}
