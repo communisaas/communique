@@ -15,10 +15,17 @@
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 	});
+
+	$: console.log(expand);
 </script>
 
 {#if store && email}
-	<aside class:invisible={!expand} bind:this={expandable} on:mousedown|preventDefault>
+	<aside
+		class:invisible={!expand}
+		style="max-height: {expand ? 'fit-content' : '0'}"
+		bind:this={expandable}
+		on:mousedown|preventDefault
+	>
 		<input value="Copy to clipboard" bind:this={actionButton} type="button" on:blur />
 		<div>
 			{@html DOMPurify.sanitize(email.body)}

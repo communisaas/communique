@@ -22,6 +22,13 @@
 			tagWidth = context.measureText(item).width + 20;
 		}
 	});
+
+	function handleSelect() {
+		if (selected.id != item) {
+			selected.id = item;
+		}
+		dispatch('select', selected);
+	}
 </script>
 
 <input
@@ -31,11 +38,14 @@
 	value={item}
 	bind:this={tag}
 	on:mousedown|stopPropagation={() => {
-		if (selected.id != item) {
-			selected.id = item;
-		}
-		dispatch('select', selected);
+		handleSelect();
 	}}
+	on:keypress|stopPropagation={(e) => {
+		if (e.key === 'Enter') {
+			handleSelect();
+		}
+	}}
+	on:blur
 />
 
 <style lang="scss">

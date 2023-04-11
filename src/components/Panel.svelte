@@ -26,10 +26,6 @@
 	<section
 		class:section__active={expand}
 		class="flex flex-col relative pb-5 px-5 gradient-background"
-		on:blur={(e) => {
-			expand = false;
-			console.log(e);
-		}}
 	>
 		<span class="tab tab__{alignment}" style="align-self: {alignment}">
 			<h1 style="text-align: {alignment}; ">
@@ -43,7 +39,7 @@
 			{selectable}
 			{items}
 			{alignment}
-			selectorStyle="flex-col"
+			selectorStyle="flex-col min-h-[15rem]"
 			target={selected.type}
 			bind:selected
 			on:select={(e) => {

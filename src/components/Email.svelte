@@ -18,6 +18,7 @@
 	$: scrollPosition = { x: 0, remainingWidth: 0 };
 	let header: HTMLHeadingElement;
 	let actionButton: HTMLInputElement;
+	let card: HTMLButtonElement;
 	let scrollable: boolean, scrolled: boolean;
 
 	onMount(async () => {
@@ -35,14 +36,13 @@
 
 	$: currentEmail = {} as email;
 	$: expand = false;
-</script>
 
-<button
-	on:mousedown={() => {
+	function handleSelect() {
 		if (selected.id != item.rowid) {
 			selected.id = item.rowid;
 		}
 		expand = true;
+		// get email body (TODO fetch only necessary data)
 		fetch(`data/${selected.type}/${selected.id}`)
 			.then((res) => res.json())
 			.then((data) => {
@@ -50,11 +50,25 @@
 				console.log(currentEmail);
 			});
 		dispatch('select', selected);
+	}
+
+	function handleBlur(event: FocusEvent) {
+		if (event.relatedTarget instanceof HTMLElement) {
+			if (!card.contains(event.relatedTarget)) expand = false;
+		} else expand = false;
+	}
+</script>
+
+<button
+	bind:this={card}
+	on:mousedown={handleSelect}
+	on:keypress={(e) => {
+		if (e.key === 'Enter') {
+			handleSelect();
+		}
 	}}
-	on:blur={() => {
-		expand = false;
-	}}
-	class="{style} p-2 m-1 rounded bg-paper-500 w-[95%] max-w-4xl"
+	on:blur={handleBlur}
+	class="{style} p-2 m-1 rounded bg-paper-500 w-[95%] min-h-[13.5rem] max-w-4xl"
 >
 	<section class="flex flex-col relative w-4xl">
 		{#if store}
@@ -83,6 +97,7 @@
 				target="email"
 				bind:selected={$store.topic}
 				on:select
+				on:blur={handleBlur}
 			/>
 			<div class="stats p-1">
 				<span>reads: {item.open_count}</span>
@@ -98,8 +113,9 @@
 				target="email"
 				bind:selected={$store.recipient}
 				on:select
+				on:blur={handleBlur}
 			/>
-			<Reader bind:actionButton {expand} email={currentEmail} />
+			<Reader bind:actionButton {expand} email={currentEmail} on:blur={handleBlur} />
 		{/if}
 	</section>
 </button>
