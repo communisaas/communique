@@ -24,15 +24,6 @@ jobs:
           node-version: 16
       - name: Install dependencies
         run: npm ci
-      - name: Generate dotenv file
-        run: |
-          cat <<EOF > .env
-          TINYMCE_KEY="$TINYMCE_KEY"
-          DATABASE_URL="$DATABASE_URL"
-          FINGERPRINTJS_KEY="$FINGERPRINTJS_KEY"
-          FINGERPRINTJS_SERVER_KEY="$FINGERPRINTJS_SERVER_KEY"
-          FINGERPRINTJS_URL="$FINGERPRINTJS_URL"
-          EOF
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
