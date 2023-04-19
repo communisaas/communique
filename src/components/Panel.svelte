@@ -39,7 +39,7 @@
 			{selectable}
 			{items}
 			{alignment}
-			selectorStyle="flex-col min-h-[15rem]"
+			selectorStyle="flex-col min-h-[13rem]"
 			target={selected.type}
 			bind:selected
 			on:select={(e) => {

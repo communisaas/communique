@@ -8,6 +8,8 @@
 
 	let store: Writable<UserState>;
 
+	export let data;
+
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 	});
@@ -22,7 +24,7 @@
 </svelte:head>
 
 <div class="flex flex-col gap-y-10">
-	{#if store}
+	{#if store && data}
 		{#each Object.entries($store.template) as [order, panel]}
 			{#key panel.header}
 				<Panel

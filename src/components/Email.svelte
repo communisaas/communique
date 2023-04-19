@@ -34,21 +34,13 @@
 		}
 	}
 
-	$: currentEmail = {} as email;
-	$: expand = false;
+	$: expand = true;
 
 	function handleSelect() {
 		if (selected.id != item.rowid) {
 			selected.id = item.rowid;
 		}
 		expand = true;
-		// get email body (TODO fetch only necessary data)
-		fetch(`data/${selected.type}/${selected.id}`)
-			.then((res) => res.json())
-			.then((data) => {
-				currentEmail = data;
-				console.log(currentEmail);
-			});
 		dispatch('select', selected);
 	}
 
@@ -68,9 +60,9 @@
 		}
 	}}
 	on:blur={handleBlur}
-	class="{style} p-2 m-1 rounded bg-paper-500 w-[95%] min-h-[13.5rem] max-w-4xl"
+	class="{style} p-2 m-1 rounded bg-paper-500 w-[95%] min-h-[11.5rem] max-w-4xl"
 >
-	<section class="flex flex-col relative w-4xl">
+	<section class="flex flex-col relative">
 		{#if store}
 			<h1
 				title={scrollPosition.x > 0 ? item.subject : null}
@@ -88,34 +80,40 @@
 			>
 				{item.subject}
 			</h1>
-			<Selector
-				selectable={Tag}
-				items={item.topic_list}
-				itemStyle="text-[11px]"
-				alignment="start"
-				overflow="scroll"
-				target="email"
-				bind:selected={$store.topic}
-				on:select
-				on:blur={handleBlur}
-			/>
-			<div class="stats p-1">
-				<span>reads: {item.open_count}</span>
-				<span>sends: {item.send_count}</span>
-			</div>
+			<article class="flex flex-row">
+				<div>
+					<Selector
+						selectable={Tag}
+						items={item.topic_list}
+						itemStyle="text-[11px]"
+						alignment="start"
+						overflow="scroll"
+						target="email"
+						bind:selected={$store.topic}
+						on:select
+						on:blur={handleBlur}
+					/>
+					<div class="stats p-1">
+						<span>reads: {item.open_count}</span>
+						<span>sends: {item.send_count}</span>
+					</div>
 
-			<Selector
-				selectable={Tag}
-				items={item.recipient_list}
-				itemStyle="text-[11px] bg-teal-500"
-				alignment="start"
-				overflow="scroll"
-				target="email"
-				bind:selected={$store.recipient}
-				on:select
-				on:blur={handleBlur}
-			/>
-			<Reader bind:actionButton {expand} email={currentEmail} on:blur={handleBlur} />
+					<Selector
+						selectable={Tag}
+						items={item.recipient_list}
+						itemStyle="text-[11px] bg-teal-500"
+						alignment="start"
+						overflow="scroll"
+						target="email"
+						bind:selected={$store.recipient}
+						on:select
+						on:blur={handleBlur}
+					/>
+				</div>
+				<div class="basis-4/6 text-right">
+					<Reader bind:actionButton {expand} email={item} on:blur={handleBlur} />
+				</div>
+			</article>
 		{/if}
 	</section>
 </button>
@@ -140,8 +138,10 @@
 		text-align: start;
 		font-weight: 600;
 		white-space: nowrap;
-		overflow-x: scroll;
+		overflow: scroll;
+		overflow-x: overlay;
 		min-width: 100%;
+		padding-bottom: 0;
 		&::before {
 			content: '';
 			position: absolute;

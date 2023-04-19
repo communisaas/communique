@@ -12,7 +12,7 @@
 
 	const listStyle = `p-1 flex ${
 		alignment == 'end' ? 'flex-row-reverse items-end' : 'flex-row'
-	} gap-3 overflow-x-hidden hover:overflow-x-${overflow} 
+	} gap-3  overflow-x-hidden hover:overflow-x-${overflow}  overflow-visible
 	whitespace-nowrap ${selectorStyle}`;
 
 	// TODO overflowing items
