@@ -15,32 +15,33 @@
 	const dispatch = createEventDispatcher();
 
 	// TODO email card layout
-	$: scrollPosition = { x: 0, remainingWidth: 0 };
+	$: scrollPosition = { header: { x: 0, remainingWidth: 0 }, card: { x: 0, remainingWidth: 0 } };
 	let header: HTMLHeadingElement;
 	let actionButton: HTMLInputElement;
 	let card: HTMLButtonElement;
-	let scrollable: boolean, scrolled: boolean;
+	let reader: HTMLElement;
+	let scrollableElements: { [key: string]: HTMLElement };
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		if (header) scrollPosition.remainingWidth = header.scrollWidth - header.clientWidth;
+		scrollableElements = { card, header };
+		if (card && header) {
+			for (const [name, element] of Object.entries(scrollableElements)) {
+				scrollPosition[name as keyof typeof scrollPosition].remainingWidth =
+					element.scrollWidth - element.clientWidth;
+			}
+		}
 	});
 
-	$: {
-		if (item && header) {
-			scrollPosition.remainingWidth = header.scrollWidth - header.clientWidth;
-			scrollable = scrollPosition.remainingWidth > 0;
-			scrolled = scrollPosition.x > 1;
-		}
-	}
-
-	$: expand = true;
-
+	$: expand = false;
+	$: console.log(scrollPosition);
+	$: actionButton && document.activeElement != actionButton ? (expand = false) : null;
 	function handleSelect() {
 		if (selected.id != item.rowid) {
 			selected.id = item.rowid;
 		}
 		expand = true;
+		actionButton.focus();
 		dispatch('select', selected);
 	}
 
@@ -60,27 +61,34 @@
 		}
 	}}
 	on:blur={handleBlur}
-	class="{style} p-2 m-1 rounded bg-paper-500 w-[95%] min-h-[11.5rem] max-w-4xl"
+	class="{style} flex p-2 m-1 rounded bg-paper-500 w-[95%] min-h-[15.5rem] max-w-4xl "
+	style="min-width: {expand ? '99%' : '95%'}"
 >
-	<section class="flex flex-col relative">
+	<section
+		class="flex flex-col relative {!expand
+			? 'cardWrapper'
+			: ''} min-h-[14.5rem] min-w-[inherit] overflow-hidden"
+	>
 		{#if store}
 			<h1
-				title={scrollPosition.x > 0 ? item.subject : null}
+				title={scrollPosition.header.x > 0 ? item.subject : null}
 				bind:this={header}
 				on:wheel={(e) => {
 					header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-					scrollPosition.x = header.scrollLeft + 1;
-					if (scrollable) {
+					scrollPosition.header.x = header.scrollLeft + 1;
+					if (scrollPosition.header.remainingWidth > 0) {
 						e.preventDefault();
 					}
 				}}
-				class:scrollable
-				class:scrolled
-				class:scrolled__max={scrollable && scrollPosition.remainingWidth < scrollPosition.x}
+				class:scrollable={scrollPosition.header.remainingWidth > 0}
+				class:scrolled={scrollPosition.header.x > 1}
+				class:scrolled__max={scrollPosition.header.remainingWidth > 0 &&
+					scrollPosition.header.remainingWidth < scrollPosition.header.x}
+				class="max-w-fit inline-block"
 			>
 				{item.subject}
 			</h1>
-			<article class="flex flex-row">
+			<article class="flex" style="flex-direction:{!expand ? 'row' : 'column'}">
 				<div>
 					<Selector
 						selectable={Tag}
@@ -110,7 +118,12 @@
 						on:blur={handleBlur}
 					/>
 				</div>
-				<div class="basis-4/6 text-right">
+				<div
+					style="text-align: initial"
+					class="whitespace-normal "
+					class:scrollableY={!expand}
+					bind:this={reader}
+				>
 					<Reader bind:actionButton {expand} email={item} on:blur={handleBlur} />
 				</div>
 			</article>
@@ -119,6 +132,17 @@
 </button>
 
 <style lang="scss">
+	.cardWrapper {
+		&::after {
+			background: linear-gradient(to top, var(--color-bg-2) 1%, transparent 10%);
+			content: '';
+			position: absolute;
+			bottom: -1px;
+			margin-bottom: -1px;
+			height: 100%;
+			width: 100%;
+		}
+	}
 	button {
 		transition: 0.2s ease-out;
 		&:hover {
@@ -163,15 +187,16 @@
 		}
 
 		&:hover {
-			overflow-x: scroll;
+			overflow: scroll;
 			/* prevent scrollbar from changing container dimensions in webkit */
-			overflow-x: overlay;
+			overflow: overlay;
 		}
 		&::before {
 			background: linear-gradient(to right, transparent 90%, var(--color-bg-2) 97%);
 			transform: scaleX(1.01);
 		}
 	}
+
 	.scrolled::before {
 		background: linear-gradient(
 			to right,

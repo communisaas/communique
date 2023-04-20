@@ -11,7 +11,6 @@
 	let expandable: HTMLElement;
 
 	let store: Writable<UserState>;
-
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 	});
@@ -20,9 +19,14 @@
 </script>
 
 {#if store && email}
-	<aside bind:this={expandable} on:mousedown|preventDefault>
+	<aside
+		tabindex="-1"
+		style="text-align: initial; max-height: {expand ? 'fit-content' : '0'}, overflow: visible"
+		bind:this={expandable}
+		on:mousedown|preventDefault
+	>
 		<input value="Copy to clipboard" bind:this={actionButton} type="button" on:blur />
-		<div>
+		<div style="max-height: {expand ? 'fit-content' : '11rem'}">
 			{@html DOMPurify.sanitize(email.body)}
 		</div>
 	</aside>
