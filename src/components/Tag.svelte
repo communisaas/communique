@@ -12,16 +12,17 @@
 	let tag: HTMLInputElement;
 	let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
 	let tagWidth: number;
-	onMount(async () => {
-		store = (await import('$lib/sessionStorage')).store;
+	$: context ? (tagWidth = context.measureText(item).width + 20) : null,
+		onMount(async () => {
+			store = (await import('$lib/sessionStorage')).store;
 
-		canvas = document.createElement('canvas');
-		context = canvas.getContext('2d') as CanvasRenderingContext2D;
-		if (context) {
-			context.font = getComputedStyle(tag).font;
-			tagWidth = context.measureText(item).width + 20;
-		}
-	});
+			canvas = document.createElement('canvas');
+			context = canvas.getContext('2d') as CanvasRenderingContext2D;
+			if (context) {
+				context.font = getComputedStyle(tag).font;
+				tagWidth = context.measureText(item).width + 20;
+			}
+		});
 
 	function handleSelect() {
 		if (selected.id != item) {
@@ -33,7 +34,7 @@
 
 <input
 	readonly
-	class="cursor-pointer text-center px-2 py-1 rounded bg-larimarGreen-600 {style} "
+	class="cursor-pointer text-center px-2 py-1 rounded bg-larimarGreen-600 overflow-visible {style} "
 	style:width="{tagWidth}px"
 	value={item}
 	bind:this={tag}

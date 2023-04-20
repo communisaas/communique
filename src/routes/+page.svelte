@@ -24,7 +24,7 @@
 </svelte:head>
 
 <div class="flex flex-col gap-y-10">
-	{#if store && data}
+	{#if $store && $store.hasOwnProperty('template')}
 		{#each Object.entries($store.template) as [order, panel]}
 			{#key panel.header}
 				<Panel
