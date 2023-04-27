@@ -25,7 +25,13 @@
 		bind:this={expandable}
 		on:mousedown|preventDefault
 	>
-		<input value="Copy to clipboard" bind:this={actionButton} type="button" on:blur />
+		<input
+			style="visibility: {expand ? 'visible' : 'hidden'}"
+			value="Copy to clipboard"
+			bind:this={actionButton}
+			type="button"
+			on:blur
+		/>
 		<div style="max-height: {expand ? 'fit-content' : '11rem'}">
 			{@html DOMPurify.sanitize(email.body)}
 		</div>

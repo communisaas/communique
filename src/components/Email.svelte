@@ -88,7 +88,7 @@
 			>
 				{item.subject}
 			</h1>
-			<article class="flex" style="flex-direction:{!expand ? 'row' : 'column'}">
+			<article class="flex justify-between" style="flex-direction:{!expand ? 'row' : 'column'}">
 				<div>
 					<Selector
 						selectable={Tag}
@@ -134,7 +134,7 @@
 <style lang="scss">
 	.cardWrapper {
 		&::after {
-			background: linear-gradient(to top, var(--color-bg-2) 1%, transparent 10%);
+			background: linear-gradient(to top, var(--color-bg-2) 0%, transparent 10%);
 			content: '';
 			position: absolute;
 			bottom: -1px;
