@@ -6,26 +6,30 @@
 	export let selected: Selectable;
 	export let target: SelectableKey;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
-	export let overflow: 'scroll' | 'hidden' | 'visible' = 'hidden';
+	export let overflow: 'scroll' | 'hidden' | 'visible' | 'wrap' = 'hidden';
+	export let scrollable = true;
 	export let itemStyle: string = '';
 	export let selectorStyle: string = '';
 
 	const listStyle = `p-1 flex ${
 		alignment == 'end' ? 'flex-row-reverse items-end' : 'flex-row'
-	} gap-3  overflow-x-hidden hover:overflow-x-${overflow}  overflow-visible
-	whitespace-nowrap ${selectorStyle}`;
+	} gap-3  overflow-x-hidden ${
+		overflow == 'wrap'
+			? 'whitespace-normal flex-wrap gap-y-1'
+			: 'whitespace-nowrap hover:overflow-x-' + overflow
+	} ${selectorStyle}`;
 
 	// TODO overflowing items
 	let scrollPosition = { x: 0, remainingWidth: 0 };
 
 	let list: HTMLUListElement;
-	let scrollable: boolean, scrolled: boolean;
+	let scrolled: boolean;
 	onMount(async () => {
 		selected.target = target;
 	});
 
 	$: {
-		if (items && list) {
+		if (items && list && scrollable) {
 			// update if new list litems
 			scrollPosition.remainingWidth = list.scrollWidth - list.clientWidth;
 			scrollable = scrollPosition.remainingWidth == 0 ? false : true;

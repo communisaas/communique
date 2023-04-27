@@ -64,7 +64,7 @@
 	}}
 	on:blur={handleBlur}
 	class="{style} flex p-2 m-1 rounded bg-paper-500 w-[95%] min-h-[15.5rem] max-w-4xl "
-	style="min-width: {expand ? '99%' : '95%'}"
+	style="min-width: {expand ? '99%' : '95%'}; cursor: {expand ? 'default' : 'pointer'};"
 >
 	<section
 		class="flex flex-col relative {!expand
@@ -106,33 +106,36 @@
 							{item.send_count}
 						</span>
 					</div>
-					<Selector
-						selectable={Tag}
-						items={item.topic_list}
-						itemStyle="text-[11px]"
-						alignment="start"
-						overflow="scroll"
-						target="email"
-						bind:selected={$store.topic}
-						on:select
-						on:blur={handleBlur}
-					/>
 
-					<Selector
-						selectable={Tag}
-						items={item.recipient_list}
-						itemStyle="text-[11px] bg-teal-500"
-						alignment="start"
-						overflow="scroll"
-						target="email"
-						bind:selected={$store.recipient}
-						on:select
-						on:blur={handleBlur}
-					/>
+					<div class="tags min-w-[25rem]" style="max-width: {!expand ? '35rem' : '100%'};">
+						<Selector
+							selectable={Tag}
+							items={item.topic_list}
+							itemStyle="text-[11px]"
+							alignment="start"
+							overflow="wrap"
+							target="email"
+							bind:selected={$store.topic}
+							on:select
+							on:blur={handleBlur}
+						/>
+
+						<Selector
+							selectable={Tag}
+							items={item.recipient_list}
+							itemStyle="text-[11px] bg-teal-500"
+							alignment="start"
+							overflow="wrap"
+							target="email"
+							bind:selected={$store.recipient}
+							on:select
+							on:blur={handleBlur}
+						/>
+					</div>
 				</div>
 				<div
-					style="text-align: initial"
-					class="whitespace-normal "
+					style="text-align: initial; margin-top: {!expand ? '-3rem' : '0'};"
+					class="whitespace-normal"
 					class:scrollableY={!expand}
 					bind:this={reader}
 				>
@@ -191,6 +194,13 @@
 		display: flex;
 		flex-direction: row;
 		padding-left: 1em;
+	}
+	.tags {
+		white-space: normal;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		margin-bottom: 1rem;
 	}
 	.scrollable {
 		scrollbar-width: none;
