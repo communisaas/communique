@@ -2,6 +2,7 @@
 	import { backInOut } from 'svelte/easing';
 
 	export let hovered: boolean = false;
+	export let color = '#D7FEF0';
 
 	interface AnimationTiming {
 		duration: number;
@@ -29,30 +30,26 @@
 
 <icon class="cursor-pointer" title="Post">
 	<svg width="100%" viewBox="0 0 32 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<path
-			d="M22.4165 17L29.7307 25H2.26923L9.58352 17H22.4165Z"
-			stroke="#D7FEF0"
-			stroke-width="2"
-		/>
+		<path d="M22.4165 17L29.7307 25H2.26923L9.58352 17H22.4165Z" stroke={color} stroke-width="2" />
 		<path
 			d="M15.9527 1.22463L29.9239 9.92937L15.9499 16.6153L2.06637 9.96973L15.9527 1.22463Z"
-			stroke="#D7FEF0"
+			stroke={color}
 			stroke-width="2"
 		/>
 		<path
 			d="M15.95 16.9154L4.93449 12.287L16.3194 12.2608H16.3205L27.0353 12.2608L15.95 16.9154Z"
-			fill="#D7FEF0"
-			stroke="#D7FEF0"
+			fill={color}
+			stroke={color}
 			stroke-width="2"
 		/>
 		<path
 			d="M1.00001 23.8696L11.2846 15.3286L1.00015 11.4464L1.00001 23.8696Z"
-			stroke="#D7FEF0"
+			stroke={color}
 			stroke-width="2"
 		/>
 		<path
 			d="M31 23.859L20.8072 15.3281L30.9998 11.4504L31 23.859Z"
-			stroke="#D7FEF0"
+			stroke={color}
 			stroke-width="2"
 		/>
 		{#if !hovered}
@@ -63,7 +60,7 @@
 			>
 				<path
 					d="M2.28431 3.90134H29.7843L28.1343 9.91535L24.8359 11.4062H6.75759L3.70448 9.91597L2.28431 3.90134Z"
-					fill="#D7FEF0"
+					fill={color}
 				/>
 			</g>
 		{/if}

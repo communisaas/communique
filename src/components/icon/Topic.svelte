@@ -1,4 +1,4 @@
-<icon class="cursor-pointer" title="Add topic">
+<icon class="cursor-pointer">
 	<svg width="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<line x1="7.07696" y1="7.99014" x2="8.81762" y2="7.99014" stroke="#D7FEF0" stroke-width="3" />
 		<line x1="14.7693" y1="7.99014" x2="19.121" y2="7.99014" stroke="#D7FEF0" stroke-width="3" />

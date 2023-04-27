@@ -120,7 +120,7 @@
 		}}
 		class="flex justify-center items-center relative py-1"
 	>
-		<span class="relative w-12 shadow-artistBlue" class:active={inputVisible}>
+		<span title={`Add ${name}`} class="relative w-12 shadow-artistBlue" class:active={inputVisible}>
 			<slot />
 			<icon class={addIconClass} />
 		</span>

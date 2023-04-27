@@ -4,11 +4,8 @@
 	import { handleSelect } from '$lib/selectable';
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
-	import Layout from './+layout.svelte';
 
 	let store: Writable<UserState>;
-
-	export let data;
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
