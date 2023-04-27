@@ -5,6 +5,8 @@
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
 	import Reader from './Reader.svelte';
+	import Recipient from './icon/Recipient.svelte';
+	import Sent from './icon/Sent.svelte';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -90,6 +92,20 @@
 			</h1>
 			<article class="flex justify-between" style="flex-direction:{!expand ? 'row' : 'column'}">
 				<div>
+					<div class="stats p-1 flex flex-row gap-x-5">
+						<span title="Read count" class="flex flex-row items-center ">
+							<icon class="max-w-[36px]" style="filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));">
+								<Recipient color="#005F73" />
+							</icon>
+							{item.open_count}
+						</span>
+						<span title="Send count" class="flex flex-row items-center gap-x-1.5">
+							<icon class="max-w-[36px]" style="filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));">
+								<Sent color="#005F73" />
+							</icon>
+							{item.send_count}
+						</span>
+					</div>
 					<Selector
 						selectable={Tag}
 						items={item.topic_list}
@@ -101,10 +117,6 @@
 						on:select
 						on:blur={handleBlur}
 					/>
-					<div class="stats p-1">
-						<span>reads: {item.open_count}</span>
-						<span>sends: {item.send_count}</span>
-					</div>
 
 					<Selector
 						selectable={Tag}
@@ -177,7 +189,7 @@
 	.stats {
 		text-align: start;
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 		padding-left: 1em;
 	}
 	.scrollable {
