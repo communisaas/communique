@@ -91,7 +91,7 @@
 				{item.subject}
 			</h1>
 			<article class="flex justify-between" style="flex-direction:{!expand ? 'row' : 'column'}">
-				<div>
+				<div class="flex flex-col justify-between min-h-full">
 					<div class="stats p-1 flex flex-row gap-x-5">
 						<span title="Read count" class="flex flex-row items-center ">
 							<icon class="max-w-[36px]" style="filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));">

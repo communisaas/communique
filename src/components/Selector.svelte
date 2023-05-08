@@ -2,9 +2,9 @@
 	import { onMount, type ComponentType } from 'svelte';
 
 	export let items: Selectable[] | string[];
-	export let selectable: ComponentType;
-	export let selected: Selectable;
-	export let target: SelectableKey;
+	export let selectable: ComponentType; // type of item
+	export let selected: Selectable; // selected item
+	export let target: SelectableKey; // TODO remove
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let overflow: 'scroll' | 'hidden' | 'visible' | 'wrap' = 'hidden';
 	export let scrollable = true;
@@ -19,7 +19,6 @@
 			: 'whitespace-nowrap hover:overflow-x-' + overflow
 	} ${selectorStyle}`;
 
-	// TODO overflowing items
 	let scrollPosition = { x: 0, remainingWidth: 0 };
 
 	let list: HTMLUListElement;

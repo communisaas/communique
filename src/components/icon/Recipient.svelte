@@ -2,7 +2,7 @@
 	export let color = '#D7FEF0';
 </script>
 
-<icon class="cursor-pointer">
+<icon>
 	<svg width="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<g filter="url(#filter0_d_40_6)">
 			<path d="M10.9082 18.6953H24.0961L22.6307 29.9637H12.3735L10.9082 18.6953Z" fill="#D9D9D9" />
