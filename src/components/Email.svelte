@@ -19,7 +19,7 @@
 	// TODO email card layout
 	$: scrollPosition = { header: { x: 0, remainingWidth: 0 }, card: { x: 0, remainingWidth: 0 } };
 	let header: HTMLHeadingElement;
-	let actionButton: HTMLInputElement;
+	let actionButton: HTMLButtonElement;
 	let card: HTMLButtonElement;
 	let reader: HTMLElement;
 	let scrollableElements: { [key: string]: HTMLElement };
@@ -37,13 +37,15 @@
 
 	$: expand = false;
 	$: console.log(scrollPosition);
-	$: actionButton && document.activeElement != actionButton ? (expand = false) : null;
 	function handleSelect() {
 		if (selected.id != item.rowid) {
 			selected.id = item.rowid;
 		}
+		// card already expanded, so toggle action
+		if (expand) {
+			console.log('copy');
+		}
 		expand = true;
-		actionButton.focus();
 		dispatch('select', selected);
 	}
 
@@ -134,12 +136,12 @@
 					</div>
 				</div>
 				<div
-					style="text-align: initial; margin-top: {!expand ? '-3rem' : '0'};"
+					style="text-align: initial; margin-top: {!expand ? '-1.5rem' : '0'};"
 					class="whitespace-normal"
 					class:scrollableY={!expand}
 					bind:this={reader}
 				>
-					<Reader bind:actionButton {expand} email={item} on:blur={handleBlur} />
+					<Reader {expand} email={item} />
 				</div>
 			</article>
 		{/if}
