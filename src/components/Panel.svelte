@@ -58,11 +58,7 @@
 
 <style lang="scss">
 	section {
-		box-shadow: 0 2.5px 1px theme('colors.peacockFeather.500');
 		transition: all 0.5s ease-in-out;
-		&:hover {
-			box-shadow: 0 2.5px 1px theme('colors.peacockFeather.600');
-		}
 	}
 	h1 {
 		background-color: theme('colors.peacockFeather.600');

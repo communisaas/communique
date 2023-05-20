@@ -102,7 +102,7 @@
 							{item.open_count}
 						</span>
 						<span title="Send count" class="flex flex-row items-center gap-x-1.5">
-							<icon class="max-w-[36px]" style="filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));">
+							<icon class="max-w-[36px]">
 								<Sent color="#005F73" />
 							</icon>
 							{item.send_count}
@@ -125,7 +125,7 @@
 						<Selector
 							selectable={Tag}
 							items={item.recipient_list}
-							itemStyle="text-[11px] bg-teal-500"
+							itemStyle="text-[11px] text-white bg-teal-500"
 							alignment="start"
 							overflow="wrap"
 							target="email"
