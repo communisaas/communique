@@ -13,8 +13,6 @@
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 	});
-
-	$: console.log(expand);
 </script>
 
 {#if store && email}

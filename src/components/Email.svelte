@@ -19,7 +19,6 @@
 	// TODO email card layout
 	$: scrollPosition = { header: { x: 0, remainingWidth: 0 }, card: { x: 0, remainingWidth: 0 } };
 	let header: HTMLHeadingElement;
-	let actionButton: HTMLButtonElement;
 	let card: HTMLButtonElement;
 	let reader: HTMLElement;
 	let scrollableElements: { [key: string]: HTMLElement };
@@ -37,13 +36,20 @@
 
 	$: expand = false;
 	$: console.log(scrollPosition);
-	function handleSelect() {
+	async function handleSelect() {
 		if (selected.id != item.rowid) {
 			selected.id = item.rowid;
 		}
 		// card already expanded, so toggle action
 		if (expand) {
-			console.log('copy');
+			await navigator.clipboard.write([
+				new ClipboardItem({
+					'text/html': new Blob([item.body], { type: 'text/html' })
+				})
+			]);
+			const mailBaseURL = new URL(`mailto:${item.recipient_list.join(',')}`);
+			const mailURL = mailBaseURL.href + `?subject=${encodeURI(item.subject)}`;
+			window.open(mailURL, '_blank');
 		}
 		expand = true;
 		dispatch('select', selected);
