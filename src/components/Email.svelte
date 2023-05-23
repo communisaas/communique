@@ -7,19 +7,18 @@
 	import Reader from './Reader.svelte';
 	import Recipient from './icon/Recipient.svelte';
 	import Sent from './icon/Sent.svelte';
-	import Page from '../routes/+page.svelte';
 
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';
+	export let sending: boolean;
 
 	let store: Writable<UserState>;
-
-	const dispatch = createEventDispatcher();
 
 	$: scrollPosition = { header: { x: 0, remainingWidth: 0 }, card: { x: 0, remainingWidth: 0 } };
 	let header: HTMLHeadingElement;
 	let card: HTMLButtonElement;
+	let expand = false;
 	let scrollToCard = false;
 	let reader: HTMLElement;
 	let scrollableElements: { [key: string]: HTMLElement };
@@ -35,12 +34,19 @@
 		}
 	});
 
-	$: expand = false;
+	const dispatch = createEventDispatcher();
+
+	function setExpand(value: boolean) {
+		expand = value;
+		dispatch('expand', expand); // Dispatch the `expand` event.
+	}
+
 	async function handleSelect() {
 		if (selected.id != item.rowid) {
 			selected.id = item.rowid;
 		}
 		if (expand) {
+			sending = true; // switch this in parent component with viewport overlay
 			await navigator.clipboard.write([
 				new ClipboardItem({
 					'text/html': new Blob([item.body], { type: 'text/html' })
@@ -50,7 +56,7 @@
 			const mailURL = mailBaseURL.href + `?subject=${encodeURI(item.subject)}`;
 			window.open(mailURL, '_blank');
 		} else {
-			expand = true;
+			setExpand(true);
 			scrollToCard = true;
 		}
 		dispatch('select', selected);
@@ -67,7 +73,7 @@
 		if (event.relatedTarget instanceof HTMLElement) {
 			// keep expanded if focus is on a nested button
 			if (!card.contains(event.relatedTarget)) expand = false;
-		} else expand = false;
+		} else setExpand(false);
 	}
 </script>
 
