@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { email } from '@prisma/client';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher, onMount, afterUpdate } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
 	import Reader from './Reader.svelte';
 	import Recipient from './icon/Recipient.svelte';
 	import Sent from './icon/Sent.svelte';
+	import Page from '../routes/+page.svelte';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -16,10 +17,10 @@
 
 	const dispatch = createEventDispatcher();
 
-	// TODO email card layout
 	$: scrollPosition = { header: { x: 0, remainingWidth: 0 }, card: { x: 0, remainingWidth: 0 } };
 	let header: HTMLHeadingElement;
 	let card: HTMLButtonElement;
+	let scrollToCard = false;
 	let reader: HTMLElement;
 	let scrollableElements: { [key: string]: HTMLElement };
 
@@ -35,12 +36,10 @@
 	});
 
 	$: expand = false;
-	$: console.log(scrollPosition);
 	async function handleSelect() {
 		if (selected.id != item.rowid) {
 			selected.id = item.rowid;
 		}
-		// card already expanded, so toggle action
 		if (expand) {
 			await navigator.clipboard.write([
 				new ClipboardItem({
@@ -50,13 +49,23 @@
 			const mailBaseURL = new URL(`mailto:${item.recipient_list.join(',')}`);
 			const mailURL = mailBaseURL.href + `?subject=${encodeURI(item.subject)}`;
 			window.open(mailURL, '_blank');
+		} else {
+			expand = true;
+			scrollToCard = true;
 		}
-		expand = true;
 		dispatch('select', selected);
 	}
 
+	afterUpdate(() => {
+		if (scrollToCard) {
+			card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			scrollToCard = false;
+		}
+	});
+
 	function handleBlur(event: FocusEvent) {
 		if (event.relatedTarget instanceof HTMLElement) {
+			// keep expanded if focus is on a nested button
 			if (!card.contains(event.relatedTarget)) expand = false;
 		} else expand = false;
 	}
@@ -72,7 +81,8 @@
 	}}
 	on:blur={handleBlur}
 	class="{style} flex p-2 m-1 rounded bg-paper-900 items-center justify-center w-[95%] min-h-[15.5rem] max-w-4xl "
-	style="min-width: {expand ? '99%' : '95%'}; cursor: 'pointer';"
+	style="min-width: {expand ? '99%' : '95%'}; cursor: 'pointer'; 
+		//scroll-margin-bottom: px;"
 >
 	<section
 		class="flex flex-col relative items-center {!expand
@@ -149,7 +159,7 @@
 				</div>
 				<div
 					style="text-align: initial; margin-top: {!expand ? '-1.5rem' : '0'};"
-					class="whitespace-normal flex flex-col items-center self-center min-w-full"
+					class="whitespace-normal flex flex-col"
 					class:scrollableY={!expand}
 					bind:this={reader}
 				>
@@ -199,13 +209,6 @@
 		overflow-x: overlay;
 		min-width: 100%;
 		padding-bottom: 0;
-		&::before {
-			content: '';
-			position: absolute;
-			bottom: 0;
-			height: 100%;
-			width: 100%;
-		}
 	}
 	.stats {
 		text-align: start;
