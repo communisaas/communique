@@ -35,7 +35,7 @@
 <span>
 	<input
 		readonly
-		class="cursor-pointer text-center px-2 py-1 rounded bg-larimarGreen-600 overflow-visible {style} "
+		class="cursor-pointer text-center px-2 py-1 rounded overflow-visible {style} "
 		style:width="{tagWidth}px"
 		value={item}
 		bind:this={tag}

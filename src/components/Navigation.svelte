@@ -7,7 +7,7 @@
 </script>
 
 <aside class="object-cover inline-flex h-full">
-	<div class="flex flex-col items-center  h-full bg-peacockFeather-600 shadow-nav z-50">
+	<div class="flex flex-col items-center  h-full bg-peacockFeather-700 shadow-nav z-50">
 		<nav class="flex flex-col">
 			{#each Object.entries(navLinks) as [route, icon]}
 				<span

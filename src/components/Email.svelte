@@ -71,8 +71,8 @@
 		}
 	}}
 	on:blur={handleBlur}
-	class="{style} flex p-2 m-1 rounded bg-paper-500 w-[95%] min-h-[15.5rem] max-w-4xl "
-	style="min-width: {expand ? '99%' : '95%'}; cursor: {expand ? 'default' : 'pointer'};"
+	class="{style} flex p-2 m-1 rounded bg-paper-900 w-[95%] min-h-[15.5rem] max-w-4xl "
+	style="min-width: {expand ? '99%' : '95%'}; cursor: 'pointer';"
 >
 	<section
 		class="flex flex-col relative {!expand
@@ -108,7 +108,10 @@
 							{item.open_count}
 						</span>
 						<span title="Send count" class="flex flex-row items-center gap-x-1.5">
-							<icon class="max-w-[36px]">
+							<icon
+								class="max-w-[36px]"
+								style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
+							>
 								<Sent color="#005F73" />
 							</icon>
 							{item.send_count}
@@ -119,7 +122,7 @@
 						<Selector
 							selectable={Tag}
 							items={item.topic_list}
-							itemStyle="text-[11px]"
+							itemStyle="text-[11px] text-paper-500 bg-peacockFeather-500"
 							alignment="start"
 							overflow="wrap"
 							target="email"
@@ -131,7 +134,7 @@
 						<Selector
 							selectable={Tag}
 							items={item.recipient_list}
-							itemStyle="text-[11px] text-white bg-teal-500"
+							itemStyle="text-[11px] text-paper-500 bg-artistBlue-700"
 							alignment="start"
 							overflow="wrap"
 							target="email"
@@ -157,7 +160,7 @@
 <style lang="scss">
 	.cardWrapper {
 		&::after {
-			background: linear-gradient(to top, var(--color-bg-2) 0%, transparent 10%);
+			background: linear-gradient(to top, theme('colors.paper.900') 0%, transparent 10%);
 			content: '';
 			position: absolute;
 			bottom: -1px;
@@ -169,15 +172,14 @@
 	button {
 		transition: 0.2s ease-out;
 		&:hover {
-			transform: scale(1.01);
-			box-shadow: theme('colors.peacockFeather.600') 0 0 2px 2px;
+			transform: scale(1.0025);
+			box-shadow: theme('colors.larimarGreen.700') 0 0 2px 2px;
 			transition: 0.1s ease-in;
 		}
 		&:active {
 			transform: scale(1);
 			box-shadow: unset;
-			transition: 0.1s ease-in-out;
-			box-shadow: theme('colors.paper.700') 0 0 2px 2px;
+			transition: 0.1s ease-out;
 		}
 	}
 	h1 {
@@ -222,7 +224,11 @@
 			overflow: overlay;
 		}
 		&::before {
-			background: linear-gradient(to right, transparent 90%, var(--color-bg-2) 97%);
+			background: linear-gradient(
+				to right,
+				transparent 90%,
+				theme('colors.peacockFeather.500') 97%
+			);
 			transform: scaleX(1.01);
 		}
 	}
@@ -237,6 +243,6 @@
 		);
 	}
 	.scrolled__max::before {
-		background: linear-gradient(to right, var(--color-bg-2) 3%, transparent 10%);
+		background: linear-gradient(to right, theme('colors.peacockFeather.500') 3%, transparent 10%);
 	}
 </style>

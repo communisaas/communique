@@ -35,11 +35,12 @@
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
 		<div class="grow whitespace-nowrap">
-			<header class="flex h-fit py-2 px-3 pb-2 bg-peacockFeather-600">
+			<header class="flex h-fit py-2 px-3 pb-2 bg-peacockFeather-700">
 				{#if $store}
 					<Selector
 						selectable={Tag}
 						target="email"
+						itemStyle="bg-peacockFeather-500 text-paper-500"
 						items={topicNames}
 						alignment="center"
 						bind:selected={$store.topic}
