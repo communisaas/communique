@@ -71,13 +71,13 @@
 		}
 	}}
 	on:blur={handleBlur}
-	class="{style} flex p-2 m-1 rounded bg-paper-900 w-[95%] min-h-[15.5rem] max-w-4xl "
+	class="{style} flex p-2 m-1 rounded bg-paper-900 items-center justify-center w-[95%] min-h-[15.5rem] max-w-4xl "
 	style="min-width: {expand ? '99%' : '95%'}; cursor: 'pointer';"
 >
 	<section
-		class="flex flex-col relative {!expand
+		class="flex flex-col relative items-center {!expand
 			? 'cardWrapper'
-			: ''} min-h-[14.5rem] min-w-[inherit] overflow-hidden"
+			: ''} min-h-[14.5rem] min-w-full overflow-hidden"
 	>
 		{#if store}
 			<h1
@@ -98,7 +98,10 @@
 			>
 				{item.subject}
 			</h1>
-			<article class="flex justify-between" style="flex-direction:{!expand ? 'row' : 'column'}">
+			<article
+				class="flex justify-between min-w-full"
+				style="flex-direction:{!expand ? 'row' : 'column'}"
+			>
 				<div class="flex flex-col justify-between min-h-full">
 					<div class="stats p-1 flex flex-row gap-x-5">
 						<span title="Read count" class="flex flex-row items-center ">
@@ -146,11 +149,16 @@
 				</div>
 				<div
 					style="text-align: initial; margin-top: {!expand ? '-1.5rem' : '0'};"
-					class="whitespace-normal"
+					class="whitespace-normal flex flex-col items-center self-center min-w-full"
 					class:scrollableY={!expand}
 					bind:this={reader}
 				>
-					<Reader {expand} email={item} />
+					{#if expand}
+						<p class="text-center"><i>click again to send...</i></p>
+					{/if}
+					<div class="{expand ? 'bg-paper-700' : ''} rounded p-2 min-w-full">
+						<Reader {expand} email={item} />
+					</div>
 				</div>
 			</article>
 		{/if}
