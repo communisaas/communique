@@ -18,8 +18,7 @@
 		store = (await import('$lib/sessionStorage')).store;
 	});
 
-	$: expand = false;
-	$: console.log(expand);
+	let expand = false;
 </script>
 
 {#if store}
@@ -48,7 +47,6 @@
 					expand = true;
 				} else {
 					dispatch('select', e.detail);
-					// actionButton.focus();
 				}
 			}}
 			on:blur
