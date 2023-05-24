@@ -63,7 +63,10 @@
 
 	afterUpdate(() => {
 		if (scrollToCard) {
-			card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			// hacky fix, still a few events behind
+			setTimeout(() => {
+				card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			});
 			scrollToCard = false;
 		}
 	});
