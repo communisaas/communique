@@ -20,7 +20,6 @@
 	let card: HTMLButtonElement;
 	let expand = false;
 	let scrollToCard = false;
-	let reader: HTMLElement;
 	let scrollableElements: { [key: string]: HTMLElement };
 
 	onMount(async () => {
@@ -167,7 +166,6 @@
 					style="text-align: initial; margin-top: {!expand ? '-1.5rem' : '0'};"
 					class="whitespace-normal flex flex-col"
 					class:scrollableY={!expand}
-					bind:this={reader}
 				>
 					{#if expand}
 						<p class="text-center"><i>click again to send...</i></p>
