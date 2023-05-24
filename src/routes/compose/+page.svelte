@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
 	import TagInput from '$components/input/Tag.svelte';
 	import Editor from '$components/input/Editor.svelte';
 	import AddRecipient from '$components/icon/Recipient.svelte';
@@ -63,7 +63,7 @@
 		}}
 	>
 		<div class="ml-20 mr-20 flex flex-col w-fit h-full max-md:w-18 gap-x-20 gap-y-3">
-			<span class="flex flex-row flex-wrap gap-5 ">
+			<span class="flex flex-row flex-wrap gap-5">
 				<TagInput
 					bind:tagList={recipientEmails}
 					type="email"
