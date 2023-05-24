@@ -6,7 +6,6 @@
 	import type { Writable } from 'svelte/store';
 
 	let store: Writable<UserState>;
-
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 	});

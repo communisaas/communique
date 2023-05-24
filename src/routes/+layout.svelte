@@ -14,7 +14,7 @@
 
 	export let data: LayoutSchema;
 
-	let store: Writable<UserState>, lastStore: Writable<UserState>;
+	let store: Writable<UserState>;
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 		$store.topic = { id: topicNames[0], type: 'topic' };
@@ -31,7 +31,7 @@
 </script>
 
 <div class="app min-w-fit flex flex-col max-w-[100vw]">
-	<main class="flex min-h-screen ">
+	<main class="flex min-h-screen">
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
 		<div class="grow whitespace-nowrap">
