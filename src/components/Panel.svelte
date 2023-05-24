@@ -1,7 +1,8 @@
 <script lang="ts">
 	import Selector from './Selector.svelte';
-	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
+	import { createEventDispatcher, onMount, type ComponentType, tick } from 'svelte';
 	import type { Writable } from 'svelte/store';
+	import Page from '../routes/+page.svelte';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
@@ -41,10 +42,12 @@
 			selectorStyle="flex-col min-h-[13rem]"
 			target={selected.type}
 			bind:selected
-			on:select={(e) => {
-				// if selected item is targeting the panel selectable
+			on:select={async (e) => {
 				if (e.detail.type === selected.type) {
-					expand = true;
+					expand = true; // selected item is targeting the panel selectable
+				} else if (e.detail.type === 'topic' || e.detail.type === 'recipient') {
+					window.scrollTo({ top: 0, behavior: 'smooth' }); // TODO handle this in parent page component
+					dispatch('select', e.detail);
 				} else {
 					dispatch('select', e.detail);
 				}

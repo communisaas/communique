@@ -85,7 +85,7 @@
 		}
 	}}
 	on:blur={handleBlur}
-	class="{style} flex p-2 m-1 rounded bg-paper-900 items-center justify-center w-[95%] min-h-[15.5rem] max-w-4xl "
+	class="{style} flex p-2 m-1 rounded bg-paper-900 items-center justify-center w-[95%] min-h-[15.5rem] max-w-4xl"
 	style="min-width: {expand ? '99%' : '95%'}; cursor: 'pointer'; 
 		//scroll-margin-bottom: px;"
 >
@@ -119,7 +119,7 @@
 			>
 				<div class="flex flex-col justify-between min-h-full">
 					<div class="stats p-1 flex flex-row gap-x-5">
-						<span title="Read count" class="flex flex-row items-center ">
+						<span title="Read count" class="flex flex-row items-center">
 							<icon class="max-w-[36px]" style="filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));">
 								<Recipient color="#005F73" />
 							</icon>
@@ -218,7 +218,6 @@
 		text-align: start;
 		display: flex;
 		flex-direction: row;
-		padding-left: 1em;
 	}
 	.tags {
 		white-space: normal;
