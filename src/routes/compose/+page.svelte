@@ -24,6 +24,8 @@
 		class="flex flex-col gap-y-5 rounded-full"
 		method="POST"
 		action="?/publish"
+		aria-label="Compose form"
+		aria-describedby="Add topics, recipients, a subject line, and email body here"
 		use:enhance={async ({ form, data: post, action, cancel }) => {
 			// `form` is the `<form>` element
 			// `data` is its `FormData` object
@@ -90,6 +92,8 @@
 				<input
 					required
 					type="text"
+					aria-label="Subject line"
+					aria-describedby="Enter a subject line for your email"
 					on:keypress={(e) => {
 						if (e.key == 'Enter') {
 							e.preventDefault();
@@ -110,6 +114,7 @@
 			type="submit"
 			name="post"
 			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-larimarGreen-600 text-white"
+			aria-label="Post button"
 			on:mouseenter={() => ($postButtonHovered = true)}
 			on:focus={() => ($postButtonHovered = true)}
 			on:mouseleave={() => ($postButtonHovered = false)}

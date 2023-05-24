@@ -66,7 +66,7 @@
 		width: fit-content;
 	}
 	.tab {
-		filter: drop-shadow(-1px 2px 1px theme('colors.larimarGreen.700'));
+		filter: drop-shadow(1px 2px 1px theme('colors.artistBlue.500'));
 
 		&__start {
 			margin-left: -1.25rem;

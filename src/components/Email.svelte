@@ -44,8 +44,9 @@
 			selected.id = item.rowid;
 		}
 		if (expand) {
+			// TODO add user flow for Firefox (ClipboardItem is not available by default)
 			await navigator.clipboard.write([
-				new ClipboardItem({
+				new window.ClipboardItem({
 					'text/html': new Blob([item.body], { type: 'text/html' })
 				})
 			]);
@@ -87,7 +88,8 @@
 		}
 	}}
 	on:blur={handleBlur}
-	class="{style} flex p-2 m-1 rounded bg-paper-900 items-center justify-center w-[95%] min-h-[15.5rem] max-w-4xl"
+	aria-label="Email with a subject: {item.subject}"
+	class="{style} flex p-2 m-1 rounded bg-paper-900 items-center justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl"
 	style="min-width: {expand ? '99%' : '95%'}; cursor: 'pointer'; 
 		//scroll-margin-bottom: px;"
 >
@@ -98,6 +100,8 @@
 	>
 		{#if store}
 			<h1
+				aria-label="Subject line"
+				aria-describedby={item.subject}
 				title={scrollPosition.header.x > 0 ? item.subject : null}
 				bind:this={header}
 				on:wheel={(e) => {
@@ -121,13 +125,21 @@
 			>
 				<div class="flex flex-col justify-between min-h-full">
 					<div class="stats p-1 flex flex-row gap-x-5">
-						<span title="Read count" class="flex flex-row items-center">
+						<span
+							title="Read count"
+							aria-label="Number of reads"
+							class="flex flex-row items-center"
+						>
 							<icon class="max-w-[36px]" style="filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));">
 								<Recipient color="#005F73" />
 							</icon>
 							{item.open_count}
 						</span>
-						<span title="Send count" class="flex flex-row items-center gap-x-1.5">
+						<span
+							title="Send count"
+							aria-label="Number of sends"
+							class="flex flex-row items-center gap-x-1.5"
+						>
 							<icon
 								class="max-w-[36px]"
 								style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
@@ -138,30 +150,37 @@
 						</span>
 					</div>
 
-					<div class="tags min-w-[25rem]" style="max-width: {!expand ? '35rem' : '100%'};">
-						<Selector
-							selectable={Tag}
-							items={item.topic_list}
-							itemStyle="text-[11px] text-paper-500 bg-peacockFeather-500"
-							alignment="start"
-							overflow="wrap"
-							target="email"
-							bind:selected={$store.topic}
-							on:select
-							on:blur={handleBlur}
-						/>
-
-						<Selector
-							selectable={Tag}
-							items={item.recipient_list}
-							itemStyle="text-[11px] text-paper-500 bg-artistBlue-700"
-							alignment="start"
-							overflow="wrap"
-							target="email"
-							bind:selected={$store.recipient}
-							on:select
-							on:blur={handleBlur}
-						/>
+					<div
+						class="tags min-w-[25rem]"
+						aria-label="Topic and recepient lists"
+						style="max-width: {!expand ? '35rem' : '100%'};"
+					>
+						<div aria-label="Topic list">
+							<Selector
+								selectable={Tag}
+								items={item.topic_list}
+								itemStyle="text-[11px] text-paper-500 bg-peacockFeather-500"
+								alignment="start"
+								overflow="wrap"
+								target="email"
+								bind:selected={$store.topic}
+								on:select
+								on:blur={handleBlur}
+							/>
+						</div>
+						<div aria-label="Receipient list">
+							<Selector
+								selectable={Tag}
+								items={item.recipient_list}
+								itemStyle="text-[11px] text-paper-500 bg-artistBlue-700"
+								alignment="start"
+								overflow="wrap"
+								target="email"
+								bind:selected={$store.recipient}
+								on:select
+								on:blur={handleBlur}
+							/>
+						</div>
 					</div>
 				</div>
 				<div
@@ -170,9 +189,12 @@
 					class:scrollableY={!expand}
 				>
 					{#if expand}
-						<p class="text-center"><i>click again to send...</i></p>
+						<p aria-label="Info text" class="text-center"><i>click again to send...</i></p>
 					{/if}
-					<div class="{expand ? 'bg-paper-700' : ''} rounded mt-2 p-2 min-w-full">
+					<div
+						aria-label="Email body"
+						class="{expand ? 'bg-paper-700' : ''} rounded mt-2 p-2 min-w-full"
+					>
 						<Reader {expand} email={item} />
 					</div>
 				</div>

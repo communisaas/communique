@@ -35,7 +35,10 @@
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
 		<div class="grow whitespace-nowrap">
-			<header class="flex h-fit py-2 px-3 pb-2 bg-peacockFeather-700">
+			<header
+				aria-label="Popular topics list"
+				class="flex h-fit py-2 px-3 pb-2 bg-peacockFeather-700"
+			>
 				{#if $store}
 					<Selector
 						selectable={Tag}
@@ -61,7 +64,7 @@
 			{/if}
 		</div>
 	</main>
-
+	<!-- TODO aria labels for footer -->
 	<footer class="bg-gray-900 text-white py-6">
 		<div class="container mx-auto flex flex-wrap justify-between px-4">
 			<div class="w-full md:w-1/3 mb-4 md:mb-0">

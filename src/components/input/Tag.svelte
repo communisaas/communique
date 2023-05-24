@@ -49,8 +49,10 @@
 </script>
 
 <ul
-	class="{style} max-w-fit px-3 py-1 h-fit flex flex-row place-items-center items-center justify-center 
+	class="{style} max-w-fit px-3 py-1 h-fit flex flex-row place-items-center items-center justify-center
 		rounded bg-larimarGreen-600 cursor-pointer flex-wrap"
+	aria-label="{name} list"
+	aria-describedby="List of {name}s with an add button"
 	on:mouseenter={() => (deleteVisible = true)}
 	on:mouseleave={() => (deleteVisible = false)}
 	on:mousedown|preventDefault={(e) => {
@@ -70,7 +72,9 @@
 					on:blur={() => (deleteVisible = false)}
 					class="delete absolute -top-1 -left-2 rounded-full bg-amber-600 w-4 h-4"
 					class:show={deleteVisible}
+					aria-label={`Remove ${name}`}
 				>
+					<!-- plus sign -->
 					&#215;
 				</button>
 				{tag}
@@ -80,6 +84,8 @@
 			required={tagList.length <= 0}
 			{name}
 			role="textbox"
+			aria-label="{name} input"
+			aria-describedby="Add a {name} here"
 			{placeholder}
 			inputmode={type}
 			bind:this={inputField}
@@ -115,6 +121,7 @@
 
 	<button
 		name={`Add ${name}`}
+		aria-label="Add button for {name}s"
 		on:click|preventDefault={() => {
 			inputVisible ? addTag(inputField.value) : (inputVisible = true);
 		}}

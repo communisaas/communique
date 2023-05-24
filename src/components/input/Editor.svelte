@@ -40,7 +40,9 @@
 
 <main
 	on:mouseup={(e) => e.currentTarget.focus()}
-	class="relative flex flex-col items-center  bg-paper-500 px-40 py-5 min-h-[10vh]"
+	aria-label="Email editor"
+	aria-describedby="Write your email here"
+	class="relative flex flex-col items-center bg-paper-500 px-40 py-5 min-h-[10vh]"
 >
 	<span id="toolbar" class="-mt-12 absolute" />
 	<Editor

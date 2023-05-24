@@ -18,7 +18,7 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<div class="flex flex-col">
+<div role="feed" aria-label="Welcome to communique, you are at the home page" class="flex flex-col">
 	{#if $store && $store.hasOwnProperty('template')}
 		{#each Object.entries($store.template) as [order, panel]}
 			{#key panel.header}

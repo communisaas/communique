@@ -11,7 +11,7 @@
 	export let itemStyle: string = '';
 	export let selectorStyle: string = '';
 
-	const listStyle = `p-1 flex ${
+	const listStyle = `p-1 flex grow ${
 		alignment == 'end' ? 'flex-row-reverse items-end' : 'flex-row'
 	} gap-3  overflow-x-hidden ${
 		overflow == 'wrap'
@@ -21,7 +21,7 @@
 
 	let scrollPosition = { x: 0, remainingWidth: 0 };
 
-	let list: HTMLUListElement;
+	let list: HTMLElement;
 	let scrolled: boolean;
 	onMount(async () => {
 		selected.target = target;
@@ -37,33 +37,31 @@
 	}
 </script>
 
-<div class="relative z-0">
-	<ul
-		bind:this={list}
-		class={listStyle}
-		class:scrollable
-		class:scrolled
-		class:scrolled__max={scrolled && scrollPosition.remainingWidth - scrollPosition.x <= 1}
-		on:wheel={(e) => {
-			list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-			scrollPosition.x = list.scrollLeft + 1;
-			if (scrollable) {
-				e.preventDefault();
-			}
-		}}
-	>
-		{#each items as item}
-			<svelte:component
-				this={selectable}
-				bind:selected
-				style={itemStyle}
-				{item}
-				on:select
-				on:blur
-				on:externalAction
-			/>
-		{/each}
-	</ul>
+<div
+	bind:this={list}
+	class={listStyle}
+	class:scrollable
+	class:scrolled
+	class:scrolled__max={scrolled && scrollPosition.remainingWidth - scrollPosition.x <= 1}
+	on:wheel={(e) => {
+		list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
+		scrollPosition.x = list.scrollLeft + 1;
+		if (scrollable) {
+			e.preventDefault();
+		}
+	}}
+>
+	{#each items as item}
+		<svelte:component
+			this={selectable}
+			bind:selected
+			style={itemStyle}
+			{item}
+			on:select
+			on:blur
+			on:externalAction
+		/>
+	{/each}
 </div>
 
 <style lang="scss">

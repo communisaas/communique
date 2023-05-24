@@ -3,18 +3,23 @@
 	import Compose from '$components/icon/Compose.svelte';
 	import { page } from '$app/stores';
 
-	const navLinks = { '/': Home, '/compose': Compose };
+	const navLinks = {
+		'/': { component: Home, label: 'Home' },
+		'/compose': { component: Compose, label: 'Compose email' }
+	};
 </script>
 
 <aside class="object-cover inline-flex h-full">
-	<div class="flex flex-col items-center  h-full bg-peacockFeather-700 shadow-nav z-50">
-		<nav class="flex flex-col">
-			{#each Object.entries(navLinks) as [route, icon]}
+	<div class="flex flex-col items-center h-full bg-peacockFeather-700 shadow-nav z-50">
+		<nav aria-label="Page navigation" class="flex flex-col">
+			{#each Object.entries(navLinks) as [route, link]}
 				<span
 					class:active={$page.route.id == route}
 					class:pointer-events-none={$page.route.id == `${route}`}
 				>
-					<a class="min-h-full min-w-full" href={route}><svelte:component this={icon} /></a>
+					<a class="min-h-full min-w-full" aria-label={link.label} href={route}>
+						<svelte:component this={link.component} />
+					</a>
 				</span>
 			{/each}
 		</nav>

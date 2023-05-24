@@ -22,7 +22,7 @@
 		bind:this={expandable}
 		on:mousedown|preventDefault
 	>
-		<div style="max-height: {expand ? 'fit-content' : '11rem'}">
+		<div aria-label="Email content" style="max-height: {expand ? 'fit-content' : '11rem'}">
 			{@html DOMPurify.sanitize(email.body)}
 		</div>
 	</aside>

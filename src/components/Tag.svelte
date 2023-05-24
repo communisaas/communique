@@ -32,9 +32,10 @@
 	}
 </script>
 
-<span>
+<span class="max-w-fit">
 	<input
 		readonly
+		aria-label={item}
 		class="cursor-pointer text-center px-2 py-1 rounded overflow-visible {style} "
 		style:width="{tagWidth}px"
 		value={item}
