@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
 	import Email from '$components/Email.svelte';
 	import Panel from '$components/Panel.svelte';
 	import { handleSelect } from '$lib/selectable';
@@ -12,7 +12,6 @@
 	});
 
 	// TODO loading placeholders
-	// TODO switch panel header between selected topic & address context
 </script>
 
 <svelte:head>
