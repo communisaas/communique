@@ -60,6 +60,7 @@
 				{item}
 				on:select
 				on:blur
+				on:externalAction
 			/>
 		{/each}
 	</ul>

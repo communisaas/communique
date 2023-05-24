@@ -2,7 +2,6 @@
 	import Selector from './Selector.svelte';
 	import { createEventDispatcher, onMount, type ComponentType, tick } from 'svelte';
 	import type { Writable } from 'svelte/store';
-	import Page from '../routes/+page.svelte';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
@@ -52,6 +51,7 @@
 					dispatch('select', e.detail);
 				}
 			}}
+			on:externalAction
 			on:blur
 		/>
 	</section>

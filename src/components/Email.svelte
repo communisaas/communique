@@ -11,7 +11,6 @@
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';
-	export let sending: boolean;
 
 	let store: Writable<UserState>;
 
@@ -37,7 +36,7 @@
 
 	function setExpand(value: boolean) {
 		expand = value;
-		dispatch('expand', expand); // Dispatch the `expand` event.
+		dispatch('expand', expand);
 	}
 
 	async function handleSelect() {
@@ -45,7 +44,6 @@
 			selected.id = item.rowid;
 		}
 		if (expand) {
-			sending = true; // switch this in parent component with viewport overlay
 			await navigator.clipboard.write([
 				new ClipboardItem({
 					'text/html': new Blob([item.body], { type: 'text/html' })
@@ -53,6 +51,7 @@
 			]);
 			const mailBaseURL = new URL(`mailto:${item.recipient_list.join(',')}`);
 			const mailURL = mailBaseURL.href + `?subject=${encodeURI(item.subject)}`;
+			dispatch('externalAction', { type: 'email', url: mailURL });
 			window.open(mailURL, '_blank');
 		} else {
 			setExpand(true);
@@ -63,7 +62,7 @@
 
 	afterUpdate(() => {
 		if (scrollToCard) {
-			// hacky fix, still a few events behind
+			// TODO better fix to resolve a few events still pending after the DOM update
 			setTimeout(() => {
 				card.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			});
@@ -173,7 +172,7 @@
 					{#if expand}
 						<p class="text-center"><i>click again to send...</i></p>
 					{/if}
-					<div class="{expand ? 'bg-paper-700' : ''} rounded p-2 min-w-full">
+					<div class="{expand ? 'bg-paper-700' : ''} rounded mt-2 p-2 min-w-full">
 						<Reader {expand} email={item} />
 					</div>
 				</div>

@@ -43,6 +43,11 @@
 						}
 						$store.template.primary.focus = e.detail.id;
 					}}
+					on:externalAction={async (e) => {
+						if (e.detail.type === 'email') {
+							console.log(e);
+						}
+					}}
 				/>{/key}
 		{/each}
 	{/if}
