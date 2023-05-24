@@ -1,11 +1,14 @@
 <script lang="ts">
 	import Email from '$components/Email.svelte';
 	import Panel from '$components/Panel.svelte';
+	import Popover from '$components/Popover.svelte';
+	import portal from '$lib/portal';
 	import { handleSelect } from '$lib/selectable';
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 
 	let store: Writable<UserState>;
+	let showActionPopover = false;
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 	});
@@ -45,10 +48,16 @@
 					}}
 					on:externalAction={async (e) => {
 						if (e.detail.type === 'email') {
-							console.log(e);
+							showActionPopover = true;
 						}
 					}}
 				/>{/key}
 		{/each}
 	{/if}
 </div>
+
+{#if showActionPopover}
+	<div use:portal>
+		<Popover bind:show={showActionPopover} />
+	</div>
+{/if}
