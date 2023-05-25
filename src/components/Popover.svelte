@@ -1,25 +1,73 @@
 <script lang="ts">
-	import { quintOut } from 'svelte/easing';
+	import { expoOut, expoIn } from 'svelte/easing';
 	import { fade, scale } from 'svelte/transition';
 
 	export let show: boolean;
 </script>
 
-<aside transition:fade aria-label="Send status screen" class="fixed z-50 top-0">
-	<div
-		class="absolute min-w-[100vw] min-h-[100vh]"
-		transition:scale={{ delay: 25, duration: 150, easing: quintOut }}
+<aside
+	transition:fade={{ delay: 50, duration: 500, easing: expoIn }}
+	aria-label="Send status screen"
+	class="popover fixed items-center z-50 top-0"
+	style="--bodyOverflow: {show ? 'hidden' : 'auto'}"
+>
+	<section
+		class="absolute text-paper-800 flex justify-center items-center min-w-[100vw] min-h-[100vh]"
+		in:fade={{ delay: 25, duration: 450, easing: expoOut }}
+		out:fade={{ delay: 50, duration: 100, easing: expoIn }}
 	>
-		content!
-		<button class="min-w-max" on:click={() => (show = false)}>Close</button>
-	</div>
+		<div
+			class="info flex flex-col p-2 pl-10 pr-10 -mt-60"
+			in:scale={{ delay: 125, duration: 350, easing: expoIn }}
+			out:scale={{ delay: 25, duration: 150, easing: expoOut }}
+		>
+			<span class="flex flex-col items-center justify-center gap-2 mb-12">
+				<p>Paste into your email app.</p>
+				<p>Link others in:</p>
+				<ul />
+			</span>
+			<span class="flex flex-col items-center justify-center gap-2">
+				<div>
+					<input name="Sent!" id="sendStatus" type="checkbox" class="min-w-max" />
+					<label for="sendStatus">Sent!</label>
+				</div>
+				<button class="min-w-max" on:click={() => (show = false)}>Close</button>
+			</span>
+		</div>
+	</section>
 </aside>
 
 <style lang="scss">
-	div {
-		background: rgba(255, 255, 255, 0.35);
-		box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+	:global(body:has(.popover)) {
+		overflow: hidden;
+	}
+	section {
+		overflow: auto;
+		background: rgba(0, 0, 0, 0.6);
 		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
+	}
+
+	.info {
+		background: rgba(255, 255, 255, 0.05);
+		box-shadow: 0 1px 2px 2px rgba(0, 0, 0, 0.1);
+		border-radius: 16px;
+	}
+
+	button {
+		background: rgba(255, 255, 255, 0.15);
+		border-radius: 16px;
+		box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.1);
+		backdrop-filter: blur(3px);
+		padding: 2px 5px;
+
+		&:hover {
+			background: rgba(255, 255, 255, 0.25);
+			transform: translateY(-1px);
+			transition: ease-in-out 0.1s;
+		}
+		&:active {
+			transform: translateY(1px);
+			background: rgba(255, 255, 255, 0.15);
+		}
 	}
 </style>
