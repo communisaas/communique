@@ -48,15 +48,17 @@
 		}
 		if (expand) {
 			// TODO add user flow for Firefox (ClipboardItem is not available by default)
-			await navigator.clipboard.write([
-				new window.ClipboardItem({
-					'text/html': new Blob([item.body], { type: 'text/html' })
-				})
-			]);
+			try {
+				await navigator.clipboard.write([
+					new window.ClipboardItem({
+						'text/html': new Blob([item.body], { type: 'text/html' })
+					})
+				]);
+			} catch (e) {} // TODO handle Firefox where ClipboardItem is not available
 			const mailBaseURL = new URL(`mailto:${item.recipient_list.join(',')}`);
 			const mailURL = mailBaseURL.href + `?subject=${encodeURI(item.subject)}`;
 			dispatch('externalAction', { type: 'email', url: mailURL });
-			window.open(mailURL, '_blank');
+			window.open(mailURL);
 		} else {
 			setExpand(true);
 			scrollToCard = true;
@@ -75,10 +77,13 @@
 	});
 
 	function handleBlur(event: FocusEvent) {
+		if (document.activeElement == event.target) return; // keep expanded if focus is on the card
 		if (event.relatedTarget instanceof HTMLElement) {
 			// keep expanded if focus is on a nested button
 			if (!card.contains(event.relatedTarget)) expand = false;
-		} else setExpand(false);
+		} else {
+			setExpand(false);
+		}
 	}
 </script>
 

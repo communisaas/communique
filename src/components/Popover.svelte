@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { expoOut, expoIn } from 'svelte/easing';
+	import { expoOut, expoIn, backInOut } from 'svelte/easing';
 	import { fade, scale } from 'svelte/transition';
 
 	export let show: boolean;
@@ -10,16 +10,17 @@
 	aria-label="Send status screen"
 	class="popover fixed items-center z-50 top-0"
 	style="--bodyOverflow: {show ? 'hidden' : 'auto'}"
+	on:mousedown|stopPropagation|preventDefault
 >
 	<section
 		class="absolute text-paper-800 flex justify-center items-center min-w-[100vw] min-h-[100vh]"
-		in:fade={{ delay: 25, duration: 450, easing: expoOut }}
-		out:fade={{ delay: 50, duration: 100, easing: expoIn }}
+		in:fade={{ delay: 25, duration: 250, easing: expoOut }}
+		out:fade={{ delay: 50, duration: 300, easing: expoIn }}
 	>
 		<div
 			class="info flex flex-col p-2 pl-10 pr-10 -mt-60"
-			in:scale={{ delay: 125, duration: 350, easing: expoIn }}
-			out:scale={{ delay: 25, duration: 150, easing: expoOut }}
+			in:scale={{ delay: 25, duration: 50, easing: backInOut }}
+			out:scale={{ delay: 25, duration: 250, easing: backInOut }}
 		>
 			<span class="flex flex-col items-center justify-center gap-2 mb-12">
 				<p>Paste into your email app.</p>
