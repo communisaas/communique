@@ -7,6 +7,9 @@
 	import Reader from './Reader.svelte';
 	import Recipient from './icon/Recipient.svelte';
 	import Sent from './icon/Sent.svelte';
+	import Menu from './icon/Menu.svelte';
+	import { scale, fade } from 'svelte/transition';
+	import { expoIn, expoOut } from 'svelte/easing';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -89,9 +92,9 @@
 	}}
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
-	class="{style} flex p-2 m-1 rounded bg-paper-900 items-center justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl"
-	style="min-width: {expand ? '99%' : '95%'}; cursor: 'pointer'; 
-		//scroll-margin-bottom: px;"
+	class="{style} flex p-2 m-1 rounded bg-paper-900 items-center
+		justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl {expand && 'cursor-alias'}"
+	style="min-width: {expand ? '99%' : '95%'};"
 >
 	<section
 		class="flex flex-col relative items-center {!expand
@@ -99,37 +102,45 @@
 			: ''} min-h-[14.5rem] min-w-full overflow-hidden"
 	>
 		{#if store}
-			<h1
-				aria-label="Subject line"
-				aria-describedby={item.subject}
-				title={scrollPosition.header.x > 0 ? item.subject : null}
-				bind:this={header}
-				on:wheel={(e) => {
-					header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-					scrollPosition.header.x = header.scrollLeft + 1;
-					if (scrollPosition.header.remainingWidth > 0) {
-						e.preventDefault();
-					}
-				}}
-				class:scrollable={scrollPosition.header.remainingWidth > 0}
-				class:scrolled={scrollPosition.header.x > 1}
-				class:scrolled__max={scrollPosition.header.remainingWidth > 0 &&
-					scrollPosition.header.remainingWidth < scrollPosition.header.x}
-				class="max-w-fit inline-block"
-			>
-				{item.subject}
-			</h1>
+			<span class="flex min-w-full">
+				<h1
+					aria-label="Subject line"
+					aria-describedby={item.subject}
+					title={scrollPosition.header.x > 0 ? item.subject : null}
+					bind:this={header}
+					on:wheel={(e) => {
+						header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
+						scrollPosition.header.x = header.scrollLeft + 1;
+						if (scrollPosition.header.remainingWidth > 0) {
+							e.preventDefault();
+						}
+					}}
+					class:scrollable={scrollPosition.header.remainingWidth > 0}
+					class:scrolled={scrollPosition.header.x > 1}
+					class:scrolled__max={scrollPosition.header.remainingWidth > 0 &&
+						scrollPosition.header.remainingWidth < scrollPosition.header.x}
+					class="max-w-fit inline-block"
+				>
+					{item.subject}
+				</h1>
+				{#if expand}
+					<span
+						on:mousedown|stopPropagation={(e) => console.log(e)}
+						class="flex items-center max-w-[24px] cursor-context-menu"
+						in:fade={{ delay: 50, duration: 200, easing: expoIn }}
+						out:scale={{ delay: 50, duration: 500, easing: expoOut }}
+					>
+						<Menu />
+					</span>
+				{/if}
+			</span>
 			<article
 				class="flex justify-between min-w-full"
 				style="flex-direction:{!expand ? 'row' : 'column'}"
 			>
-				<div class="flex flex-col justify-between min-h-full">
+				<div class="flex flex-col min-h-full">
 					<div class="stats p-1 flex flex-row gap-x-5">
-						<span
-							title="Read count"
-							aria-label="Number of reads"
-							class="flex flex-row items-center"
-						>
+						<span title="Read count" aria-label="Number of reads" class="flex items-center">
 							<icon class="max-w-[36px]" style="filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));">
 								<Recipient color="#005F73" />
 							</icon>
@@ -138,7 +149,7 @@
 						<span
 							title="Send count"
 							aria-label="Number of sends"
-							class="flex flex-row items-center gap-x-1.5"
+							class="flex items-center gap-x-1.5"
 						>
 							<icon
 								class="max-w-[36px]"
@@ -164,7 +175,10 @@
 								overflow="wrap"
 								target="email"
 								bind:selected={$store.topic}
-								on:select
+								on:select={(e) => {
+									expand = false;
+									dispatch('select', e.detail);
+								}}
 								on:blur={handleBlur}
 							/>
 						</div>
@@ -177,7 +191,10 @@
 								overflow="wrap"
 								target="email"
 								bind:selected={$store.recipient}
-								on:select
+								on:select={(e) => {
+									expand = false;
+									dispatch('select', e.detail);
+								}}
 								on:blur={handleBlur}
 							/>
 						</div>
@@ -235,7 +252,6 @@
 		white-space: nowrap;
 		overflow: scroll;
 		overflow-x: overlay;
-		min-width: 100%;
 		padding-bottom: 0;
 	}
 	.stats {
@@ -262,11 +278,7 @@
 			overflow: overlay;
 		}
 		&::before {
-			background: linear-gradient(
-				to right,
-				transparent 90%,
-				theme('colors.peacockFeather.500') 97%
-			);
+			background: linear-gradient(to right, transparent 90%, theme('colors.paper.900') 97%);
 			transform: scaleX(1.01);
 		}
 	}
@@ -274,13 +286,13 @@
 	.scrolled::before {
 		background: linear-gradient(
 			to right,
-			var(--color-bg-2) 3%,
+			theme('colors.paper.900') 3%,
 			transparent 10%,
 			transparent 90%,
-			var(--color-bg-2) 97%
+			theme('colors.paper.900') 97%
 		);
 	}
 	.scrolled__max::before {
-		background: linear-gradient(to right, theme('colors.peacockFeather.500') 3%, transparent 10%);
+		background: linear-gradient(to right, theme('colors.paper.900') 3%, transparent 10%);
 	}
 </style>

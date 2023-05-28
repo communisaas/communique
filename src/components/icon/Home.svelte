@@ -1,4 +1,4 @@
-<icon class="cursor-pointer" title="Home">
+<icon title="Home">
 	<svg width="100%" viewBox="0 0 32 26" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path
 			d="M22.4165 17L29.7308 25H2.26925L9.58353 17H22.4165Z"

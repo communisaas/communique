@@ -28,7 +28,7 @@
 	}
 </script>
 
-<icon class="cursor-pointer" title="Post">
+<icon title="Post">
 	<svg width="100%" viewBox="0 0 32 26" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path d="M22.4165 17L29.7307 25H2.26923L9.58352 17H22.4165Z" stroke={color} stroke-width="2" />
 		<path

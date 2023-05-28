@@ -1,4 +1,4 @@
-<icon class="cursor-pointer" title="Compose">
+<icon title="Compose">
 	<svg width="100%" viewBox="0 0 32 28" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<line y1="26.5" x2="2.03739" y2="26.5" stroke="#D7FEF0" stroke-width="3" />
 		<line x1="3.05608" y1="26.5" x2="8.14954" y2="26.5" stroke="#D7FEF0" stroke-width="3" />

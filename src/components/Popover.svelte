@@ -57,7 +57,6 @@
 		background: rgba(255, 255, 255, 0.15);
 		border-radius: 16px;
 		box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.1);
-		backdrop-filter: blur(3px);
 		padding: 2px 5px;
 
 		&:hover {
