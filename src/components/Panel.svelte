@@ -17,15 +17,10 @@
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
 	});
-
-	let expand = false;
 </script>
 
 {#if store}
-	<section
-		class:section__active={expand}
-		class="flex flex-col relative pb-5 px-5 gradient-background"
-	>
+	<section class="flex flex-col relative pb-5 px-5 gradient-background">
 		<span class="tab tab__{alignment}" style="align-self: {alignment}">
 			<h1 class="text-paper-500" style="text-align: {alignment}; ">
 				{header}
@@ -43,7 +38,6 @@
 			bind:selected
 			on:select={async (e) => {
 				if (e.detail.type === selected.type) {
-					expand = true; // selected item is targeting the panel selectable
 				} else if (e.detail.type === 'topic' || e.detail.type === 'recipient') {
 					window.scrollTo({ top: 0, behavior: 'smooth' }); // TODO handle this in parent page component
 					dispatch('select', e.detail);
