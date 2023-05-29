@@ -10,7 +10,7 @@
 	import Tag from '$components/Tag.svelte';
 	import { navigating } from '$app/stores';
 	import type { Writable } from 'svelte/store';
-	import { handleSelect } from '$lib/selectable';
+	import { handleSelect } from '$lib/endpoint';
 
 	export let data: LayoutSchema;
 

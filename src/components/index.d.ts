@@ -9,7 +9,7 @@ interface Panel extends Expandable {
 	cardList: email[];
 }
 
-type SelectableKey = 'email' | 'topic' | 'recipient' | 'spotlight';
+type SelectableKey = 'option' | 'email' | 'topic' | 'recipient' | 'spotlight';
 interface Selectable {
 	id: string;
 	type: SelectableKey;

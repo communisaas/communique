@@ -3,7 +3,7 @@
 	import Panel from '$components/Panel.svelte';
 	import Popover from '$components/Popover.svelte';
 	import portal from '$lib/portal';
-	import { handleSelect } from '$lib/selectable';
+	import { handleSelect } from '$lib/endpoint';
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 
