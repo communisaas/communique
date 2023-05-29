@@ -97,7 +97,7 @@
 	}}
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
-	class="{style} flex p-2 m-1 rounded bg-paper-900 items-center
+	class="{style} flex p-2 m-1 rounded bg-artistBlue-600 items-center
 		justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl {expand && 'cursor-alias'}"
 	style="min-width: {expand ? '99%' : '95%'};"
 >
@@ -147,7 +147,7 @@
 					<div class="stats p-1 flex flex-row gap-x-5">
 						<span title="Read count" aria-label="Number of reads" class="flex items-center">
 							<icon class="max-w-[36px]" style="filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));">
-								<Recipient color="#005F73" />
+								<Recipient color="#94D2BD" />
 							</icon>
 							{item.open_count}
 						</span>
@@ -160,7 +160,7 @@
 								class="max-w-[36px]"
 								style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
 							>
-								<Sent color="#005F73" />
+								<Sent color="#94D2BD" />
 							</icon>
 							{item.send_count}
 						</span>
@@ -191,7 +191,7 @@
 							<Selector
 								selectable={Tag}
 								items={item.recipient_list}
-								itemStyle="text-[11px] text-paper-500 bg-artistBlue-700"
+								itemStyle="text-[11px] text-paper-500 bg-peacockFeather-600"
 								alignment="start"
 								overflow="wrap"
 								target="email"
@@ -215,7 +215,7 @@
 					{/if}
 					<div
 						aria-label="Email body"
-						class="{expand ? 'bg-paper-700' : ''} rounded mt-2 p-2 min-w-full"
+						class="{expand ? 'bg-artistBlue-800' : ''} rounded mt-2 p-2 min-w-full"
 					>
 						<Reader {expand} email={item} />
 					</div>
@@ -228,7 +228,7 @@
 <style lang="scss">
 	.cardWrapper {
 		&::after {
-			background: linear-gradient(to top, theme('colors.paper.900') 0%, transparent 10%);
+			background: linear-gradient(to top, theme('colors.artistBlue.600') 0%, transparent 10%);
 			content: '';
 			position: absolute;
 			bottom: -1px;
@@ -239,6 +239,7 @@
 	}
 	button {
 		transition: 0.2s ease-out;
+		color: theme('colors.paper.500');
 		&:hover {
 			transform: scale(1.0025);
 			box-shadow: theme('colors.larimarGreen.700') 0 0 2px 2px;
@@ -283,7 +284,7 @@
 			overflow: overlay;
 		}
 		&::before {
-			background: linear-gradient(to right, transparent 90%, theme('colors.paper.900') 97%);
+			background: linear-gradient(to right, transparent 90%, theme('colors.artistBlue.600') 97%);
 			transform: scaleX(1.01);
 		}
 	}
@@ -291,13 +292,13 @@
 	.scrolled::before {
 		background: linear-gradient(
 			to right,
-			theme('colors.paper.900') 3%,
+			theme('colors.artistBlue.600') 3%,
 			transparent 10%,
 			transparent 90%,
-			theme('colors.paper.900') 97%
+			theme('colors.artistBlue.600') 97%
 		);
 	}
 	.scrolled__max::before {
-		background: linear-gradient(to right, theme('colors.paper.900') 3%, transparent 10%);
+		background: linear-gradient(to right, theme('colors.artistBlue.600') 3%, transparent 10%);
 	}
 </style>

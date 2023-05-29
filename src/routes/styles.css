@@ -20,7 +20,7 @@ body {
 	min-height: 100vh;
 	margin: 0;
 	background-attachment: fixed;
-	background-color: theme('colors.artistBlue.600');
+	background-color: theme('colors.peacockFeather.700');
 	background-size: 100vw 100vh;
 	scroll-behavior: smooth;
 }
