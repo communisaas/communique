@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Home from '$components/icon/Home.svelte';
 	import Compose from '$components/icon/Compose.svelte';
 	import { page } from '$app/stores';
+	import Topic from './icon/Topic.svelte';
 
 	const navLinks = {
-		'/': { component: Home, label: 'Home' },
+		'/': { component: Topic, label: 'Home' },
 		'/compose': { component: Compose, label: 'Compose email' }
 	};
 </script>
