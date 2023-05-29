@@ -216,6 +216,7 @@
 					<div
 						aria-label="Email body"
 						class="{expand ? 'bg-artistBlue-800' : ''} rounded mt-2 p-2 min-w-full"
+						on:mousedown|stopPropagation
 					>
 						<Reader {expand} email={item} />
 					</div>
