@@ -2,7 +2,7 @@
 	import Email from '$components/Email.svelte';
 	import Panel from '$components/Panel.svelte';
 	import Popover from '$components/Popover.svelte';
-	import portal from '$lib/portal';
+	import modal from '$lib/modal';
 	import { handleSelect } from '$lib/endpoint';
 	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
@@ -57,7 +57,7 @@
 </div>
 
 {#if showActionPopover}
-	<div use:portal>
+	<div use:modal>
 		<Popover bind:show={showActionPopover} />
 	</div>
 {/if}
