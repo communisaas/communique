@@ -20,6 +20,11 @@
 					<a class="min-h-full min-w-full" aria-label={link.label} href={route}>
 						<svelte:component this={link.component} />
 					</a>
+					<ins
+						style="transform-origin: center right;"
+						class:active={$page.route.id == route}
+						class="absolute top-0 left-0 w-full h-full bg-paper-500 opacity-20"
+					/>
 				</span>
 			{/each}
 		</nav>
@@ -31,6 +36,18 @@
 		width: 100%;
 		position: relative;
 	}
+
+	ins {
+		height: 100%;
+		transform: scale(0);
+		transition: transform 0.1s ease-out;
+	}
+
+	.active {
+		transform: scale(1);
+		height: 100%;
+	}
+
 	a::before {
 		content: '';
 		display: block;
