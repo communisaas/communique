@@ -146,8 +146,8 @@
 	.gradient-background {
 		background: linear-gradient(
 			90deg,
-			theme('colors.peacockFeather.500'),
-			theme('colors.larimarGreen.600')
+			theme('colors.peacockFeather.600'),
+			theme('colors.teal.700')
 		);
 	}
 </style>
