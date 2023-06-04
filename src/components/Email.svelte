@@ -8,8 +8,8 @@
 	import Recipient from './icon/Recipient.svelte';
 	import Sent from './icon/Sent.svelte';
 	import MenuIcon from './icon/Menu.svelte';
-	import { scale, fade, slide } from 'svelte/transition';
-	import { backInOut, expoIn, expoOut, quintInOut, quintOut } from 'svelte/easing';
+	import { scale, fade } from 'svelte/transition';
+	import { expoIn, expoOut } from 'svelte/easing';
 	import Menu from './Menu.svelte';
 
 	export let item: email;
@@ -82,11 +82,11 @@
 		if (document.activeElement == event.target) return; // keep expanded if focus is on the card
 		if (event.relatedTarget instanceof HTMLElement) {
 			// keep expanded if focus is on a nested button
-			if (!card.contains(event.relatedTarget)) expand = false;
+			if (!card.contains(event.relatedTarget)) setExpand(false);
 		} else {
 			setExpand(false);
-			showMenu = false;
 		}
+		showMenu = false;
 	}
 </script>
 
@@ -105,27 +105,20 @@
 	style="min-width: {expand ? '99%' : '95%'};"
 >
 	{#if showMenu}
-		<aside
-			class="menu rounded absolute top-0 min-h-full min-w-full z-20"
-			in:fade={{ delay: 50, duration: 300, easing: expoIn }}
-			out:fade={{ delay: 50, duration: 300, easing: expoOut }}
+		<div
 			on:mousedown|stopPropagation={() => {
 				if (expand) {
 					showMenu = !showMenu;
 				} else expand = true; // if menu recently closed but not yet destroyed, still expand the card
 			}}
 		>
-			<div
-				transition:slide={{ delay: 200, axis: 'x', easing: quintOut }}
-				on:mousedown|stopPropagation
-				class="pt-[0.75rem] max-w-[50%]"
-			>
-				<Menu>
-					<li class="menu__item">Option</li>
-					<li class="menu__item">Two</li>
-				</Menu>
-			</div>
-		</aside>
+			<Menu bind:show={showMenu}>
+				<li class="menu__item">Get link</li>
+				<li class="menu__item">Not interested...</li>
+				<li class="menu__item">Report</li>
+				<li class="menu__item menu__item__close" on:mousedown={() => (showMenu = false)}>Close</li>
+			</Menu>
+		</div>
 	{/if}
 	<section
 		class="flex flex-col relative items-center {!expand
@@ -157,7 +150,7 @@
 				{#if expand}
 					<span
 						on:mousedown|stopPropagation={() => (showMenu = !showMenu)}
-						class="flex items-center max-w-[24px] cursor-context-menu z-20"
+						class="flex items-center max-w-[24px] cursor-context-menu hover:scale-125 ease-in-out duration-150"
 						in:fade={{ delay: 50, duration: 200, easing: expoIn }}
 						out:scale={{ delay: 50, duration: 500, easing: expoOut }}
 					>
@@ -207,7 +200,7 @@
 								target="email"
 								bind:selected={$store.topic}
 								on:select={(e) => {
-									expand = false;
+									setExpand(false);
 									dispatch('select', e.detail);
 								}}
 								on:blur={handleBlur}
@@ -223,7 +216,7 @@
 								target="email"
 								bind:selected={$store.recipient}
 								on:select={(e) => {
-									expand = false;
+									setExpand(false);
 									dispatch('select', e.detail);
 								}}
 								on:blur={handleBlur}
@@ -301,22 +294,19 @@
 	}
 
 	.menu {
-		background: rgba(0, 0, 0, 0.2);
-		backdrop-filter: blur(8px);
-		cursor: initial;
-		overflow: hidden;
 		&__item {
-			min-width: 105%;
-			text-align: end;
+			min-width: 100%;
 			background-color: theme('colors.peacockFeather.500');
 			padding: 0.25em;
 			cursor: pointer;
-			filter: drop-shadow(1px 2px 1px theme('colors.artistBlue.800'));
 			transition: ease-in-out 0.2s;
+			&__close {
+				margin-top: 2em;
+				background-color: theme('colors.peacockFeather.600');
+			}
 		}
 		&__item:hover {
-			margin-right: -5%;
-			transform: scale(1.05);
+			transform: scale(1.075);
 		}
 		&__item:active {
 			transform: scale(1);
