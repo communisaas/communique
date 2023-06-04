@@ -80,15 +80,15 @@
 			<div class="w-full md:w-1/3 text-center mb-4 md:mb-0">
 				<h4 class="font-bold text-lg mb-2">Get Involved</h4>
 				<ul class="list-reset">
-					<li><a href="#" class="text-teal-400 hover:text-teal-500">Write templates</a></li>
 					<li><a href="#" class="text-teal-400 hover:text-teal-500">Find legislators</a></li>
+					<li><a href="#" class="text-teal-400 hover:text-teal-500">Codebase</a></li>
 					<li><a href="#" class="text-teal-400 hover:text-teal-500">Donate</a></li>
 				</ul>
 			</div>
 			<div class="w-full md:w-1/3 text-center md:text-right">
 				<h4 class="font-bold text-lg mb-2">Connect</h4>
 				<ul class="list-reset">
-					<li><a href="#" class="text-teal-400 hover:text-teal-500">Email us</a></li>
+					<li><a href="#" class="text-teal-400 hover:text-teal-500">Discord</a></li>
 					<li><a href="#" class="text-teal-400 hover:text-teal-500">Twitter</a></li>
 					<li><a href="#" class="text-teal-400 hover:text-teal-500">Instagram</a></li>
 				</ul>
