@@ -7,9 +7,10 @@
 	import Reader from './Reader.svelte';
 	import Recipient from './icon/Recipient.svelte';
 	import Sent from './icon/Sent.svelte';
-	import Menu from './icon/Menu.svelte';
-	import { scale, fade } from 'svelte/transition';
-	import { expoIn, expoOut } from 'svelte/easing';
+	import MenuIcon from './icon/Menu.svelte';
+	import { scale, fade, slide } from 'svelte/transition';
+	import { backInOut, expoIn, expoOut, quintInOut, quintOut } from 'svelte/easing';
+	import Menu from './Menu.svelte';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -23,6 +24,7 @@
 	let expand = false;
 	let scrollToCard = false;
 	let scrollableElements: { [key: string]: HTMLElement };
+	let showMenu = false;
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
@@ -83,6 +85,7 @@
 			if (!card.contains(event.relatedTarget)) expand = false;
 		} else {
 			setExpand(false);
+			showMenu = false;
 		}
 	}
 </script>
@@ -97,10 +100,33 @@
 	}}
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
-	class="{style} flex p-2 m-1 rounded bg-artistBlue-600 items-center
+	class="{style} flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
 		justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl {expand && 'cursor-alias'}"
 	style="min-width: {expand ? '99%' : '95%'};"
 >
+	{#if showMenu}
+		<aside
+			class="menu rounded absolute top-0 min-h-full min-w-full z-20"
+			in:fade={{ delay: 50, duration: 300, easing: expoIn }}
+			out:fade={{ delay: 50, duration: 300, easing: expoOut }}
+			on:mousedown|stopPropagation={() => {
+				if (expand) {
+					showMenu = !showMenu;
+				} else expand = true; // if menu recently closed but not yet destroyed, still expand the card
+			}}
+		>
+			<div
+				transition:slide={{ delay: 200, axis: 'x', easing: quintOut }}
+				on:mousedown|stopPropagation
+				class="pt-[0.75rem] max-w-[50%]"
+			>
+				<Menu>
+					<li class="menu__item">Option</li>
+					<li class="menu__item">Two</li>
+				</Menu>
+			</div>
+		</aside>
+	{/if}
 	<section
 		class="flex flex-col relative items-center {!expand
 			? 'cardWrapper'
@@ -130,12 +156,12 @@
 				</h1>
 				{#if expand}
 					<span
-						on:mousedown|stopPropagation={(e) => console.log(e)}
-						class="flex items-center max-w-[24px] cursor-context-menu"
+						on:mousedown|stopPropagation={() => (showMenu = !showMenu)}
+						class="flex items-center max-w-[24px] cursor-context-menu z-20"
 						in:fade={{ delay: 50, duration: 200, easing: expoIn }}
 						out:scale={{ delay: 50, duration: 500, easing: expoOut }}
 					>
-						<Menu />
+						<MenuIcon />
 					</span>
 				{/if}
 			</span>
@@ -242,7 +268,7 @@
 		transition: 0.2s ease-out;
 		color: theme('colors.paper.500');
 		&:hover {
-			transform: scale(1.0025);
+			transform: scale(1.0073);
 			box-shadow: theme('colors.larimarGreen.700') 0 0 2px 2px;
 			transition: 0.1s ease-in;
 		}
@@ -272,6 +298,29 @@
 		flex-direction: column;
 		gap: 0.25rem;
 		margin-bottom: 1rem;
+	}
+
+	.menu {
+		background: rgba(0, 0, 0, 0.2);
+		backdrop-filter: blur(8px);
+		cursor: initial;
+		overflow: hidden;
+		&__item {
+			min-width: 105%;
+			text-align: end;
+			background-color: theme('colors.peacockFeather.500');
+			padding: 0.25em;
+			cursor: pointer;
+			filter: drop-shadow(1px 2px 1px theme('colors.artistBlue.800'));
+			transition: ease-in-out 0.2s;
+		}
+		&__item:hover {
+			margin-right: -5%;
+			transform: scale(1.05);
+		}
+		&__item:active {
+			transform: scale(1);
+		}
 	}
 	.scrollable {
 		scrollbar-width: none;
