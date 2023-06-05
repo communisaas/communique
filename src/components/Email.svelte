@@ -28,13 +28,6 @@
 
 	onMount(async () => {
 		store = (await import('$lib/sessionStorage')).store;
-		scrollableElements = { card, header };
-		if (card && header) {
-			for (const [name, element] of Object.entries(scrollableElements)) {
-				scrollPosition[name as keyof typeof scrollPosition].remainingWidth =
-					element.scrollWidth - element.clientWidth;
-			}
-		}
 	});
 
 	const dispatch = createEventDispatcher();
@@ -66,6 +59,18 @@
 			scrollToCard = true;
 		}
 		dispatch('select', selected);
+	}
+
+	$: if (card && header) {
+		scrollableElements = { card, header };
+		for (const [name, element] of Object.entries(scrollableElements)) {
+			console.log(element);
+
+			scrollPosition[name as keyof typeof scrollPosition].remainingWidth =
+				element.scrollWidth - element.clientWidth;
+			console.log(element.scrollWidth);
+			console.log(element.clientWidth);
+		}
 	}
 
 	afterUpdate(() => {
@@ -121,12 +126,12 @@
 		</div>
 	{/if}
 	<section
-		class="flex flex-col relative items-center {!expand
+		class="flex flex-col relative {!expand
 			? 'cardWrapper'
 			: ''} min-h-[14.5rem] min-w-full overflow-hidden"
 	>
 		{#if store}
-			<span class="flex min-w-full">
+			<span class="flex max-w-full relative">
 				<h1
 					aria-label="Subject line"
 					aria-describedby={item.subject}
@@ -143,16 +148,16 @@
 					class:scrolled={scrollPosition.header.x > 1}
 					class:scrolled__max={scrollPosition.header.remainingWidth > 0 &&
 						scrollPosition.header.remainingWidth < scrollPosition.header.x}
-					class="max-w-fit inline-block"
+					class="max-w-full inline-block mr-1"
 				>
 					{item.subject}
 				</h1>
 				{#if expand}
 					<span
 						on:mousedown|stopPropagation={() => (showMenu = !showMenu)}
-						class="flex items-center max-w-[24px] cursor-context-menu hover:scale-125 ease-in-out duration-150"
+						class="flex items-center max-w-[24px] cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
 						in:fade={{ delay: 50, duration: 200, easing: expoIn }}
-						out:scale={{ delay: 50, duration: 500, easing: expoOut }}
+						out:scale={{ delay: 50, duration: 200, easing: expoOut }}
 					>
 						<MenuIcon />
 					</span>
@@ -234,7 +239,7 @@
 					{/if}
 					<div
 						aria-label="Email body"
-						class="{expand ? 'bg-artistBlue-800' : ''} rounded mt-2 p-2 min-w-full"
+						class="{expand ? 'bg-artistBlue-800' : 'mt-[1.5rem]'} rounded mt-4 p-2 min-w-full"
 						on:mousedown|stopPropagation
 					>
 						<Reader {expand} email={item} />
@@ -276,7 +281,6 @@
 		text-align: start;
 		font-weight: 600;
 		white-space: nowrap;
-		overflow: scroll;
 		overflow-x: overlay;
 		padding-bottom: 0;
 	}
@@ -324,12 +328,25 @@
 			overflow: overlay;
 		}
 		&::before {
+			content: '';
+			display: inline-block;
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 100%;
 			background: linear-gradient(to right, transparent 90%, theme('colors.artistBlue.600') 97%);
 			transform: scaleX(1.01);
 		}
 	}
 
 	.scrolled::before {
+		content: '';
+		display: block;
+		z-index: -1;
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
 		background: linear-gradient(
 			to right,
 			theme('colors.artistBlue.600') 3%,
@@ -339,6 +356,9 @@
 		);
 	}
 	.scrolled__max::before {
-		background: linear-gradient(to right, theme('colors.artistBlue.600') 3%, transparent 10%);
+		content: '';
+		height: 100%;
+		position: absolute;
+		background: linear-gradient(to right, theme('colors.artistBlue.600') 3%, transparent 25%);
 	}
 </style>
