@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { expoOut, expoIn, backInOut } from 'svelte/easing';
 	import { fade, scale } from 'svelte/transition';
+	import Clipboard from './icon/Clipboard.svelte';
 
 	export let show: boolean;
 </script>
@@ -24,6 +25,7 @@
 		>
 			<span class="flex flex-col items-center justify-center gap-2 mb-12">
 				<p>Paste into your email app.</p>
+				<Clipboard />
 				<p>Link others in:</p>
 				<ul />
 			</span>
