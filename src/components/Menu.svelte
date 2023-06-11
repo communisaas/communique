@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { expoIn, expoOut, quintOut } from 'svelte/easing';
 	import { fade, slide } from 'svelte/transition';
-
-	export let show: boolean;
 </script>
 
 <aside
