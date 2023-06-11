@@ -224,7 +224,7 @@
 				{#if expand}
 					<span
 						on:mousedown|stopPropagation={() => (showMenu = !showMenu)}
-						class="flex items-center max-w-[24px] cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
+						class="z-10 flex items-center max-w-[24px] cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
 						in:fade={{ delay: 50, duration: 200, easing: expoIn }}
 						out:scale={{ delay: 50, duration: 200, easing: expoOut }}
 					>
@@ -401,26 +401,21 @@
 			/* prevent scrollbar from changing container dimensions in webkit */
 			overflow: overlay;
 		}
+
 		&::before {
 			content: '';
-			display: inline-block;
+			display: block;
 			position: absolute;
 			top: 0;
 			right: 0;
-			width: 100%;
+			bottom: 0;
+			left: 0;
 			background: linear-gradient(to right, transparent 90%, theme('colors.artistBlue.600') 97%);
 			transform: scaleX(1.01);
 		}
 	}
 
 	.scrolled::before {
-		content: '';
-		display: block;
-		z-index: -1;
-		position: absolute;
-		top: 0;
-		right: 0;
-		left: 0;
 		background: linear-gradient(
 			to right,
 			theme('colors.artistBlue.600') 3%,
@@ -429,10 +424,14 @@
 			theme('colors.artistBlue.600') 97%
 		);
 	}
+
 	.scrolled__max::before {
 		content: '';
-		height: 100%;
+		display: block;
 		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
 		background: linear-gradient(to right, theme('colors.artistBlue.600') 3%, transparent 25%);
 	}
 </style>
