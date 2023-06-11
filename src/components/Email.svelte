@@ -12,6 +12,8 @@
 	import { expoIn, expoOut } from 'svelte/easing';
 	import Menu from './Menu.svelte';
 
+	import he from 'he';
+
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';
@@ -32,6 +34,46 @@
 
 	const dispatch = createEventDispatcher();
 
+	function convertHtmlToText(node: Node): string {
+		let text = '';
+
+		const blockTags: string[] = [
+			'div',
+			'p',
+			'h1',
+			'h2',
+			'h3',
+			'h4',
+			'h5',
+			'h6',
+			'header',
+			'footer',
+			'article',
+			'section',
+			'aside'
+		];
+
+		for (const child of Array.from(node.childNodes)) {
+			switch (child.nodeType) {
+				case Node.ELEMENT_NODE:
+					const childText = convertHtmlToText(child);
+					if (blockTags.includes((child as HTMLElement).tagName.toLowerCase())) {
+						text += '\n' + childText + '\n';
+					} else {
+						text += childText;
+					}
+					break;
+				case Node.TEXT_NODE:
+					text += (child as Text).textContent;
+					break;
+				default:
+					break;
+			}
+		}
+
+		return text.trim();
+	}
+
 	function setExpand(value: boolean) {
 		expand = value;
 		dispatch('expand', expand);
@@ -42,18 +84,47 @@
 			selected.id = item.rowid;
 		}
 		if (expand) {
-			// TODO add user flow for Firefox (ClipboardItem is not available by default)
 			try {
 				await navigator.clipboard.write([
 					new window.ClipboardItem({
 						'text/html': new Blob([item.body], { type: 'text/html' })
 					})
 				]);
-			} catch (e) {} // TODO handle Firefox where ClipboardItem is not available
+			} catch (e) {
+				// handle Firefox where ClipboardItem is not available
+				try {
+					const copyListener = (e: ClipboardEvent) => {
+						e.clipboardData?.setData('text/html', item.body);
+						e.clipboardData?.setData('text/plain', item.body);
+						e.preventDefault();
+					};
+					document.addEventListener('copy', copyListener);
+					document.execCommand('copy');
+					document.removeEventListener('copy', copyListener);
+				} catch {
+					console.error('Clipboard API not available');
+				}
+			}
 			const mailBaseURL = new URL(`mailto:${item.recipient_list.join(',')}`);
-			const mailURL = mailBaseURL.href + `?subject=${encodeURI(item.subject)}`;
+			const mailSubject = `?subject=${encodeURI(item.subject)}`;
+
+			// Parse the HTML string into a DOM
+			let parser = new DOMParser();
+			let doc = parser.parseFromString(item.body, 'text/html');
+			let plainBody = convertHtmlToText(doc.body);
+
+			// Decode any HTML entities
+			plainBody = he.decode(plainBody);
+
+			// Collapse consecutive newlines
+			plainBody = plainBody.replace(/\n{3,}/g, '\n');
+
+			// URL encode the plain text body
+			const mailBody = `&body=${encodeURIComponent(plainBody)}`;
+			const mailURL = mailBaseURL.href + mailSubject + mailBody;
+
 			dispatch('externalAction', { type: 'email', url: mailURL });
-			window.open(mailURL);
+			window.open(mailURL, '_self');
 		} else {
 			setExpand(true);
 			scrollToCard = true;
@@ -64,12 +135,8 @@
 	$: if (card && header) {
 		scrollableElements = { card, header };
 		for (const [name, element] of Object.entries(scrollableElements)) {
-			console.log(element);
-
 			scrollPosition[name as keyof typeof scrollPosition].remainingWidth =
 				element.scrollWidth - element.clientWidth;
-			console.log(element.scrollWidth);
-			console.log(element.clientWidth);
 		}
 	}
 
@@ -117,7 +184,7 @@
 				} else expand = true; // if menu recently closed but not yet destroyed, still expand the card
 			}}
 		>
-			<Menu bind:show={showMenu}>
+			<Menu>
 				<li class="menu__item">Get link</li>
 				<li class="menu__item">Not interested...</li>
 				<li class="menu__item">Report</li>
@@ -301,7 +368,8 @@
 		&__item {
 			min-width: 100%;
 			background-color: theme('colors.peacockFeather.500');
-			padding: 0.25em;
+			padding: 0.33em;
+			margin: 0.25em 0;
 			cursor: pointer;
 			transition: ease-in-out 0.2s;
 			&__close {
