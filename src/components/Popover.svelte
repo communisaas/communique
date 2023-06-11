@@ -19,7 +19,7 @@
 		out:fade={{ delay: 50, duration: 300, easing: expoIn }}
 	>
 		<div
-			class="info flex flex-col p-2 pl-10 pr-10 -mt-60"
+			class="info flex flex-col p-2 pl-10 pr-10"
 			in:scale={{ delay: 25, duration: 50, easing: backInOut }}
 			out:scale={{ delay: 25, duration: 250, easing: backInOut }}
 		>
