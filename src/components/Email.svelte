@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { email } from '@prisma/client';
-	import { createEventDispatcher, onMount, afterUpdate } from 'svelte';
+	import { createEventDispatcher, onMount, afterUpdate, beforeUpdate } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
@@ -134,14 +134,6 @@
 		dispatch('select', selected);
 	}
 
-	$: if (card && header) {
-		scrollableElements = { card, header };
-		for (const [name, element] of Object.entries(scrollableElements)) {
-			scrollPosition[name as keyof typeof scrollPosition].remainingWidth =
-				element.scrollWidth - element.clientWidth;
-		}
-	}
-
 	afterUpdate(() => {
 		if (scrollToCard) {
 			// TODO better fix to resolve a few events still pending after the DOM update
@@ -149,6 +141,13 @@
 				card.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			});
 			scrollToCard = false;
+		}
+		if (card && header) {
+			scrollableElements = { card, header };
+			for (const [name, element] of Object.entries(scrollableElements)) {
+				scrollPosition[name as keyof typeof scrollPosition].remainingWidth =
+					element.scrollWidth - element.clientWidth;
+			}
 		}
 	});
 
