@@ -58,6 +58,6 @@
 
 {#if showActionPopover}
 	<div use:modal>
-		<Popover bind:show={showActionPopover} />
+		<Popover bind:show={showActionPopover} bind:htmlContent={$store.email.content.body} />
 	</div>
 {/if}

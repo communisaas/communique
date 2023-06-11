@@ -2,8 +2,10 @@
 	import { expoOut, expoIn, backInOut } from 'svelte/easing';
 	import { fade, scale } from 'svelte/transition';
 	import Clipboard from './icon/Clipboard.svelte';
+	import DOMPurify from 'dompurify';
 
 	export let show: boolean;
+	export let htmlContent: string;
 </script>
 
 <aside
@@ -23,9 +25,11 @@
 			in:scale={{ delay: 25, duration: 50, easing: backInOut }}
 			out:scale={{ delay: 25, duration: 250, easing: backInOut }}
 		>
-			<span class="flex flex-col items-center justify-center gap-2 mb-12">
+			<span class="flex flex-col items-center self-center gap-2 mb-12">
 				<p>Paste into your email app.</p>
-				<Clipboard />
+				<Clipboard>
+					{@html DOMPurify.sanitize(htmlContent)}
+				</Clipboard>
 				<p>Link others in:</p>
 				<ul />
 			</span>

@@ -15,4 +15,5 @@ interface Selectable {
 	type: SelectableKey;
 	target?: SelectableKey;
 	index?: number;
+	content?: email;
 }

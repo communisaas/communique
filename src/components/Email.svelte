@@ -117,7 +117,7 @@
 			plainBody = he.decode(plainBody);
 
 			// Collapse consecutive newlines
-			plainBody = plainBody.replace(/\n{3,}/g, '\n');
+			plainBody = plainBody.replace(/\n{4,}/g, '\n');
 
 			// URL encode the plain text body
 			const mailBody = `&body=${encodeURIComponent(plainBody)}`;
@@ -128,6 +128,8 @@
 		} else {
 			setExpand(true);
 			scrollToCard = true;
+			$store.email.id = item.rowid;
+			$store.email.content = item;
 		}
 		dispatch('select', selected);
 	}
@@ -307,7 +309,11 @@
 					<div
 						aria-label="Email body"
 						class="{expand ? 'bg-artistBlue-800' : 'mt-[1.5rem]'} rounded mt-4 p-2 min-w-full"
-						on:mousedown|stopPropagation
+						on:mousedown={(e) => {
+							if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
+								e.stopPropagation();
+							}
+						}}
 					>
 						<Reader {expand} email={item} />
 					</div>
