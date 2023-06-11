@@ -101,8 +101,8 @@
 					document.addEventListener('copy', copyListener);
 					document.execCommand('copy');
 					document.removeEventListener('copy', copyListener);
-				} catch {
-					console.error('Clipboard API not available');
+				} catch (e) {
+					(console.error || console.log).call(console, e.stack || e);
 				}
 			}
 			const mailBaseURL = new URL(`mailto:${item.recipient_list.join(',')}`);
