@@ -146,7 +146,8 @@
 			setExpand(false);
 		}
 		if (!expand) {
-			scrollPosition.header.x -= 1;
+			header.scrollLeft = 0;
+			scrollPosition.header.x = 0;
 		} else {
 			scrollPosition.header.x = 1;
 		}
