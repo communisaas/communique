@@ -31,7 +31,7 @@ model email {
   recipient_list  String[]
   rowid           String   @id(map: "email___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   added_by        String
-  shortid         String?  @unique(map: "shortid__key")
+  shortid         String   @unique(map: "shortid__key")
   author          author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
   issue           issue[]
 }
