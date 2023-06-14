@@ -32,6 +32,27 @@
 		store = (await import('$lib/sessionStorage')).store;
 	});
 
+	afterUpdate(() => {
+		if (scrollToCard) {
+			// TODO better fix for resolving events still pending after the DOM update
+			setTimeout(() => {
+				card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			});
+			scrollToCard = false;
+		}
+		if (card && header) {
+			scrollableElements = { card, header };
+			updateScrollableElements(scrollableElements);
+		}
+	});
+
+	function updateScrollableElements(scrollableElements: { [key: string]: HTMLElement }) {
+		for (const [name, element] of Object.entries(scrollableElements)) {
+			scrollPosition[name as keyof typeof scrollPosition].remainingWidth =
+				element.scrollWidth - element.clientWidth;
+		}
+	}
+
 	const dispatch = createEventDispatcher();
 
 	function convertHtmlToText(node: Node): string {
@@ -50,7 +71,9 @@
 			'footer',
 			'article',
 			'section',
-			'aside'
+			'aside',
+			'br',
+			'hr'
 		];
 
 		for (const child of Array.from(node.childNodes)) {
@@ -58,7 +81,7 @@
 				case Node.ELEMENT_NODE:
 					const childText = convertHtmlToText(child);
 					if (blockTags.includes((child as HTMLElement).tagName.toLowerCase())) {
-						text += '\n' + childText + '\n';
+						text += '\n' + childText;
 					} else {
 						text += childText;
 					}
@@ -84,27 +107,7 @@
 			selected.id = item.rowid;
 		}
 		if (expand) {
-			try {
-				await navigator.clipboard.write([
-					new window.ClipboardItem({
-						'text/html': new Blob([item.body], { type: 'text/html' })
-					})
-				]);
-			} catch (e) {
-				// handle Firefox where ClipboardItem is not available
-				try {
-					const copyListener = (e: ClipboardEvent) => {
-						e.clipboardData?.setData('text/html', item.body);
-						e.clipboardData?.setData('text/plain', item.body);
-						e.preventDefault();
-					};
-					document.addEventListener('copy', copyListener);
-					document.execCommand('copy');
-					document.removeEventListener('copy', copyListener);
-				} catch (e) {
-					(console.error || console.log).call(console, e.stack || e);
-				}
-			}
+			// TODO handle this in email class
 			const mailBaseURL = new URL(`mailto:${item.recipient_list.join(',')}`);
 			const mailSubject = `?subject=${encodeURI(item.subject)}`;
 
@@ -134,23 +137,6 @@
 		dispatch('select', selected);
 	}
 
-	afterUpdate(() => {
-		if (scrollToCard) {
-			// TODO better fix to resolve a few events still pending after the DOM update
-			setTimeout(() => {
-				card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-			});
-			scrollToCard = false;
-		}
-		if (card && header) {
-			scrollableElements = { card, header };
-			for (const [name, element] of Object.entries(scrollableElements)) {
-				scrollPosition[name as keyof typeof scrollPosition].remainingWidth =
-					element.scrollWidth - element.clientWidth;
-			}
-		}
-	});
-
 	function handleBlur(event: FocusEvent) {
 		if (document.activeElement == event.target) return; // keep expanded if focus is on the card
 		if (event.relatedTarget instanceof HTMLElement) {
@@ -158,6 +144,11 @@
 			if (!card.contains(event.relatedTarget)) setExpand(false);
 		} else {
 			setExpand(false);
+		}
+		if (!expand) {
+			scrollPosition.header.x -= 1;
+		} else {
+			scrollPosition.header.x = 1;
 		}
 		showMenu = false;
 	}
@@ -207,7 +198,7 @@
 					bind:this={header}
 					on:wheel={(e) => {
 						header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-						scrollPosition.header.x = header.scrollLeft + 1;
+						scrollPosition.header.x = header.scrollLeft;
 						if (scrollPosition.header.remainingWidth > 0) {
 							e.preventDefault();
 						}
@@ -215,17 +206,19 @@
 					class:scrollable={scrollPosition.header.remainingWidth > 0}
 					class:scrolled={scrollPosition.header.x > 1}
 					class:scrolled__max={scrollPosition.header.remainingWidth > 0 &&
-						scrollPosition.header.remainingWidth < scrollPosition.header.x}
+						scrollPosition.header.remainingWidth == scrollPosition.header.x}
 					class="max-w-full inline-block mr-1"
 				>
 					{item.subject}
 				</h1>
 				{#if expand}
 					<span
-						on:mousedown|stopPropagation={() => (showMenu = !showMenu)}
+						on:mousedown|stopPropagation={() => {
+							showMenu = !showMenu;
+						}}
 						class="z-10 flex items-center max-w-[24px] cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
-						in:fade={{ delay: 50, duration: 200, easing: expoIn }}
-						out:scale={{ delay: 50, duration: 200, easing: expoOut }}
+						in:fade={{ delay: 50, duration: 100, easing: expoIn }}
+						out:scale={{ delay: 50, duration: 100, easing: expoOut }}
 					>
 						<MenuIcon />
 					</span>
@@ -300,7 +293,6 @@
 				<div
 					style="text-align: initial; margin-top: {!expand ? '-1.5rem' : '0'};"
 					class="whitespace-normal flex flex-col"
-					class:scrollableY={!expand}
 				>
 					{#if expand}
 						<p aria-label="Info text" class="text-center"><i>click again to send...</i></p>
@@ -343,14 +335,13 @@
 			transition: 0.1s ease-in;
 		}
 		&:active {
-			transform: scale(1);
+			transform: scale(0.9927);
 			box-shadow: unset;
 			transition: 0.1s ease-out;
 		}
 	}
 	h1 {
 		font-size: 1.4rem;
-		text-align: start;
 		font-weight: 600;
 		white-space: nowrap;
 		overflow-x: overlay;
@@ -383,10 +374,10 @@
 			}
 		}
 		&__item:hover {
-			transform: scale(1.075);
+			transform: scale(1.08);
 		}
 		&__item:active {
-			transform: scale(1);
+			transform: scale(0.92);
 		}
 	}
 	.scrollable {
@@ -409,8 +400,7 @@
 			right: 0;
 			bottom: 0;
 			left: 0;
-			background: linear-gradient(to right, transparent 90%, theme('colors.artistBlue.600') 97%);
-			transform: scaleX(1.01);
+			background: linear-gradient(to right, transparent 85%, theme('colors.artistBlue.600') 97%);
 		}
 	}
 
@@ -418,8 +408,8 @@
 		background: linear-gradient(
 			to right,
 			theme('colors.artistBlue.600') 3%,
-			transparent 10%,
-			transparent 90%,
+			transparent 15%,
+			transparent 85%,
 			theme('colors.artistBlue.600') 97%
 		);
 	}
@@ -431,6 +421,6 @@
 		top: 0;
 		right: 0;
 		bottom: 0;
-		background: linear-gradient(to right, theme('colors.artistBlue.600') 3%, transparent 25%);
+		background: linear-gradient(to right, theme('colors.artistBlue.600') 3%, transparent 15%);
 	}
 </style>
