@@ -55,7 +55,7 @@
 		<div
 			bind:this={content}
 			class="content-inner"
-			style="zoom: {Math.log10(contentHeight) / Math.log(overflowHeight)}"
+			style="zoom: {Math.log10(contentHeight) / Math.log1p(overflowHeight)}"
 		>
 			<slot />
 		</div>
