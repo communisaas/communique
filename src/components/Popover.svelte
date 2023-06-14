@@ -37,7 +37,7 @@
 	}
 </script>
 
-<aside
+<main
 	transition:fade={{ delay: 50, duration: 500, easing: expoIn }}
 	aria-label="Send status screen"
 	class="popover fixed items-center z-50 top-0"
@@ -108,7 +108,7 @@
 			<button class="w-full h-10" on:click={() => (show = false)}>Close</button>
 		</div>
 	</section>
-</aside>
+</main>
 
 <style lang="scss">
 	:global(body:has(.popover)) {
