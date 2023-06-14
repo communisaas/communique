@@ -37,7 +37,7 @@
 		<div class="whitespace-nowrap w-full">
 			<header
 				aria-label="Popular topics list"
-				class="flex h-fi w-fit py-2 px-3 pb-2 bg-peacockFeather-700"
+				class="flex w-fit py-2 px-3 pb-2 bg-peacockFeather-700"
 			>
 				{#if $store}
 					<Selector
