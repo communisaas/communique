@@ -67,12 +67,19 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		align-content: center;
 	}
 
 	.content {
 		position: absolute;
+		box-sizing: border-box;
 		top: 20%;
-		left: 17%;
+		padding: 5%;
+		padding-top: 0;
 		pointer-events: none;
 		max-width: 66%;
 		height: 75%;
@@ -87,8 +94,9 @@
 	}
 
 	.content-inner {
-		margin: 5%;
-		height: 94%;
+		margin-top: 0;
+		height: 97%;
+		width: fit-content;
 		background-color: rgba(0, 50, 64, 0.8);
 		padding-bottom: 2%;
 		color: white;

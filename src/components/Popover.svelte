@@ -10,7 +10,7 @@
 
 	let emailCopied = false;
 
-	async function handleCopy(e: MouseEvent) {
+	async function handleCopy() {
 		emailCopied = true;
 		try {
 			await navigator.clipboard.write([
@@ -45,60 +45,67 @@
 	on:mousedown|stopPropagation|preventDefault
 >
 	<section
-		class="absolute text-paper-800 flex justify-center items-center min-w-[100vw] min-h-[100vh]"
+		class="absolute text-paper-800 flex flex-col gap-y-2 justify-center items-center min-w-[100vw] min-h-[100vh]"
 		in:fade={{ delay: 25, duration: 250, easing: expoOut }}
 		out:fade={{ delay: 50, duration: 300, easing: expoIn }}
 	>
-		<div
-			class="info flex flex-col p-2 pl-10 pr-10"
-			in:scale={{ delay: 25, duration: 50, easing: backInOut }}
-			out:scale={{ delay: 25, duration: 250, easing: backInOut }}
-		>
-			<span class="flex flex-col items-center self-center gap-2 mb-12 w-fit max-w-10">
-				<div>
-					{#if /<\/?[a-z][\s\S]*>/i.test(emailContent)}
-						<p class="font-bold text-center">Click clipboard for a formatted copy.</p>
-					{/if}
-					<p class="text-center text-sm opacity-75">Double-click to reopen.</p>
-				</div>
+		<div class="flex flex-col gap-y-3">
+			<div
+				class="info flex flex-col p-2 pl-10 pr-10"
+				in:scale={{ delay: 25, duration: 50, easing: backInOut }}
+				out:scale={{ delay: 25, duration: 250, easing: backInOut }}
+			>
+				<span class="flex flex-col items-center self-center gap-2 mb-12 w-fit max-w-10">
+					<div>
+						{#if /<\/?[a-z][\s\S]*>/i.test(emailContent)}
+							<p class="font-bold text-center">Click clipboard for a formatted copy.</p>
+						{/if}
+						<p class="text-center text-sm opacity-75">Double-click to reopen.</p>
+					</div>
 
-				<span class="relative w-fit flex-col" on:mousedown={(e) => handleCopy(e)}>
-					{#if emailCopied}
-						<div>
-							<p
-								in:scale={{ delay: 35, duration: 250 }}
-								out:scale={{ delay: 50, duration: 300 }}
-								class="font-bold absolute z-20 left-0 right-0 mx-auto top-[50%] text-center"
-							>
-								Copied!
-							</p>
-
-							<icon class="absolute z-10 w-1/2 left-0 right-0 top-[45%] mx-auto">
-								<Checkmark />
-							</icon>
-						</div>
-					{/if}
-					<icon />
-					<icon
-						class="inline-block min-w-[40vh]"
-						class:clipboard-clicked={emailCopied}
-						class:clipboard={!emailCopied}
+					<span
+						class="relative w-fit flex-col"
+						on:click={(e) => handleCopy()}
+						on:keypress={(e) => handleCopy()}
+						on:dblclick={() => (show = false)}
 					>
-						<Clipboard>
-							{@html DOMPurify.sanitize(emailContent)}
-						</Clipboard>
-					</icon>
-					<p class="text-center">Link others in:</p>
+						{#if emailCopied}
+							<div>
+								<p
+									in:scale={{ delay: 35, duration: 250 }}
+									out:scale={{ delay: 50, duration: 300 }}
+									class="font-bold absolute z-20 left-0 right-0 mx-auto top-[50%] text-center"
+								>
+									Copied!
+								</p>
+
+								<icon class="absolute z-10 w-1/2 left-0 right-0 top-[45%] mx-auto">
+									<Checkmark />
+								</icon>
+							</div>
+						{/if}
+						<icon />
+						<icon
+							class="inline-block min-w-[40vh]"
+							class:clipboard-clicked={emailCopied}
+							class:clipboard={!emailCopied}
+						>
+							<Clipboard>
+								{@html DOMPurify.sanitize(emailContent)}
+							</Clipboard>
+						</icon>
+						<p class="text-center">Link others in:</p>
+					</span>
+					<ul />
 				</span>
-				<ul />
-			</span>
-			<span class="flex flex-col items-center justify-center gap-2">
-				<div>
-					<input name="Sent!" id="sendStatus" type="checkbox" class="min-w-max" />
-					<label for="sendStatus">Sent!</label>
-				</div>
-				<button class="w-full h-10" on:click={() => (show = false)}>Close</button>
-			</span>
+				<span class="flex flex-col items-center justify-center gap-2">
+					<div>
+						<input name="Sent!" id="sendStatus" type="checkbox" class="min-w-max" />
+						<label for="sendStatus">Sent!</label>
+					</div>
+				</span>
+			</div>
+			<button class="w-full h-10" on:click={() => (show = false)}>Close</button>
 		</div>
 	</section>
 </aside>
