@@ -4,9 +4,12 @@
 	import Clipboard from './icon/Clipboard.svelte';
 	import DOMPurify from 'dompurify';
 	import Checkmark from './icon/Checkmark.svelte';
+	import Social from './Social.svelte';
+	import type { email } from '@prisma/client';
+	import { page } from '$app/stores';
 
 	export let show: boolean;
-	export let emailContent: string;
+	export let item: email;
 
 	let emailCopied = false;
 
@@ -15,15 +18,15 @@
 		try {
 			await navigator.clipboard.write([
 				new window.ClipboardItem({
-					'text/html': new Blob([emailContent], { type: 'text/html' })
+					'text/html': new Blob([item.body], { type: 'text/html' })
 				})
 			]);
 		} catch (e) {
 			// handle Firefox where ClipboardItem is not available
 			try {
 				const copyListener = (e: ClipboardEvent) => {
-					e.clipboardData?.setData('text/html', emailContent);
-					e.clipboardData?.setData('text/plain', emailContent);
+					e.clipboardData?.setData('text/html', item.body);
+					e.clipboardData?.setData('text/plain', item.body);
 					e.preventDefault();
 				};
 				document.addEventListener('copy', copyListener);
@@ -51,13 +54,13 @@
 	>
 		<div class="flex flex-col gap-y-3">
 			<div
-				class="info flex flex-col p-2 pl-10 pr-10"
+				class="info flex flex-row p-2 pl-10 pr-10"
 				in:scale={{ delay: 25, duration: 50, easing: backInOut }}
 				out:scale={{ delay: 25, duration: 250, easing: backInOut }}
 			>
-				<span class="flex flex-col items-center self-center gap-2 mb-12 w-fit max-w-10">
+				<span class="flex flex-col items-center self-center w-fit max-w-10">
 					<div>
-						{#if /<\/?[a-z][\s\S]*>/i.test(emailContent)}
+						{#if /<\/?[a-z][\s\S]*>/i.test(item.body)}
 							<p class="font-bold text-center">Click clipboard for a formatted copy.</p>
 						{/if}
 						<p class="text-center text-sm opacity-75">Double-click to reopen.</p>
@@ -91,14 +94,13 @@
 							class:clipboard={!emailCopied}
 						>
 							<Clipboard>
-								{@html DOMPurify.sanitize(emailContent)}
+								{@html DOMPurify.sanitize(item.body)}
 							</Clipboard>
 						</icon>
-						<p class="text-center">Link others in:</p>
 					</span>
-					<ul />
 				</span>
 				<span class="flex flex-col items-center justify-center gap-2">
+					<Social shortLink={new URL('/' + item.shortid, $page.url.origin)} />
 					<div>
 						<input name="Sent!" id="sendStatus" type="checkbox" class="min-w-max" />
 						<label for="sendStatus">Sent!</label>
@@ -128,10 +130,10 @@
 	}
 
 	.clipboard {
+		cursor: pointer;
 		transition: 0.1s ease-in-out;
 		&:hover {
 			transform: scale(1.03);
-			cursor: pointer;
 		}
 		&:active {
 			transform: scale(0.97);
@@ -139,11 +141,9 @@
 	}
 
 	.clipboard-clicked {
+		cursor: pointer;
 		opacity: 0.5;
 		transition: 0.1s ease-in-out;
-		&:hover {
-			cursor: pointer;
-		}
 		&:active {
 			transform: scale(0.99);
 		}
