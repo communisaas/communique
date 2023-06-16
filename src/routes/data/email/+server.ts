@@ -9,7 +9,6 @@ const emailFieldMap: FieldMap = {
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url }) {
-	console.log(url);
 	const options = {
 		where: Array.from(url.searchParams.entries()).reduce(
 			(filter: Criteria, [field, value]: string[]) => {

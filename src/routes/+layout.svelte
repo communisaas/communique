@@ -14,17 +14,17 @@
 
 	export let data: LayoutSchema;
 
-	let store: Writable<UserState>;
+	let sessionStore: Writable<UserState>;
 	onMount(async () => {
-		store = (await import('$lib/sessionStorage')).store;
-		$store.topic = { id: topicNames[0], type: 'topic' };
-		$store.recipient = {
+		sessionStore = (await import('$lib/sessionStorage')).store;
+		$sessionStore.topic = $sessionStore.topic || { id: topicNames[0], type: 'topic' };
+		$sessionStore.recipient = $sessionStore.recipient || {
 			id: '',
 			type: 'recipient'
 		};
-		$store.spotlight = { id: 'custom', type: 'recipient' };
-		$store.email = { id: '', type: 'email' };
-		$store.template = data.template;
+		$sessionStore.spotlight = $sessionStore.spotlight || { id: 'custom', type: 'recipient' };
+		$sessionStore.email = $sessionStore.email || { id: '', type: 'email' };
+		$sessionStore.template = $sessionStore.template || data.template;
 	});
 
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
@@ -39,29 +39,25 @@
 				aria-label="Popular topics list"
 				class="flex w-fit py-2 px-3 pb-2 bg-peacockFeather-700"
 			>
-				{#if $store}
+				{#if $sessionStore && $sessionStore.template}
 					<Selector
 						selectable={Tag}
 						target="email"
 						itemStyle="bg-peacockFeather-500 text-paper-500"
 						items={topicNames}
 						alignment="center"
-						bind:selected={$store.topic}
+						bind:selected={$sessionStore.topic}
 						on:select={async (e) => {
-							$store.template.primary.cardList = await handleSelect(e);
-							$store.template.primary.header = 'Loudest voices in';
-							$store.template.primary.focus = e.detail.id;
+							if ($sessionStore.template.primary) {
+								$sessionStore.template.primary.cardList = await handleSelect(e);
+								$sessionStore.template.primary.header = 'Loudest voices in';
+								$sessionStore.template.primary.focus = e.detail.id;
+							}
 						}}
 					/>
 				{/if}
 			</header>
-			{#if $navigating}
-				<div class="m-8">
-					<h1 class="ext-3xl text-center text-cText">Fetching...</h1>
-				</div>
-			{:else}
-				<slot />
-			{/if}
+			<slot />
 		</div>
 	</main>
 	<!-- TODO aria labels for footer -->

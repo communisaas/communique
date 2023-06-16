@@ -13,12 +13,13 @@
 	import Menu from './Menu.svelte';
 
 	import he from 'he';
+	import { goto } from '$app/navigation';
 
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';
 
-	let store: Writable<UserState>;
+	let sessionStore: Writable<UserState>;
 
 	$: scrollPosition = { header: { x: 0, remainingWidth: 0 }, card: { x: 0, remainingWidth: 0 } };
 	let header: HTMLHeadingElement;
@@ -29,7 +30,7 @@
 	let showMenu = false;
 
 	onMount(async () => {
-		store = (await import('$lib/sessionStorage')).store;
+		sessionStore = (await import('$lib/sessionStorage')).store;
 	});
 
 	afterUpdate(() => {
@@ -55,48 +56,6 @@
 
 	const dispatch = createEventDispatcher();
 
-	function convertHtmlToText(node: Node): string {
-		let text = '';
-
-		const blockTags: string[] = [
-			'div',
-			'p',
-			'h1',
-			'h2',
-			'h3',
-			'h4',
-			'h5',
-			'h6',
-			'header',
-			'footer',
-			'article',
-			'section',
-			'aside',
-			'br',
-			'hr'
-		];
-
-		for (const child of Array.from(node.childNodes)) {
-			switch (child.nodeType) {
-				case Node.ELEMENT_NODE:
-					const childText = convertHtmlToText(child);
-					if (blockTags.includes((child as HTMLElement).tagName.toLowerCase())) {
-						text += '\n' + childText;
-					} else {
-						text += childText;
-					}
-					break;
-				case Node.TEXT_NODE:
-					text += (child as Text).textContent;
-					break;
-				default:
-					break;
-			}
-		}
-
-		return text.trim();
-	}
-
 	function setExpand(value: boolean) {
 		expand = value;
 		dispatch('expand', expand);
@@ -107,32 +66,12 @@
 			selected.id = item.rowid;
 		}
 		if (expand) {
-			// TODO handle this in email class
-			const mailBaseURL = new URL(`mailto:${item.recipient_list.join(',')}`);
-			const mailSubject = `?subject=${encodeURI(item.subject)}`;
-
-			// Parse the HTML string into a DOM
-			let parser = new DOMParser();
-			let doc = parser.parseFromString(item.body, 'text/html');
-			let plainBody = convertHtmlToText(doc.body);
-
-			// Decode any HTML entities
-			plainBody = he.decode(plainBody);
-
-			// Collapse consecutive newlines
-			plainBody = plainBody.replace(/\n{4,}/g, '\n');
-
-			// URL encode the plain text body
-			const mailBody = `&body=${encodeURIComponent(plainBody)}`;
-			const mailURL = mailBaseURL.href + mailSubject + mailBody;
-
-			dispatch('externalAction', { type: 'email', url: mailURL });
-			window.open(mailURL, '_self');
+			dispatch('externalAction', { type: 'email', context: item });
 		} else {
 			setExpand(true);
 			scrollToCard = true;
-			$store.email.id = item.rowid;
-			$store.email.content = item;
+			$sessionStore.email.id = item.rowid;
+			$sessionStore.email.content = item;
 		}
 		dispatch('select', selected);
 	}
@@ -168,6 +107,7 @@
 	class="{style} flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
 		justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl {expand && 'cursor-alias'}"
 	style="min-width: {expand ? '99%' : '95%'};"
+	data-sveltekit-preload-data="tap"
 >
 	{#if showMenu}
 		<div
@@ -190,7 +130,7 @@
 			? 'cardWrapper'
 			: ''} min-h-[14.5rem] min-w-full overflow-hidden"
 	>
-		{#if store}
+		{#if sessionStore}
 			<span class="flex max-w-full relative">
 				<h1
 					aria-label="Subject line"
@@ -265,7 +205,7 @@
 								alignment="start"
 								overflow="wrap"
 								target="email"
-								bind:selected={$store.topic}
+								bind:selected={$sessionStore.topic}
 								on:select={(e) => {
 									setExpand(false);
 									dispatch('select', e.detail);
@@ -281,7 +221,7 @@
 								alignment="start"
 								overflow="wrap"
 								target="email"
-								bind:selected={$store.recipient}
+								bind:selected={$sessionStore.recipient}
 								on:select={(e) => {
 									setExpand(false);
 									dispatch('select', e.detail);

@@ -3,8 +3,6 @@
 
 	$: contentHeight = content?.offsetHeight;
 	$: overflowHeight = content?.scrollHeight - contentHeight;
-	$: console.log(contentHeight);
-	$: console.log(overflowHeight);
 </script>
 
 <div class="container">
