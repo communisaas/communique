@@ -10,6 +10,7 @@
 	import { createEventDispatcher } from 'svelte';
 
 	import he from 'he';
+	import { convertHtmlToText, handleMailto } from '$lib/email';
 
 	export let item: email;
 
@@ -21,49 +22,6 @@
 	function setPopover(value: boolean) {
 		show = value;
 		dispatch('popover', show);
-	}
-
-	// TODO remove duplicate in root +page after consolidating in email class
-	function convertHtmlToText(node: Node): string {
-		let text = '';
-
-		const blockTags: string[] = [
-			'div',
-			'p',
-			'h1',
-			'h2',
-			'h3',
-			'h4',
-			'h5',
-			'h6',
-			'header',
-			'footer',
-			'article',
-			'section',
-			'aside',
-			'br',
-			'hr'
-		];
-
-		for (const child of Array.from(node.childNodes)) {
-			switch (child.nodeType) {
-				case Node.ELEMENT_NODE:
-					const childText = convertHtmlToText(child);
-					if (blockTags.includes((child as HTMLElement).tagName.toLowerCase())) {
-						text += '\n' + childText;
-					} else {
-						text += childText;
-					}
-					break;
-				case Node.TEXT_NODE:
-					text += (child as Text).textContent;
-					break;
-				default:
-					break;
-			}
-		}
-
-		return text.trim();
 	}
 
 	async function handleCopy() {
@@ -138,7 +96,7 @@
 							class="relative w-fit flex-col"
 							on:click={(e) => handleCopy()}
 							on:keypress={(e) => handleCopy()}
-							on:dblclick={() => setPopover(false)}
+							on:dblclick={() => handleMailto(dispatch)}
 						>
 							{#if emailCopied}
 								<div in:fade={{ delay: 25, duration: 200 }} out:fade={{ delay: 50, duration: 300 }}>
@@ -159,6 +117,7 @@
 							<icon
 								class="inline-block min-w-[40vh]"
 								class:clipboard-clicked={emailCopied}
+								class:blur-sm={emailCopied}
 								class:clipboard={!emailCopied}
 							>
 								<Clipboard>

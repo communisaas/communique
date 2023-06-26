@@ -12,9 +12,6 @@
 	import { expoIn, expoOut } from 'svelte/easing';
 	import Menu from './Menu.svelte';
 
-	import he from 'he';
-	import { goto } from '$app/navigation';
-
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';

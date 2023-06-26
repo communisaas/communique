@@ -102,25 +102,26 @@
 		position: absolute;
 		box-sizing: border-box;
 		top: 20%;
-		padding: 5%;
-		padding-top: 0;
+		padding: 3%;
+		padding-top: 1%;
 		pointer-events: none;
 		max-width: 66%;
 		height: 75%;
 		&::after {
-			background: linear-gradient(to top, rgba(0, 50, 64, 0.8) 2%, transparent 5%);
+			background: linear-gradient(to top, rgba(0, 50, 64, 1) 3%, transparent 10%);
 			content: '';
 			position: absolute;
-			bottom: 2%;
+			bottom: 3%;
+			left: 0;
 			height: 100%;
-			max-width: 70%;
+			width: 100%;
 		}
 	}
 
 	.content-inner {
 		margin-top: 0;
 		height: 97%;
-		width: fit-content;
+		max-width: fit-content;
 		background-color: rgba(0, 50, 64, 0.8);
 		padding-bottom: 2%;
 		color: white;

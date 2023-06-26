@@ -22,3 +22,9 @@
 		stroke-linejoin="round"
 	/>
 </svg>
+
+<style lang="scss">
+	circle {
+		backdrop-filter: blur(8px);
+	}
+</style>
