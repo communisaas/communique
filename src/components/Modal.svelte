@@ -118,19 +118,21 @@
 			in:fade={{ delay: 25, duration: 250, easing: expoOut }}
 			out:fade={{ delay: 50, duration: 300, easing: expoIn }}
 		>
-			<div class="flex flex-col gap-y-3">
+			<article class="flex flex-col gap-y-1">
 				<div
-					class="info flex flex-row p-2 pl-10 pr-10"
+					class="flex flex-row justify-around items-stretch py-2 gap-x-3"
 					in:scale={{ delay: 25, duration: 50, easing: backInOut }}
 					out:scale={{ delay: 25, duration: 250, easing: backInOut }}
 				>
-					<span class="flex flex-col items-center self-center w-fit max-w-10">
-						<div>
+					<div
+						class="info info__clipboard p-2 flex flex-col items-center self-center w-fit max-w-10"
+					>
+						<span>
 							{#if /<\/?[a-z][\s\S]*>/i.test(item.body)}
 								<p class="font-bold text-center">Click clipboard for a formatted copy.</p>
 							{/if}
 							<p class="text-center text-sm opacity-75">Double-click to reopen.</p>
-						</div>
+						</span>
 
 						<span
 							class="relative w-fit flex-col"
@@ -139,7 +141,7 @@
 							on:dblclick={() => setPopover(false)}
 						>
 							{#if emailCopied}
-								<div>
+								<div in:fade={{ delay: 25, duration: 200 }} out:fade={{ delay: 50, duration: 300 }}>
 									<p
 										in:scale={{ delay: 35, duration: 250 }}
 										out:scale={{ delay: 50, duration: 300 }}
@@ -164,17 +166,22 @@
 								</Clipboard>
 							</icon>
 						</span>
-					</span>
-					<span class="flex flex-col items-center justify-center gap-2">
-						<Social shortLink={new URL('/' + item.shortid, $page.url.origin)} />
-						<div>
-							<input name="Sent!" id="sendStatus" type="checkbox" class="min-w-max" />
-							<label for="sendStatus">Sent!</label>
-						</div>
-					</span>
+					</div>
+					<div class="info info__share flex flex-col items-center justify-center p-2">
+						<span class="flex flex-col items-center justify-center gap-2 h-max">
+							<Social
+								shortLink={new URL('/' + item.shortid, $page.url.origin)}
+								linkMessage="Share this email:"
+							/>
+							<div>
+								<input name="Sent!" id="sendStatus" type="checkbox" class="min-w-max" />
+								<label for="sendStatus">Sent!</label>
+							</div>
+						</span>
+					</div>
 				</div>
 				<button class="w-full h-10" on:click={() => setPopover(false)}>Close</button>
-			</div>
+			</article>
 		</section>
 	</main>
 {/if}

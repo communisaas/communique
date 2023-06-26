@@ -1,14 +1,44 @@
 <script lang="ts">
-	let content: HTMLDivElement;
+	import { onMount, onDestroy } from 'svelte';
 
-	$: contentHeight = content?.offsetHeight;
-	$: overflowHeight = content?.scrollHeight - contentHeight;
+	let content: HTMLDivElement;
+	let clipboardArea: SVGRectElement;
+	let contentHeight: number;
+	let contentZoomRatio: number;
+
+	let resizeObserver: ResizeObserver;
+
+	// onMount(() => {
+	// 	resizeObserver = new ResizeObserver(() => {
+	// 		// Update the height of the content and the clipboard area
+	// 		let clipboardHeight = clipboardArea?.getBBox().height;
+	// 		contentHeight = Math.abs(content?.clientHeight - content?.scrollHeight);
+
+	// 		// Calculate the new content zoom ratio
+	// 		contentZoomRatio = clipboardHeight / contentHeight;
+
+	// 		// Log the new values
+	// 		console.log(`content: ${contentHeight}`);
+	// 		console.log(`overflow: ${content?.scrollHeight}`);
+	// 		console.log(`clipboard: ${clipboardHeight}`);
+	// 		console.log(contentZoomRatio);
+	// 	});
+
+	// 	// Start observing the elements
+	// 	resizeObserver.observe(content);
+	// 	resizeObserver.observe(clipboardArea);
+	// });
+
+	// onDestroy(() => {
+	// 	// Disconnect the observer when the component is destroyed to avoid memory leaks
+	// 	resizeObserver.disconnect();
+	// });
 </script>
 
 <div class="container">
 	<svg width="100%" viewBox="0 0 400 525" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<rect x="50" y="54.2769" width="300" height="450.723" rx="10.5191" fill="#635957" />
-		<rect x="67" y="80" width="266.667" height="408.99" fill="#003240" />
+		<rect bind:this={clipboardArea} x="67" y="80" width="266.667" height="408.99" fill="#003240" />
 		<path
 			d="M200 44H212.967C213.646 44 214.314 44.1642 214.916 44.4785L249.69 62.6504C249.896 62.7583 250.111 62.8488 250.333 62.921L271.429 69.8099V69.8099C275.309 71.0771 274.397 76.8073 270.315 76.8073H129.685C125.603 76.8073 124.691 71.0771 128.571 69.8099V69.8099L149.667 62.921C149.889 62.8488 150.104 62.7583 150.31 62.6504L185.084 44.4785C185.686 44.1642 186.354 44 187.033 44H200Z"
 			fill="#929292"
@@ -48,13 +78,9 @@
 			</filter>
 		</defs>
 	</svg>
-
-	<div class="content {overflowHeight <= 0 ? 'after::invisible' : ''}">
-		<div
-			bind:this={content}
-			class="content-inner"
-			style="zoom: {Math.log10(contentHeight) / Math.log1p(overflowHeight)}"
-		>
+	<!-- {overflowHeight <= 0 ? 'after::invisible' : ''} -->
+	<div class="content">
+		<div bind:this={content} class="content-inner" style="zoom: {contentZoomRatio}">
 			<slot />
 		</div>
 	</div>
