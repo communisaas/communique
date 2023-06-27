@@ -2,6 +2,9 @@ import he from 'he';
 import DOMPurify from 'dompurify';
 
 import { get } from 'svelte/store';
+import { error } from '@sveltejs/kit';
+
+import type { email } from '@prisma/client';
 
 export function convertHtmlToText(node: Node): string {
 	let text = '';
@@ -70,4 +73,17 @@ export async function handleMailto(dispatch: (name: string, detail?: unknown) =>
 
 	dispatch('externalAction', { type: 'email', url: mailURL });
 	window.open(mailURL, '_self');
+}
+
+export async function setActiveEmail(id: string) {
+	const sessionStore = (await import('$lib/sessionStorage')).store;
+	try {
+		const email: email = await (await fetch(`data/email/${id}`)).json();
+		sessionStore.update((sessionData) => {
+			sessionData.email = { type: 'email', id: email.rowid, content: email };
+			return sessionData;
+		});
+	} catch (e) {
+		throw error(404, `Not found: ${e.message}`);
+	}
 }

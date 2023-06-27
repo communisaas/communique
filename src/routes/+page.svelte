@@ -7,7 +7,8 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
-	import { handleMailto } from '$lib/email';
+	import { setActiveEmail, handleMailto } from '$lib/email';
+	import { error } from '@sveltejs/kit';
 
 	let sessionStore: Writable<UserState>;
 	let showActionPopover = false;
@@ -17,11 +18,23 @@
 	onMount(async () => {
 		sessionStore = (await import('$lib/sessionStorage')).store;
 		// Watch for changes to the URL hash
-		const slug = window.location.hash.substring(1);
+		const slug = window.location.hash.substring(1).replaceAll('#', '');
 		if (slug) {
-			// If the hash matches an email slug, show the modal
-			handleMailto(dispatch);
-			showActionPopover = true;
+			// If the hash matches an email slug and email has been set as a selection target, show the modal
+			if (
+				$sessionStore &&
+				'email' in $sessionStore &&
+				'content' in $sessionStore.email &&
+				$sessionStore.email.content.shortid === slug
+			) {
+				showActionPopover = true;
+				handleMailto(dispatch);
+			} else {
+				// Otherwise, resolve the slug
+				await setActiveEmail(slug);
+				showActionPopover = true;
+				handleMailto(dispatch);
+			}
 		}
 	});
 
@@ -60,7 +73,7 @@
 					}}
 					on:externalAction={async (e) => {
 						if (e.detail.type === 'email') {
-							goto(`/#${e.detail.context.shortid}`);
+							goto(`/#${e.detail.context.shortid}`, { noScroll: true });
 							showActionPopover = true;
 							handleMailto(dispatch);
 						}
@@ -77,7 +90,7 @@
 			on:popover={(e) => {
 				showActionPopover = e.detail;
 				if (!showActionPopover) {
-					goto('/');
+					goto('/', { noScroll: true });
 				}
 			}}
 			bind:item={$sessionStore.email.content}
