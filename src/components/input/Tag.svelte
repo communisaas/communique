@@ -50,7 +50,7 @@
 
 <ul
 	class="{style} max-w-fit px-3 py-1 h-fit flex flex-row place-items-center items-center justify-center
-		rounded bg-larimarGreen-600 cursor-pointer flex-wrap"
+		rounded bg-peacockFeather-400 cursor-pointer flex-wrap"
 	aria-label="{name} list"
 	aria-describedby="List of {name}s with an add button"
 	on:mouseenter={() => (deleteVisible = true)}
@@ -144,7 +144,7 @@
 	button span {
 		filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));
 		transform: scale(0.97);
-		transition: 0.3s all ease-out;
+		transition: 0.1s all ease-out;
 	}
 	button .active {
 		transform: scale(1);
@@ -152,7 +152,7 @@
 	button:hover span {
 		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
 		transform: scale(1);
-		transition: 0.3s all ease-in;
+		transition: 0.1s all ease-in;
 	}
 	.add {
 		position: absolute;
@@ -165,13 +165,13 @@
 		opacity: 75%;
 		filter: drop-shadow(0 rgb(0 0 0 / 0.4));
 		transform: scale(0.75);
-		transition: all 0.8s ease-in;
+		transition: all 0.2s ease-in;
 	}
 	span:hover > .add {
 		opacity: 85%;
 		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
 		transform: scale(0.85);
-		transition: all 0.6s ease-out;
+		transition: all 0.2s ease-out;
 	}
 	.add:after {
 		content: '+';
