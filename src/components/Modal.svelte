@@ -87,18 +87,24 @@
 					<div
 						class="info info__clipboard p-2 flex flex-col items-center self-center w-fit max-w-10"
 					>
-						<span>
+						<span class="pb-2 flex flex-col items-center">
 							{#if /<\/?[a-z][\s\S]*>/i.test(item.body)}
 								<p class="font-bold text-center">Click clipboard for a formatted copy.</p>
 							{/if}
-							<p class="text-center text-sm opacity-75">Double-click to reopen.</p>
+							<button
+								on:click={() => handleMailto(dispatch)}
+								on:keypress={() => handleMailto(dispatch)}
+								class="text-sm opacity-75 hover:underline hover:cursor-pointer hover:bg-transparent"
+								style="background: unset; box-shadow: unset"
+							>
+								(or here to reopen)
+							</button>
 						</span>
 
 						<span
 							class="relative w-fit flex-col"
 							on:click={(e) => handleCopy()}
 							on:keypress={(e) => handleCopy()}
-							on:dblclick={() => handleMailto(dispatch)}
 						>
 							{#if emailCopied}
 								<div in:fade={{ delay: 25, duration: 200 }} out:fade={{ delay: 50, duration: 300 }}>
@@ -107,7 +113,7 @@
 										out:scale={{ delay: 50, duration: 300 }}
 										class="font-bold absolute z-20 left-0 right-0 mx-auto top-[50%] text-center"
 									>
-										Copied!
+										{emailCopied ? 'Copied!' : 'Reopened!'}
 									</p>
 
 									<icon class="absolute z-10 w-1/2 left-0 right-0 top-[45%] mx-auto">
