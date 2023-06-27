@@ -8,7 +8,6 @@ Let the collective voice rise.
 
 - Frontend: [SvelteKit](https://kit.svelte.dev/), [tailwindcss](https://tailwindcss.com/), [TinyMCE](https://www.tiny.cloud/docs/tinymce/6/)
 - Database: [CockroachDB](https://www.cockroachlabs.com/docs/)
-- Know-your-consumer: [FingerprintJS](https://fingerprint.com/)
 - Object-relational mapping: [Prisma](https://www.prisma.io/cockroachdb)
 
 ## Running locally for development
@@ -20,10 +19,6 @@ Let the collective voice rise.
     ```.env
 
     TINYMCE_KEY={Public client token for TinyMCE editor}
-
-    FINGERPRINTJS_KEY={Public client token for FingerprintJS}
-    FINGERPRINTJS_SERVER_KEY={Private server API token for FingerprintJS}
-    FINGERPRINTJS_URL={Base URL for FingerprintJS server API}
 
     DATABASE_URL={Cockroachdb connection URL for Prisma}
     
