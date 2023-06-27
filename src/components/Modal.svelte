@@ -127,12 +127,12 @@
 						</span>
 					</div>
 					<div class="info info__share flex flex-col items-center justify-center p-2">
-						<span class="flex flex-col items-center justify-center gap-2 h-max">
+						<span class="flex flex-col items-center justify-center relative gap-2 h-full">
 							<Social
 								shortLink={new URL('/' + item.shortid, $page.url.origin)}
 								linkMessage="Share this email:"
 							/>
-							<div>
+							<div class="justify-self-end absolute bottom-4">
 								<input name="Sent!" id="sendStatus" type="checkbox" class="min-w-max" />
 								<label for="sendStatus">Sent!</label>
 							</div>

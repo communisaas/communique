@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fade, scale } from 'svelte/transition';
+	import Checkmark from './icon/Checkmark.svelte';
 
 	export let shortLink: URL;
 	export let linkMessage = '';
@@ -31,6 +32,13 @@
 <aside>
 	<section class="relative grid grid-rows-2" aria-live="polite">
 		<div class="relative h-fit">
+			{#if linkCopied}
+				<div in:fade={{ delay: 25, duration: 200 }} out:fade={{ delay: 50, duration: 300 }}>
+					<icon class="absolute z-10 w-4/5 left-0 right-0 -top-[0.775rem] m-auto">
+						<Checkmark />
+					</icon>
+				</div>
+			{/if}
 			{#if linkMessage && !linkCopied}
 				<p
 					out:scale={{ delay: 20, duration: 150 }}
@@ -52,6 +60,8 @@
 		</div>
 		<button
 			class="shortLink underline p-2 rounded inline-block"
+			class:blur-sm={linkCopied}
+			class:opacity-50={linkCopied}
 			aria-label="copy shortened link"
 			on:click={() => handleCopy()}
 			on:keypress={() => handleCopy()}

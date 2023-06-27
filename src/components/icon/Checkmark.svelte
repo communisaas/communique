@@ -9,7 +9,7 @@
 		cx="46"
 		cy="46"
 		r="46"
-		fill="#D9D9D9"
+		fill="#78809e"
 		fill-opacity="0.25"
 	/>
 	<path
