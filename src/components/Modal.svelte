@@ -17,6 +17,8 @@
 	let show: boolean;
 	let emailCopied = false;
 
+	let sent = false;
+
 	const dispatch = createEventDispatcher();
 
 	function setPopover(value: boolean) {
@@ -133,13 +135,21 @@
 								linkMessage="Share this email:"
 							/>
 							<div class="justify-self-end absolute bottom-4">
-								<input name="Sent!" id="sendStatus" type="checkbox" class="min-w-max" />
+								<input
+									bind:checked={sent}
+									name="Sent!"
+									id="sendStatus"
+									type="checkbox"
+									class="min-w-max"
+								/>
 								<label for="sendStatus">Sent!</label>
 							</div>
 						</span>
 					</div>
 				</div>
-				<button class="w-full h-10" on:click={() => setPopover(false)}>Close</button>
+				<button class="w-full h-10" on:click={() => setPopover(false)}>
+					{sent ? 'Confirm' : 'Close'}
+				</button>
 			</article>
 		</section>
 	</main>
