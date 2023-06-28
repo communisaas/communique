@@ -1,11 +1,5 @@
 import { TINYMCE_KEY } from '$env/static/private';
-import {
-	FINGERPRINTJS_SERVER_KEY,
-	FINGERPRINTJS_URL,
-	FINGERPRINTJS_KEY,
-	FINGERPRINTJS_SCRIPTURL,
-	FINGERPRINTJS_APIURL
-} from '$env/static/private';
+import { v4 as uuidv4 } from 'uuid';
 import type { RequestEvent } from './$types';
 
 import objectMapper from '$lib/database';
@@ -53,16 +47,19 @@ class EmailForm {
 export const actions = {
 	publish: async ({ cookies, request }: RequestEvent) => {
 		const formSubmission = await request.formData();
-		const profileRequestID: string | undefined = formSubmission.get('profileRequestID')?.toString();
 
-		const response = await fetch(`${FINGERPRINTJS_APIURL}/events/${profileRequestID}`, {
-			headers: { 'Auth-API-Key': FINGERPRINTJS_SERVER_KEY }
-		});
+		// TODO implement openid account linking to store profile
 
-		const profile = (await response.json()).products.identification.data;
-		if (profile) {
-			formSubmission.delete('profileRequestId');
-		} else return fail(400, { name: 'profile', missing: true });
+		// const profileRequestID: string | undefined = formSubmission.get('profileRequestID')?.toString();
+
+		// const response = await fetch(`${FINGERPRINTJS_APIURL}/events/${profileRequestID}`, {
+		// 	headers: { 'Auth-API-Key': FINGERPRINTJS_SERVER_KEY }
+		// });
+
+		// const profile = (await response.json()).products.identification.data;
+		// if (profile) {
+		// 	formSubmission.delete('profileRequestId');
+		// } else return fail(400, { name: 'profile', missing: true });
 
 		const emailForm = new EmailForm(formSubmission);
 		try {
@@ -71,16 +68,17 @@ export const actions = {
 			fail(400, { name: error, missing: true });
 		}
 
+		const stagingID = uuidv4();
 		await objectMapper.$transaction(async (tx) => {
 			const updateTime = new Date().toISOString();
 			await tx.author.upsert({
 				where: {
-					rowid: profile.visitorId
+					rowid: stagingID
 				},
-				update: { profile },
+				update: {}, // { profile },
 				create: {
-					rowid: profile.visitorId,
-					profile: profile,
+					rowid: stagingID,
+					profile: {},
 					read_email_count: 0,
 					sent_email_count: 0,
 					open_email_count: 0,
@@ -101,7 +99,7 @@ export const actions = {
 							email_sent_count: 0,
 							author: {
 								connect: {
-									rowid: profile.visitorId
+									rowid: stagingID
 								}
 							}
 						},
@@ -124,7 +122,7 @@ export const actions = {
 							email_sent_count: 0,
 							author: {
 								connect: {
-									rowid: profile.visitorId
+									rowid: stagingID
 								}
 							}
 						},
@@ -134,13 +132,18 @@ export const actions = {
 						}
 					})
 			);
+
+			// TODO email shortid creation
+			if (!('shortid' in emailForm.inputFields)) {
+				emailForm.inputFields.shortid = stagingID.slice(-8);
+			}
 			await tx.email.create({
 				data: {
 					...emailForm.inputFields,
 					...emailForm.defaultMetrics,
 					author: {
 						connect: {
-							rowid: profile.visitorId
+							rowid: stagingID
 						}
 					}
 				}
@@ -154,9 +157,6 @@ export const actions = {
 /** @type {import('./$types').PageLoad} */
 export function load() {
 	return {
-		editorKey: TINYMCE_KEY,
-		profilerKey: FINGERPRINTJS_KEY,
-		profilerURL: FINGERPRINTJS_URL,
-		profilerScriptURL: FINGERPRINTJS_SCRIPTURL
+		editorKey: TINYMCE_KEY
 	};
 }

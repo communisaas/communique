@@ -8,8 +8,6 @@
 	import { writable, type Writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
 
-	import FingerprintJS from '@fingerprintjs/fingerprintjs-pro';
-
 	export let data: ComposeSchema;
 
 	let composed: Writable<string> = writable('');
@@ -41,15 +39,15 @@
 			const letterInput = document.querySelector("input[name='body']");
 			// TODO validate & sanitize email body
 
-			const webProfile = (
-				await FingerprintJS.load({
-					apiKey: data.profilerKey,
-					endpoint: data.profilerURL,
-					scriptUrlPattern: data.profilerScriptURL
-				})
-			).get();
+			// const webProfile = (
+			// 	await FingerprintJS.load({
+			// 		apiKey: data.profilerKey,
+			// 		endpoint: data.profilerURL,
+			// 		scriptUrlPattern: data.profilerScriptURL
+			// 	})
+			// ).get();
 
-			post.set('profileRequestID', (await webProfile).requestId);
+			// post.set('profileRequestID', (await webProfile).requestId);
 
 			return async ({ result, update }) => {
 				if (result.status == 200) {

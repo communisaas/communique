@@ -1,20 +1,15 @@
 name: Playwright Tests
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
 jobs:
   test:
-    environment: Development
+    environment: Staging
     env:
       TINYMCE_KEY: ${{ secrets.TINYMCE_KEY }}
       DATABASE_URL: ${{ secrets.database_url }}
-      FINGERPRINTJS_KEY: ${{ secrets.FINGERPRINTJS_KEY }}
-      FINGERPRINTJS_SERVER_KEY: ${{  secrets.FINGERPRINTJS_SERVER_KEY }}
-      FINGERPRINTJS_URL: ${{ secrets.FINGERPRINTJS_URL }}
-      FINGERPRINTJS_APIURL: ${{ secrets.FINGERPRINTJS_APIURL }}
-      FINGERPRINTJS_SCRIPTURL: ${{ secrets.FINGERPRINTJS_SCRIPTURL }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:

@@ -1,5 +1,5 @@
 import sveltePreprocess from 'svelte-preprocess';
-import adapter from '@sveltejs/adapter-auto';
+import adapter from '@sveltejs/adapter-node';
 import { sass } from 'svelte-preprocess-sass';
 
 /** @type {import('@sveltejs/kit').Config} */

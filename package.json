@@ -11,13 +11,14 @@
 		"test": "playwright test",
 		"test:unit": "vitest",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
+		"format": "prettier --plugin-search-dir . --write .",
+		"start": "node build"
 	},
 	"devDependencies": {
 		"@fontsource/fira-mono": "^5.0.1",
 		"@neoconfetti/svelte": "^1.0.0",
 		"@playwright/test": "^1.34.2",
-		"@sveltejs/adapter-auto": "^2.1.0",
+		"@sveltejs/adapter-node": "^1.2.4",
 		"@sveltejs/kit": "^1.18.0",
 		"@tsconfig/svelte": "^3.0.0",
 		"@types/cookie": "^0.5.1",
@@ -53,6 +54,7 @@
 		"@tinymce/tinymce-svelte": "^1.0.1",
 		"dompurify": "^3.0.3",
 		"he": "^1.2.0",
-		"tinymce": "^6.4.2"
+		"tinymce": "^6.4.2",
+		"uuid": "^9.0.0"
 	}
 }
