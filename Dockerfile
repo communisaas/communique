@@ -32,7 +32,11 @@ RUN npx prisma generate
 COPY --link . .
 
 # Build application
-RUN npm run build
+RUN --mount=type=secret,id=TINYMCE_KEY \
+    --mount=type=secret,id=DATABASE_URL \
+    export TINYMCE_KEY="$(cat /run/secrets/TINYMCE_KEY)" && \
+    export DATABASE_URL="$(cat /run/secrets/DATABASE_URL)" && \
+    npm run build
 
 # Remove development dependencies
 RUN npm prune --production
