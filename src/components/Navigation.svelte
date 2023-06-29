@@ -17,7 +17,12 @@
 					class:active={$page.route.id == route}
 					class:pointer-events-none={$page.route.id == `${route}`}
 				>
-					<a class="min-h-full min-w-full" aria-label={link.label} href={route}>
+					<a
+						data-sveltekit-preload-data="hover"
+						class="min-h-full min-w-full"
+						aria-label={link.label}
+						href={route}
+					>
 						<svelte:component this={link.component} />
 					</a>
 					<ins
