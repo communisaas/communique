@@ -94,18 +94,23 @@
 							{/if}
 							<button
 								on:click={() => handleMailto(dispatch)}
-								on:keypress={() => handleMailto(dispatch)}
+								on:keypress={(e) => {
+									if (e.key === 'Enter') handleMailto(dispatch);
+								}}
 								class="text-sm opacity-75 hover:underline hover:cursor-pointer hover:bg-transparent"
 								style="background: unset; box-shadow: unset"
 							>
-								(or here to reopen)
+								(and here to reopen a blank template)
 							</button>
 						</span>
 
-						<span
+						<button
 							class="relative w-fit flex-col"
+							style="background: unset; box-shadow: unset"
 							on:click={(e) => handleCopy()}
-							on:keypress={(e) => handleCopy()}
+							on:keypress={(e) => {
+								if (e.key === 'Enter') handleCopy();
+							}}
 						>
 							{#if emailCopied}
 								<div in:fade={{ delay: 25, duration: 200 }} out:fade={{ delay: 50, duration: 300 }}>
@@ -133,7 +138,7 @@
 									{@html DOMPurify.sanitize(item.body)}
 								</Clipboard>
 							</icon>
-						</span>
+						</button>
 					</div>
 					<div class="info info__share flex flex-col items-center justify-center p-2">
 						<span class="flex flex-col items-center justify-center relative gap-2 h-full">
