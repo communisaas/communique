@@ -32,7 +32,7 @@ Under certain circumstances, you have rights under data protection laws in relat
 
 ## International Transfers
 
-We do not transfer your personal data outside of your jurisdiction.
+We do not transfer your personal data outside of your jurisdiction without express consent of the Terms of Use, which occurs when you create an account.
 
 ## Children's Privacy
 

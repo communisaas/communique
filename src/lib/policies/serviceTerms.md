@@ -15,7 +15,7 @@ You are responsible for safeguarding your account. We cannot and will not be lia
 
 ## 4. Privacy
 
-Please refer to our Privacy Policy for information on how we collect, use and disclose information from our users, in compliance with the [California Consumer Privacy Act (CCPA)](https://oag.ca.gov/privacy/ccpa). You acknowledge and agree that your use of the Services is subject to our Privacy Policy.
+Please refer to our Privacy Policy for information on how we collect, use and disclose information from our users, in compliance with the [California Consumer Privacy Act (CCPA)](https://oag.ca.gov/privacy/ccpa) and [General Data Protection Regulation (GDPR)](https://gdpr.eu/what-is-gdpr/). You acknowledge and agree that your use of the Services is subject to our Privacy Policy.
 
 ## 5. Content Responsibility
 
