@@ -9,9 +9,10 @@
 	import { goto } from '$app/navigation';
 	import { setActiveEmail, handleMailto } from '$lib/email';
 	import { error } from '@sveltejs/kit';
+	import Share from '$components/Share.svelte';
 
 	let sessionStore: Writable<UserState>;
-	let showActionPopover = false;
+	let showSharePopover = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -27,12 +28,12 @@
 				'content' in $sessionStore.email &&
 				$sessionStore.email.content.shortid === slug
 			) {
-				showActionPopover = true;
+				showSharePopover = true;
 				handleMailto(dispatch);
 			} else {
 				// Otherwise, resolve the slug
 				await setActiveEmail(slug);
-				showActionPopover = true;
+				showSharePopover = true;
 				handleMailto(dispatch);
 			}
 		}
@@ -74,7 +75,7 @@
 					on:externalAction={async (e) => {
 						if (e.detail.type === 'email') {
 							goto(`/#${e.detail.context.shortid}`, { noScroll: true });
-							showActionPopover = true;
+							showSharePopover = true;
 							handleMailto(dispatch);
 						}
 					}}
@@ -84,16 +85,17 @@
 	{/if}
 </div>
 
-{#if showActionPopover}
+{#if showSharePopover}
 	<div use:modal>
 		<Modal
+			popoverComponent={Share}
+			bind:item={$sessionStore.email.content}
 			on:popover={(e) => {
-				showActionPopover = e.detail;
-				if (!showActionPopover) {
+				showSharePopover = e.detail;
+				if (!showSharePopover) {
 					goto('/', { noScroll: true });
 				}
 			}}
-			bind:item={$sessionStore.email.content}
 		/>
 	</div>
 {/if}
