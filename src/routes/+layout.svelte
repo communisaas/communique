@@ -1,14 +1,13 @@
 <script lang="ts">
 	import '../app.postcss';
 	import './styles.css';
-
+	import colors from '$lib/colors';
 	import Navigation from '$components/Navigation.svelte';
 
 	import { onMount } from 'svelte';
 	import type { topic } from '@prisma/client';
 	import Selector from '$components/Selector.svelte';
 	import Tag from '$components/Tag.svelte';
-	import { navigating } from '$app/stores';
 	import type { Writable } from 'svelte/store';
 	import { handleSelect } from '$lib/endpoint';
 
@@ -35,10 +34,7 @@
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 
 		<div class="whitespace-nowrap w-full">
-			<header
-				aria-label="Popular topics list"
-				class="flex w-fit py-2 px-3 pb-2 bg-peacockFeather-700"
-			>
+			<header aria-label="Popular topics list" class="flex py-2 px-3 pb-2 bg-peacockFeather-700">
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
 						selectable={Tag}
@@ -46,6 +42,7 @@
 						itemStyle="bg-peacockFeather-500 text-paper-500"
 						items={topicNames}
 						alignment="center"
+						backgroundColor={colors.peacockFeather[700]}
 						bind:selected={$sessionStore.topic}
 						on:select={async (e) => {
 							if ($sessionStore.template.primary) {

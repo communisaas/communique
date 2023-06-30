@@ -10,6 +10,7 @@
 	export let scrollable = true;
 	export let itemStyle: string = '';
 	export let selectorStyle: string = '';
+	export let backgroundColor: string = '';
 
 	const listStyle = `p-1 flex grow ${
 		alignment == 'end' ? 'flex-row-reverse items-end' : 'flex-row'
@@ -20,81 +21,103 @@
 	} ${selectorStyle}`;
 
 	let scrollPosition = { x: 0, remainingWidth: 0 };
-
+	let resizeObserver: ResizeObserver;
 	let list: HTMLElement;
 	let scrolled: boolean;
 	onMount(async () => {
 		selected.target = target;
+		resizeObserver = new ResizeObserver(() => {
+			updateScrollableElements();
+		});
+
+		resizeObserver.observe(list);
 	});
+
+	function updateScrollableElements() {
+		scrollPosition.remainingWidth = list.scrollWidth - list.clientWidth;
+		scrollable = scrollPosition.remainingWidth == 0 ? false : true;
+		scrolled = scrollPosition.x > 1;
+	}
 
 	$: {
 		if (items && list && scrollable) {
 			// update if new list litems
-			scrollPosition.remainingWidth = list.scrollWidth - list.clientWidth;
-			scrollable = scrollPosition.remainingWidth == 0 ? false : true;
-			scrolled = scrollPosition.x > 1;
+			updateScrollableElements();
 		}
 	}
 </script>
 
-<div
-	bind:this={list}
-	class={listStyle}
-	class:scrollable
-	class:scrolled
-	class:scrolled__max={scrolled && scrollPosition.remainingWidth - scrollPosition.x <= 1}
-	on:wheel={(e) => {
-		list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-		scrollPosition.x = list.scrollLeft + 1;
-		if (scrollable) {
-			e.preventDefault();
-		}
-	}}
->
-	{#each items as item}
-		<svelte:component
-			this={selectable}
-			bind:selected
-			style={itemStyle}
-			{item}
-			on:select
-			on:blur
-			on:externalAction
-		/>
-	{/each}
-</div>
+<section class="relative overflow-hidden">
+	<div
+		bind:this={list}
+		style="--backgroundColor: {backgroundColor}"
+		class={listStyle}
+		class:scrollable
+		class:scrolled
+		class:scrolled__max={scrolled && scrollPosition.remainingWidth - scrollPosition.x <= 1}
+		on:wheel={(e) => {
+			if (scrollable) {
+				e.preventDefault();
+				list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
+				scrollPosition.x = list.scrollLeft + 1;
+			}
+		}}
+	>
+		{#each items as item}
+			<svelte:component
+				this={selectable}
+				bind:selected
+				style={itemStyle}
+				{item}
+				on:select
+				on:blur
+				on:externalAction
+			/>
+		{/each}
+	</div>
+</section>
 
 <style lang="scss">
 	.scrollable {
-		width: auto;
+		scrollbar-width: none;
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
+		&:hover {
+			overflow: scroll;
+			/* prevent scrollbar from changing container dimensions in webkit */
+			overflow: overlay;
+		}
 
 		&::before {
 			content: '';
+			display: block;
 			position: absolute;
+			top: 0;
+			right: 0;
 			bottom: 0;
-			height: 100%;
-			width: 100%;
-			pointer-events: none;
-			background: linear-gradient(to right, transparent 90%, var(--color-bg-2) 97%);
-			transform: scaleX(1.01);
-			z-index: 10;
+			left: 0;
+			background: linear-gradient(to right, transparent 85%, var(--backgroundColor) 97%);
 		}
 	}
+
 	.scrolled::before {
 		background: linear-gradient(
 			to right,
-			var(--color-bg-2) 3%,
-			transparent 10%,
-			transparent 90%,
-			var(--color-bg-2) 97%
+			var(--backgroundColor) 3%,
+			transparent 15%,
+			transparent 85%,
+			var(--backgroundColor) 97%
 		);
-		transform: scaleX(1.01);
-
-		z-index: 10;
 	}
-	.scrolled__max::before {
-		background: linear-gradient(to right, var(--color-bg-2) 3%, transparent 10%);
 
-		z-index: 10;
+	.scrolled__max::before {
+		content: '';
+		display: block;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		background: linear-gradient(to right, var(--backgroundColor) 3%, transparent 15%);
 	}
 </style>

@@ -135,10 +135,10 @@
 					title={scrollPosition.header.x > 0 ? item.subject : null}
 					bind:this={header}
 					on:wheel={(e) => {
-						header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-						scrollPosition.header.x = header.scrollLeft;
 						if (scrollPosition.header.remainingWidth > 0) {
 							e.preventDefault();
+							header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
+							scrollPosition.header.x = header.scrollLeft;
 						}
 					}}
 					class:scrollable={scrollPosition.header.remainingWidth > 0}
@@ -355,7 +355,6 @@
 	.scrolled__max::before {
 		content: '';
 		display: block;
-		position: absolute;
 		top: 0;
 		right: 0;
 		bottom: 0;
