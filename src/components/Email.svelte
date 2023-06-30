@@ -18,7 +18,10 @@
 
 	let sessionStore: Writable<UserState>;
 
-	$: scrollPosition = { header: { x: 0, remainingWidth: 0 }, card: { x: 0, remainingWidth: 0 } };
+	$: scrollPosition = {
+		header: { x: 0, remainingWidth: 0, startX: 0, startScrollLeft: 0 },
+		card: { x: 0, remainingWidth: 0, startX: 0, startScrollLeft: 0 }
+	};
 	let header: HTMLHeadingElement;
 	let card: HTMLButtonElement;
 	let expand = false;
@@ -93,7 +96,7 @@
 
 <button
 	bind:this={card}
-	on:mousedown={handleSelect}
+	on:click={handleSelect}
 	on:keypress={(e) => {
 		if (e.key === 'Enter') {
 			handleSelect();
@@ -108,17 +111,34 @@
 >
 	{#if showMenu}
 		<div
-			on:mousedown|stopPropagation={() => {
+			on:click|stopPropagation={() => {
 				if (expand) {
 					showMenu = !showMenu;
 				} else expand = true; // if menu recently closed but not yet destroyed, still expand the card
+			}}
+			on:keypress|stopPropagation={(e) => {
+				if (e.key === 'Enter') {
+					if (expand) {
+						showMenu = !showMenu;
+					} else expand = true;
+				}
 			}}
 		>
 			<Menu>
 				<li class="menu__item">Get link</li>
 				<li class="menu__item">Not interested...</li>
 				<li class="menu__item">Report</li>
-				<li class="menu__item menu__item__close" on:mousedown={() => (showMenu = false)}>Close</li>
+				<li
+					class="menu__item menu__item__close"
+					on:click={() => (showMenu = false)}
+					on:keypress={(e) => {
+						if (e.key === 'Enter') {
+							showMenu = false;
+						}
+					}}
+				>
+					Close
+				</li>
 			</Menu>
 		</div>
 	{/if}
@@ -141,6 +161,27 @@
 							scrollPosition.header.x = header.scrollLeft;
 						}
 					}}
+					on:touchstart={(e) => {
+						if (scrollPosition.header.remainingWidth > 0) {
+							scrollPosition.header.startX = e.touches[0].pageX;
+							scrollPosition.header.startScrollLeft = header.scrollLeft;
+						}
+					}}
+					on:touchmove={(e) => {
+						if (scrollPosition.header.remainingWidth > 0) {
+							e.preventDefault();
+							const x = e.touches[0].pageX;
+							const walk = (x - scrollPosition.header.startX) * 3; // 3: scroll-fastness
+							header.scrollLeft = scrollPosition.header.startScrollLeft - walk;
+							scrollPosition.header.x = header.scrollLeft;
+						}
+					}}
+					on:touchend={() => {
+						if (scrollPosition.header.remainingWidth > 0) {
+							scrollPosition.header.startX = 0;
+							scrollPosition.header.startScrollLeft = 0;
+						}
+					}}
 					class:scrollable={scrollPosition.header.remainingWidth > 0}
 					class:scrolled={scrollPosition.header.x > 1}
 					class:scrolled__max={scrollPosition.header.remainingWidth > 0 &&
@@ -151,8 +192,13 @@
 				</h1>
 				{#if expand}
 					<span
-						on:mousedown|stopPropagation={() => {
+						on:click|stopPropagation={() => {
 							showMenu = !showMenu;
+						}}
+						on:keypress|stopPropagation={(e) => {
+							if (e.key === 'Enter') {
+								showMenu = !showMenu;
+							}
 						}}
 						class="z-10 flex items-center max-w-[24px] cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
 						in:fade={{ delay: 50, duration: 100, easing: expoIn }}
@@ -238,9 +284,16 @@
 					<div
 						aria-label="Email body"
 						class="{expand ? 'bg-artistBlue-800' : 'mt-[1.5rem]'} rounded mt-4 p-2 min-w-full"
-						on:mousedown={(e) => {
+						on:click={(e) => {
 							if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 								e.stopPropagation();
+							}
+						}}
+						on:keypress={(e) => {
+							if (e.key === 'Enter') {
+								if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
+									e.stopPropagation();
+								}
 							}
 						}}
 					>

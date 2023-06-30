@@ -20,7 +20,8 @@
 			: 'whitespace-nowrap hover:overflow-x-' + overflow
 	} ${selectorStyle}`;
 
-	let scrollPosition = { x: 0, remainingWidth: 0 };
+	let scrollPosition = { x: 0, remainingWidth: 0, startX: 0, startScrollLeft: 0 };
+
 	let resizeObserver: ResizeObserver;
 	let list: HTMLElement;
 	let scrolled: boolean;
@@ -34,9 +35,11 @@
 	});
 
 	function updateScrollableElements() {
-		scrollPosition.remainingWidth = list.scrollWidth - list.clientWidth;
-		scrollable = scrollPosition.remainingWidth == 0 ? false : true;
-		scrolled = scrollPosition.x > 1;
+		if (list) {
+			scrollPosition.remainingWidth = list.scrollWidth - list.clientWidth;
+			scrollable = scrollPosition.remainingWidth == 0 ? false : true;
+			scrolled = scrollPosition.x > 1;
+		}
 	}
 
 	$: {
@@ -60,6 +63,27 @@
 				e.preventDefault();
 				list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
 				scrollPosition.x = list.scrollLeft + 1;
+			}
+		}}
+		on:touchstart={(e) => {
+			if (scrollable) {
+				scrollPosition.startX = e.touches[0].pageX;
+				scrollPosition.startScrollLeft = list.scrollLeft;
+			}
+		}}
+		on:touchmove={(e) => {
+			if (scrollable) {
+				e.preventDefault();
+				const x = e.touches[0].pageX;
+				const walk = x - scrollPosition.startX; // 3: scroll-fastness
+				list.scrollLeft = scrollPosition.startScrollLeft - walk;
+				scrollPosition.x = list.scrollLeft + 1;
+			}
+		}}
+		on:touchend={() => {
+			if (scrollable) {
+				scrollPosition.startX = 0;
+				scrollPosition.startScrollLeft = 0;
 			}
 		}}
 	>
@@ -92,6 +116,7 @@
 
 		&::before {
 			content: '';
+			pointer-events: none;
 			display: block;
 			position: absolute;
 			top: 0;

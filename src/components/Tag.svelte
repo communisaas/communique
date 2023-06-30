@@ -9,7 +9,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	let tag: HTMLInputElement;
+	let tag: HTMLButtonElement;
 	let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
 	let tagWidth: number;
 	$: context ? (tagWidth = context.measureText(item).width + 20) : null,
@@ -33,14 +33,12 @@
 </script>
 
 <span class="max-w-fit">
-	<input
-		readonly
+	<button
 		aria-label={item}
 		class="cursor-pointer text-center px-2 py-1 rounded overflow-visible {style} "
 		style:width="{tagWidth}px"
-		value={item}
 		bind:this={tag}
-		on:mousedown|stopPropagation={() => {
+		on:click|stopPropagation={() => {
 			handleSelect();
 		}}
 		on:keypress|stopPropagation={(e) => {
@@ -49,11 +47,13 @@
 			}
 		}}
 		on:blur
-	/>
+	>
+		{item}
+	</button>
 </span>
 
 <style lang="scss">
-	input {
+	button {
 		&:hover {
 			transform: translateY(-1px);
 			box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;

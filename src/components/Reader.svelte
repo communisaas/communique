@@ -20,7 +20,8 @@
 		tabindex="-1"
 		style="text-align: initial; max-height: {expand ? 'fit-content' : '0'}, overflow: visible"
 		bind:this={expandable}
-		on:mousedown|preventDefault
+		on:click|preventDefault
+		on:keypress|preventDefault
 	>
 		<div aria-label="Email content" style="max-height: {expand ? 'fit-content' : '11rem'}">
 			{@html DOMPurify.sanitize(email.body)}

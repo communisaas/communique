@@ -39,7 +39,8 @@
 </script>
 
 <main
-	on:mouseup={(e) => e.currentTarget.focus()}
+	on:click={(e) => e.currentTarget.focus()}
+	on:keypress={(e) => e.currentTarget.focus()}
 	aria-label="Email editor"
 	aria-describedby="Write your email here"
 	class="relative flex flex-col items-center bg-paper-500 px-40 py-5 min-h-[10vh]"

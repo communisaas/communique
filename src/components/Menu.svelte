@@ -8,7 +8,7 @@
 	in:fade={{ delay: 25, duration: 300, easing: expoIn }}
 	out:fade={{ delay: 50, duration: 300, easing: expoOut }}
 >
-	<div on:mousedown|stopPropagation class="pt-[0.75rem] w-full">
+	<div on:click|stopPropagation on:keypress|stopPropagation class="pt-[0.75rem] w-full">
 		<ul transition:slide={{ delay: 50, axis: 'x', easing: quintOut }} class="flex flex-col gap-y-2">
 			<slot />
 		</ul>

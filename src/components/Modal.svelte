@@ -71,7 +71,8 @@
 		aria-label="Send status screen"
 		class="popover fixed items-center z-50 top-0"
 		style="--bodyOverflow: {show ? 'hidden' : 'auto'}"
-		on:mousedown|stopPropagation|preventDefault
+		on:click|stopPropagation|preventDefault
+		on:keypress|stopPropagation|preventDefault
 	>
 		<section
 			class="absolute text-paper-800 flex flex-col gap-y-2 justify-center items-center min-w-[100vw] min-h-[100vh]"

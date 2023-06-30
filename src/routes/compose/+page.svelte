@@ -114,8 +114,10 @@
 			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-peacockFeather-400 text-white"
 			aria-label="Post button"
 			on:mouseenter={() => ($postButtonHovered = true)}
+			on:touchstart={() => ($postButtonHovered = true)}
 			on:focus={() => ($postButtonHovered = true)}
 			on:mouseleave={() => ($postButtonHovered = false)}
+			on:touchend={() => ($postButtonHovered = false)}
 			on:blur={() => ($postButtonHovered = false)}
 		>
 			<span><Post hovered={$postButtonHovered} /></span>Post

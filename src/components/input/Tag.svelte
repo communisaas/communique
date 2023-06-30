@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 
 	export let type: 'text' | 'email',
@@ -55,16 +54,24 @@
 	aria-describedby="List of {name}s with an add button"
 	on:mouseenter={() => (deleteVisible = true)}
 	on:mouseleave={() => (deleteVisible = false)}
-	on:mousedown|preventDefault={(e) => {
+	on:click|preventDefault={() => {
 		inputVisible = true;
 	}}
+	on:keypress={(e) => {
+		if (e.key == 'Enter') {
+			inputVisible = true;
+		}
+	}}
 >
-	<li class="flex flex-row gap-3 justify-center flex-wrap max-w-40 items-center">
+	<li
+		class="flex flex-row gap-3 justify-center flex-wrap max-w-40 items-center"
+		class:mr-1={tagList.length > 0}
+	>
 		{#each tagList as tag}
 			<li class="relative text-xs {tagStyle} group">
 				<button
 					type="button"
-					on:mousedown={(e) => {
+					on:click={(e) => {
 						tagList = tagList.filter((item) => item != tag);
 						if (!inputVisible) e.stopImmediatePropagation();
 					}}
@@ -80,6 +87,8 @@
 				{tag}
 			</li>
 		{/each}
+	</li>
+	<li>
 		<input
 			required={tagList.length <= 0}
 			{name}
@@ -104,7 +113,7 @@
 					inputValueWidth = placeholderWidth + 6;
 				}
 			}}
-			on:input={() => {
+			on:input={(e) => {
 				const currentValueWidth = context.measureText(inputField.value).width;
 				if (currentValueWidth > placeholderWidth) {
 					inputValueWidth = currentValueWidth + 6;
@@ -113,7 +122,8 @@
 				}
 			}}
 			style="width: {inputVisible ? inputValueWidth : 0}px;"
-			class="space-x-2 rounded h-full bg-larimarGreen-500 shadow-artistBlue shadow-card w-0 focus:p-0.5"
+			class="rounded bg-larimarGreen-500 shadow-artistBlue shadow-card w-0 h-0 focus:p-0.5"
+			class:ml-1={tagList.length > 0 && inputVisible}
 			class:show={inputVisible}
 			{type}
 		/>
@@ -127,7 +137,7 @@
 		}}
 		class="flex justify-center items-center relative py-1"
 	>
-		<span title={`Add ${name}`} class="relative w-12 shadow-artistBlue" class:active={inputVisible}>
+		<span title={`Add ${name}`} class="relative w-12" class:active={inputVisible}>
 			<slot />
 			<icon class={addIconClass} />
 		</span>
@@ -136,13 +146,10 @@
 
 <style lang="scss">
 	input {
-		opacity: 0;
 		transition: all 0.2s;
-		width: 0;
-		height: 0;
 	}
 	button span {
-		filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));
+		filter: drop-shadow(1px 1px 0.5px rgb(0 0 0 / 0.4));
 		transform: scale(0.97);
 		transition: 0.1s all ease-out;
 	}
@@ -150,7 +157,7 @@
 		transform: scale(1);
 	}
 	button:hover span {
-		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
+		filter: drop-shadow(2px 2px 1px rgb(0 0 0 / 0.4));
 		transform: scale(1);
 		transition: 0.1s all ease-in;
 	}
@@ -163,13 +170,11 @@
 		font-size: 1.5rem;
 		line-height: 1.5rem;
 		opacity: 75%;
-		filter: drop-shadow(0 rgb(0 0 0 / 0.4));
 		transform: scale(0.75);
 		transition: all 0.2s ease-in;
 	}
 	span:hover > .add {
 		opacity: 85%;
-		filter: drop-shadow(3px 3px 2px rgb(0 0 0 / 0.4));
 		transform: scale(0.85);
 		transition: all 0.2s ease-out;
 	}
