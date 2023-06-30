@@ -123,7 +123,8 @@
 			}}
 			style="width: {inputVisible ? inputValueWidth : 0}px;"
 			class="rounded bg-larimarGreen-500 shadow-artistBlue shadow-card w-0 h-0 focus:p-0.5"
-			class:ml-1={tagList.length > 0 && inputVisible}
+			class:ml-2={tagList.length > 0 && inputVisible}
+			class:mr-1={tagList.length > 0 && inputVisible}
 			class:show={inputVisible}
 			{type}
 		/>
