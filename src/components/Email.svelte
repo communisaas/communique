@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { email } from '@prisma/client';
-	import { createEventDispatcher, onMount, afterUpdate, beforeUpdate } from 'svelte';
+	import { createEventDispatcher, onMount, afterUpdate, tick } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
@@ -8,8 +8,9 @@
 	import Recipient from './icon/Recipient.svelte';
 	import Sent from './icon/Sent.svelte';
 	import MenuIcon from './icon/Menu.svelte';
-	import { scale, fade } from 'svelte/transition';
-	import { expoIn, expoOut } from 'svelte/easing';
+	import { flip } from 'svelte/animate';
+	import { scale, fade, slide, fly } from 'svelte/transition';
+	import { expoIn, expoOut, quintOut } from 'svelte/easing';
 	import Menu from './Menu.svelte';
 
 	export let item: email;
@@ -27,7 +28,15 @@
 	let expand = false;
 	let scrollToCard = false;
 	let scrollableElements: { [key: string]: HTMLElement };
+	let nestedHover = false;
+
 	let showMenu = false;
+	let selectedMenuItem = '';
+	let menuItems = [
+		{ name: 'Get link', show: true, nestedActions: false },
+		{ name: 'Not interested...', show: true, nestedActions: false },
+		{ name: 'Report', show: true, nestedActions: true }
+	];
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/sessionStorage')).store;
@@ -76,6 +85,13 @@
 		dispatch('select', selected);
 	}
 
+	async function focusMenuItem(itemName: string) {
+		selectedMenuItem = itemName;
+		menuItems = menuItems.map((i) =>
+			i.name === selectedMenuItem ? { ...i, show: true } : { ...i, show: false }
+		);
+	}
+
 	function handleBlur(event: FocusEvent) {
 		if (document.activeElement == event.target) return; // keep expanded if focus is on the card
 		if (event.relatedTarget instanceof HTMLElement) {
@@ -105,35 +121,69 @@
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
 	class="{style} flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
-		justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl {expand && 'cursor-alias'}"
+		justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl"
+	class:cursor-alias={expand}
+	class:clickable={!nestedHover}
 	style="min-width: {expand ? '99%' : '95%'};"
-	data-sveltekit-preload-data="tap"
 >
 	{#if showMenu}
 		<div
 			on:click|stopPropagation={() => {
 				if (expand) {
 					showMenu = !showMenu;
-				} else expand = true; // if menu recently closed but not yet destroyed, still expand the card
+				} else {
+					expand = true;
+					handleSelect();
+				} // if menu recently closed but not yet destroyed, still expand the card
 			}}
 			on:keypress|stopPropagation={(e) => {
 				if (e.key === 'Enter') {
 					if (expand) {
 						showMenu = !showMenu;
-					} else expand = true;
+					} else {
+						expand = true;
+						handleSelect();
+					}
 				}
 			}}
 		>
-			<Menu>
-				<li class="menu__item">Get link</li>
-				<li class="menu__item">Not interested...</li>
-				<li class="menu__item">Report</li>
+			<Menu on:mouseenter={() => (nestedHover = true)}>
+				{#each menuItems.filter((item) => item.show) as item (item.name)}
+					<li
+						class="menu__item"
+						on:click={() => {
+							if (item.nestedActions) focusMenuItem(item.name);
+						}}
+						on:keypress={(e) => {
+							if (e.key === 'Enter' && item.nestedActions) focusMenuItem(item.name);
+						}}
+						class:z-10={selectedMenuItem === item.name}
+						class:z-0={selectedMenuItem !== item.name}
+						out:fly={{
+							delay: 50,
+							duration: 500,
+							x: 500,
+							easing: quintOut
+						}}
+						animate:flip={{ delay: 50, duration: 500, easing: quintOut }}
+					>
+						{item.name}
+					</li>
+				{/each}
 				<li
-					class="menu__item menu__item__close"
-					on:click={() => (showMenu = false)}
+					class="menu__item menu__item--close"
+					on:click={() => {
+						showMenu = false;
+						nestedHover = false;
+						selectedMenuItem = '';
+						menuItems = menuItems.map((i) => ({ ...i, show: true }));
+					}}
 					on:keypress={(e) => {
 						if (e.key === 'Enter') {
 							showMenu = false;
+							nestedHover = false;
+							selectedMenuItem = '';
+							menuItems = menuItems.map((i) => ({ ...i, show: true }));
 						}
 					}}
 				>
@@ -171,7 +221,7 @@
 						if (scrollPosition.header.remainingWidth > 0) {
 							e.preventDefault();
 							const x = e.touches[0].pageX;
-							const walk = (x - scrollPosition.header.startX) * 3; // 3: scroll-fastness
+							const walk = (x - scrollPosition.header.startX) * 2;
 							header.scrollLeft = scrollPosition.header.startScrollLeft - walk;
 							scrollPosition.header.x = header.scrollLeft;
 						}
@@ -200,6 +250,8 @@
 								showMenu = !showMenu;
 							}
 						}}
+						on:mouseenter={() => (nestedHover = true)}
+						on:mouseleave={() => (nestedHover = false)}
 						class="z-10 flex items-center max-w-[24px] cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
 						in:fade={{ delay: 50, duration: 100, easing: expoIn }}
 						out:scale={{ delay: 50, duration: 100, easing: expoOut }}
@@ -325,6 +377,9 @@
 			box-shadow: theme('colors.larimarGreen.700') 0 0 2px 2px;
 			transition: 0.1s ease-in;
 		}
+	}
+
+	.clickable {
 		&:active {
 			transform: scale(0.9927);
 			box-shadow: unset;
@@ -353,13 +408,14 @@
 
 	.menu {
 		&__item {
-			min-width: 100%;
+			min-width: 200%;
 			background-color: theme('colors.peacockFeather.500');
 			padding: 0.33em;
-			margin: 0.25em 0;
+			margin-top: 0.5em;
+			margin-left: -50%;
 			cursor: pointer;
 			transition: ease-in-out 0.2s;
-			&__close {
+			&--close {
 				margin-top: 2em;
 				background-color: theme('colors.peacockFeather.600');
 			}

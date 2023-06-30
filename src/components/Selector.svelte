@@ -75,7 +75,7 @@
 			if (scrollable) {
 				e.preventDefault();
 				const x = e.touches[0].pageX;
-				const walk = x - scrollPosition.startX; // 3: scroll-fastness
+				const walk = x - scrollPosition.startX * 2;
 				list.scrollLeft = scrollPosition.startScrollLeft - walk;
 				scrollPosition.x = list.scrollLeft + 1;
 			}
