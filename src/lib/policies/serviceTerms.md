@@ -7,7 +7,7 @@ By using the Communique service ("Service") which includes the communi.email web
 
 ## 2. Changes to Terms
 
-We reserve the right to update or change these Terms at any time. If a revision is material, we will try to provide at least 30 days' notice prior to any new terms taking effect, as required by California law.
+We reserve the right to update or change these Terms at any time. If a revision, in our sole discretion, is material, we will notify users via email and/or a prominent notice on our Website and application, prior to the change becoming effective. We will provide at least 30 days' notice prior to any new terms taking effect, as required by California law. Your continued use of Communique following the posting of changes to these Terms means that you accept those changes.
 
 ## 3. User Accounts
 
@@ -19,7 +19,7 @@ Please refer to our Privacy Policy for information on how we collect, use and di
 
 ## 5. Content Responsibility
 
-You agree not to post content that violates our Content Moderation Policy. Violation of this policy may result in content removal and/or suspension or termination of your account.
+You agree not to post content that violates our Content Moderation Policy. Violation of this policy may result in content removal and/or suspension or termination of the user's account. Constructive political discourse, advocacy, and protest are vital aspects of free speech and are allowed on our platform as long as they adhere to our Content Moderation Policy.
 
 You are responsible for all activity in connection with your use of the Services and for all Content that is uploaded or shared. You represent and warrant that you own the Content posted by you on or through the Service or otherwise have the right to grant the rights and licenses set forth in these Terms.
 
@@ -49,6 +49,6 @@ We may terminate your access to and use of the Services, at our sole discretion,
 
 ## Contact Us
 
-If you have any questions about these Terms, please contact us at [hello@communi.email](mailto:hello@communi.email).
+If you have any questions, please contact us at [hello@communi.email](mailto:hello@communi.email). We will do our best to respond within 5 business days.
 
-By using Communique, you agree to these Terms. If you do not agree to these Terms, please do not use Communique. We reserve the right to change these Terms at any time. Your continued use of Communique following the posting of changes to these Terms means that you accept those changes.
+By using Communique, you agree to these Terms. If you do not agree to these Terms, please do not use Communique.
