@@ -18,7 +18,8 @@
 					class:pointer-events-none={$page.route.id == `${route}`}
 				>
 					<a
-						data-sveltekit-preload-data
+						data-sveltekit-preload-data="hover"
+						data-sveltekit-preload-code="eager"
 						class="min-h-full min-w-full"
 						aria-label={link.label}
 						href={route}
