@@ -25,7 +25,7 @@ export async function load({ setHeaders }) {
 			primary: {
 				type: 'panel',
 				selectable: 'topic',
-				header: 'Loudest voices in',
+				header: 'Loudest voices',
 				focus: loudestTopics[0].name,
 				alignment: 'end',
 				cardList: await loudestTopicEmails

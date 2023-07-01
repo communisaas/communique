@@ -69,24 +69,24 @@
 					type="email"
 					name="recipient"
 					placeholder="Recipient"
-					style="h-14 w-fit"
-					tagStyle="px-1 py-1 rounded bg-peacockFeather-600 text-paper-500"
+					style="h-14 w-fit bg-larimarGreen-700"
+					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-600 text-paper-500"
 				>
-					<AddRecipient />
+					<icon class="w-12 inline-block m-1"><AddRecipient /></icon>
 				</TagInput>
 				<TagInput
 					bind:tagList={topics}
 					type="text"
 					name="topic"
 					placeholder="Topic"
-					style="w-fit h-14"
-					tagStyle="px-1 py-1 rounded bg-peacockFeather-500 text-paper-500"
+					style="h-14 w-fit bg-larimarGreen-700"
+					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500"
 				>
-					<AddTopic />
+					<icon class="w-12 inline-block m-1"><AddTopic /></icon>
 				</TagInput>
 			</span>
 
-			<span class="px-1 py-1 w-fit rounded bg-peacockFeather-400">
+			<span class="px-1 py-1 w-fit rounded bg-larimarGreen-700">
 				<input
 					required
 					type="text"
@@ -111,7 +111,8 @@
 		<button
 			type="submit"
 			name="post"
-			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-peacockFeather-400 text-white"
+			title="Post"
+			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-larimarGreen-700 text-white"
 			aria-label="Post button"
 			on:mouseenter={() => ($postButtonHovered = true)}
 			on:touchstart={() => ($postButtonHovered = true)}

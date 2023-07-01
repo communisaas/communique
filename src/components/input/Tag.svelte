@@ -1,17 +1,22 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	export let type: 'text' | 'email',
+	export let type: 'text' | 'search' | 'email',
 		name: string,
 		placeholder: string,
 		style: string,
 		tagStyle: string;
+	export let backgroundColor = 'transparent';
 	export let tagList: (string | FormDataEntryValue)[] = [];
+	export let inputStyle =
+		'rounded bg-larimarGreen-500 shadow-artistBlue shadow-card w-0 h-0 focus:p-0.5';
+	export let addIconStyle =
+		'add absolute bg-peacockFeather-600 h-6 w-6 text-2xl leading-6 font-bold';
 
 	let inputVisible: boolean = false;
 	let deleteVisible: boolean = false;
 
-	let inputField: HTMLInputElement, tagForm: HTMLFormElement;
+	let inputField: HTMLInputElement;
 
 	function addTag(tag: string) {
 		if (!inputField.checkValidity() || inputField.value == '') {
@@ -39,17 +44,15 @@
 		if (context) {
 			// TODO measure input width smoothly using in-dom placeholder
 			context.font = getComputedStyle(inputField).font;
-			inputValueWidth = context.measureText(placeholder).width + 6;
+			inputValueWidth = context.measureText(placeholder).width * 1.25;
 			placeholderWidth = inputValueWidth;
 		}
 	});
-
-	const addIconClass = 'add bg-peacockFeather-600 h-6 w-6';
 </script>
 
 <ul
-	class="{style} max-w-fit px-3 py-1 h-fit flex flex-row place-items-center items-center justify-center
-		rounded bg-peacockFeather-400 cursor-pointer flex-wrap"
+	class="max-w-fit px-3 py-1 gap h-fit flex flex-row place-items-center items-center justify-center
+		rounded cursor-pointer flex-wrap {style}"
 	aria-label="{name} list"
 	aria-describedby="List of {name}s with an add button"
 	on:mouseenter={() => (deleteVisible = true)}
@@ -63,32 +66,28 @@
 		}
 	}}
 >
-	<li
-		class="flex flex-row gap-3 justify-center flex-wrap max-w-40 items-center"
-		class:mr-1={tagList.length > 0}
-	>
-		{#each tagList as tag}
-			<li class="relative text-xs {tagStyle} group">
-				<button
-					type="button"
-					on:click={(e) => {
-						tagList = tagList.filter((item) => item != tag);
-						if (!inputVisible) e.stopImmediatePropagation();
-					}}
-					on:focus={() => (deleteVisible = true)}
-					on:blur={() => (deleteVisible = false)}
-					class="delete absolute -top-1 -left-2 rounded-full bg-amber-600 w-4 h-4"
-					class:show={deleteVisible}
-					aria-label={`Remove ${name}`}
-				>
-					<!-- plus sign -->
-					&#215;
-				</button>
-				{tag}
-			</li>
-		{/each}
-	</li>
-	<li>
+	{#each tagList as tag}
+		<li class="relative group mx-2 {tagStyle}">
+			<button
+				type="button"
+				on:click={(e) => {
+					tagList = tagList.filter((item) => item != tag);
+					if (!inputVisible) e.stopImmediatePropagation();
+				}}
+				on:focus={() => (deleteVisible = true)}
+				on:blur={() => (deleteVisible = false)}
+				class="delete absolute -top-1 -left-2 rounded-full bg-amber-600 w-4 h-4"
+				class:show={deleteVisible}
+				aria-label={`Remove ${name}`}
+			>
+				<!-- plus sign -->
+				&#215;
+			</button>
+			{tag}
+		</li>
+	{/each}
+
+	<li class="flex flex-row gap-3 justify-center flex-wrap items-center">
 		<input
 			required={tagList.length <= 0}
 			{name}
@@ -101,7 +100,7 @@
 			on:blur={(e) => {
 				inputVisible = false;
 				e.currentTarget.value = '';
-				inputValueWidth = placeholderWidth + 6;
+				inputValueWidth = placeholderWidth * 1.25;
 			}}
 			on:focus={() => (inputVisible = true)}
 			on:keydown|self={(e) => {
@@ -110,19 +109,19 @@
 				if (e.key == 'Enter') {
 					e.preventDefault();
 					addTag(inputField.value);
-					inputValueWidth = placeholderWidth + 6;
+					inputValueWidth = placeholderWidth * 1.25;
 				}
 			}}
-			on:input={(e) => {
+			on:input={() => {
 				const currentValueWidth = context.measureText(inputField.value).width;
 				if (currentValueWidth > placeholderWidth) {
-					inputValueWidth = currentValueWidth + 6;
+					inputValueWidth = currentValueWidth * 1.25;
 				} else {
-					inputValueWidth = placeholderWidth + 6;
+					inputValueWidth = placeholderWidth * 1.25;
 				}
 			}}
 			style="width: {inputVisible ? inputValueWidth : 0}px;"
-			class="rounded bg-larimarGreen-500 shadow-artistBlue shadow-card w-0 h-0 focus:p-0.5"
+			class={inputStyle}
 			class:ml-2={tagList.length > 0 && inputVisible}
 			class:mr-1={tagList.length > 0 && inputVisible}
 			class:show={inputVisible}
@@ -136,11 +135,11 @@
 		on:click|preventDefault={() => {
 			inputVisible ? addTag(inputField.value) : (inputVisible = true);
 		}}
-		class="flex justify-center items-center relative py-1"
+		class="flex justify-center items-center relative"
 	>
-		<span title={`Add ${name}`} class="relative w-12" class:active={inputVisible}>
+		<span title={`Add ${name}`} class="flex" class:active={inputVisible}>
 			<slot />
-			<icon class={addIconClass} />
+			<icon class={addIconStyle} />
 		</span>
 	</button>
 </ul>
@@ -148,6 +147,8 @@
 <style lang="scss">
 	input {
 		transition: all 0.2s;
+		font-size: 1rem;
+		color: black;
 	}
 	button span {
 		filter: drop-shadow(1px 1px 0.5px rgb(0 0 0 / 0.4));
@@ -163,13 +164,10 @@
 		transition: 0.1s all ease-in;
 	}
 	.add {
-		position: absolute;
-		bottom: -0.125rem;
-		right: -0.25rem;
-		border-radius: 9999px;
+		bottom: 0;
+		right: 0;
+		border-radius: 9999px; // render circle
 		color: #fff;
-		font-size: 1.5rem;
-		line-height: 1.5rem;
 		opacity: 75%;
 		transform: scale(0.75);
 		transition: all 0.2s ease-in;

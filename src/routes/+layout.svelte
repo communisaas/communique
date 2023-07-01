@@ -43,11 +43,10 @@
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}
-						bind:selected={$sessionStore.topic}
+						bind:selectedContent={$sessionStore.topic}
 						on:select={async (e) => {
 							if ($sessionStore.template.primary) {
 								$sessionStore.template.primary.cardList = await handleSelect(e);
-								$sessionStore.template.primary.header = 'Loudest voices in';
 								$sessionStore.template.primary.focus = e.detail.id;
 							}
 						}}

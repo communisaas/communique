@@ -8,8 +8,8 @@
 	import type { Writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { setActiveEmail, handleMailto } from '$lib/email';
-	import { error } from '@sveltejs/kit';
 	import Share from '$components/Share.svelte';
+	import Tag from '$components/Tag.svelte';
 
 	let sessionStore: Writable<UserState>;
 	let showSharePopover = false;
@@ -49,15 +49,17 @@
 
 <div role="feed" aria-label="Welcome to communique, you are at the home page" class="flex flex-col">
 	{#if $sessionStore && $sessionStore.hasOwnProperty('template')}
-		{#each Object.entries($sessionStore.template) as [order, panel]}
+		{#each Object.entries($sessionStore.template) as [index, panel]}
 			{#key panel.header}
 				<Panel
-					header={`${panel.header} ${
-						panel.selectable in $sessionStore ? $sessionStore.template[order].focus : 'Loading...'
-					}`}
-					alignment={panel.alignment}
+					header={`${panel.selectable in $sessionStore ? panel.header : 'Loading...'}`}
 					selectable={Email}
+					selector={Tag}
+					selectorTarget={panel.selectable}
+					initialSelection={$sessionStore.template[index].focus}
+					alignment={panel.alignment}
 					items={panel.cardList}
+					filterable={true}
 					bind:selected={$sessionStore.email}
 					on:select={async (e) => {
 						$sessionStore.template.primary.cardList = await handleSelect(e);

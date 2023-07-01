@@ -1,14 +1,19 @@
 <script lang="ts">
 	import Selector from './Selector.svelte';
-	import { createEventDispatcher, onMount, type ComponentType, tick } from 'svelte';
+	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
 	import type { Writable } from 'svelte/store';
+	import TagInput from './input/Tag.svelte';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 
 	export let selectable: ComponentType;
+	export let selector: ComponentType;
+	export let selectorTarget: 'topic' | 'recipient' | 'spotlight';
 	export let selected: Selectable;
+	export let initialSelection: string;
 	export let items: Selectable[];
+	export let filterable = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -21,11 +26,35 @@
 
 {#if store}
 	<section class="flex flex-col relative pb-5 px-5 gradient-background">
-		<span class="tab tab__{alignment}" style="align-self: {alignment}">
-			<h1 class="text-paper-500" style="text-align: {alignment}; ">
-				{header}
-			</h1>
-		</span>
+		<aside class="flex pb-3" style="justify-content: {alignment}">
+			{#if filterable && selectorTarget != 'spotlight'}
+				<h1
+					class="text-paper-500 h-fit self-center justify-self-start"
+					style="background-color: transparent; padding: unset"
+				>
+					{header}
+				</h1>
+			{/if}
+			<div class="tab tab__{alignment}">
+				<span class="space">
+					{#if filterable && selectorTarget != 'spotlight'}
+						<TagInput
+							type="search"
+							name="search item"
+							placeholder={'Search'}
+							style="h-14 w-fit bg-transparent"
+							tagStyle="text-xl underline font-bold bg-transparent rounded px-2 py-1 text-paper-500"
+							addIconStyle="add bg-peacockFeather-500 h-12 w-12 text-5xl inline-block leading-12"
+							tagList={[initialSelection]}
+						/>
+					{:else}
+						<h1 class="text-paper-500">
+							{header + ' ' + initialSelection}
+						</h1>
+					{/if}
+				</span>
+			</div>
+		</aside>
 		<span class="control">
 			<slot />
 		</span>
@@ -35,7 +64,7 @@
 			{alignment}
 			selectorStyle="flex-col min-h-[13rem]"
 			target={selected.type}
-			bind:selected
+			bind:selectedContent={selected}
 			on:select={async (e) => {
 				if (e.detail.type === selected.type) {
 				} else if (e.detail.type === 'topic' || e.detail.type === 'recipient') {
@@ -56,33 +85,34 @@
 		transition: all 0.5s ease-in-out;
 	}
 	h1 {
-		background-color: theme('colors.peacockFeather.700');
-		width: fit-content;
+		text-align: right;
+		vertical-align: middle;
+		padding: 0 1rem;
 	}
+
+	.space {
+		background-color: theme('colors.peacockFeather.700');
+		display: flex;
+	}
+
 	.tab {
 		filter: drop-shadow(1px 2px 1px theme('colors.artistBlue.500'));
-
 		&__start {
 			margin-left: -1.25rem;
-			margin-bottom: 1rem;
-			& h1 {
-				text-align: right;
-				vertical-align: middle;
-				padding: 0.5rem 1rem;
-				display: flex;
-				padding-right: calc(1.5em + 10pt);
+			& .space {
 				clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
+				padding: 0.5em 0;
+				padding-right: 2em;
+				justify-content: center;
 			}
 		}
 		&__end {
 			margin-right: -1.25rem;
-			margin-bottom: 1rem;
-			& h1 {
-				text-align: right;
-				vertical-align: middle;
-				padding: 0.5rem 1rem;
-				display: flex;
-				padding-left: calc(1.5em + 10pt);
+			& .space {
+				padding: 0.5em 2.25em;
+				justify-content: center;
+				align-items: center;
+
 				clip-path: polygon(0 0, 100% 0, 100% 100%, 10% 100%);
 			}
 		}

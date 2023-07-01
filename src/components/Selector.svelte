@@ -2,9 +2,9 @@
 	import { onMount, type ComponentType } from 'svelte';
 
 	export let items: Selectable[] | string[];
-	export let selectable: ComponentType; // type of item
-	export let selected: Selectable; // selected item
-	export let target: SelectableKey; // TODO remove
+	export let selectable: ComponentType; // item component template
+	export let selectedContent: Selectable;
+	export let target: SelectableKey;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let overflow: 'scroll' | 'hidden' | 'visible' | 'wrap' = 'hidden';
 	export let scrollable = true;
@@ -26,7 +26,7 @@
 	let list: HTMLElement;
 	let scrolled: boolean;
 	onMount(async () => {
-		selected.target = target;
+		selectedContent.target = target;
 		resizeObserver = new ResizeObserver(() => {
 			updateScrollableElements();
 		});
@@ -90,7 +90,7 @@
 		{#each items as item}
 			<svelte:component
 				this={selectable}
-				bind:selected
+				bind:selected={selectedContent}
 				style={itemStyle}
 				{item}
 				on:select
