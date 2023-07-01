@@ -24,7 +24,9 @@
 						aria-label={link.label}
 						href={route}
 					>
-						<svelte:component this={link.component} />
+						<icon>
+							<svelte:component this={link.component} />
+						</icon>
 					</a>
 					<ins
 						style="transform-origin: center right;"

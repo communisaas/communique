@@ -5,8 +5,8 @@
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
 	import Reader from './Reader.svelte';
-	import Recipient from './icon/Recipient.svelte';
-	import Sent from './icon/Sent.svelte';
+	import RecipientIcon from './icon/Recipient.svelte';
+	import SentIcon from './icon/Sent.svelte';
 	import MenuIcon from './icon/Menu.svelte';
 	import { flip } from 'svelte/animate';
 	import { scale, fade, slide, fly } from 'svelte/transition';
@@ -241,7 +241,8 @@
 					{item.subject}
 				</h1>
 				{#if expand}
-					<span
+					<icon
+						title="Menu"
 						on:click|stopPropagation={() => {
 							showMenu = !showMenu;
 						}}
@@ -253,11 +254,11 @@
 						on:mouseenter={() => (nestedHover = true)}
 						on:mouseleave={() => (nestedHover = false)}
 						class="z-10 flex items-center max-w-[24px] cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
-						in:fade={{ delay: 50, duration: 100, easing: expoIn }}
-						out:scale={{ delay: 50, duration: 100, easing: expoOut }}
+						in:fade={{ delay: 50, duration: 200, easing: expoIn }}
+						out:scale={{ delay: 50, duration: 300, easing: expoOut }}
 					>
 						<MenuIcon />
-					</span>
+					</icon>
 				{/if}
 			</span>
 			<article
@@ -267,8 +268,12 @@
 				<div class="flex flex-col min-h-full">
 					<div class="stats p-1 flex flex-row gap-x-5">
 						<span title="Read count" aria-label="Number of reads" class="flex items-center">
-							<icon class="max-w-[36px]" style="filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));">
-								<Recipient color="#94D2BD" />
+							<icon
+								title="Recipient"
+								class="max-w-[36px]"
+								style="filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.4));"
+							>
+								<RecipientIcon color="#94D2BD" />
 							</icon>
 							{item.open_count}
 						</span>
@@ -278,10 +283,11 @@
 							class="flex items-center gap-x-1.5"
 						>
 							<icon
+								title="Send count"
 								class="max-w-[36px]"
 								style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
 							>
-								<Sent color="#94D2BD" />
+								<SentIcon color="#94D2BD" />
 							</icon>
 							{item.send_count}
 						</span>
@@ -300,7 +306,7 @@
 								alignment="start"
 								overflow="wrap"
 								target="email"
-								bind:selected={$sessionStore.topic}
+								bind:selectedContent={$sessionStore.topic}
 								on:select={(e) => {
 									setExpand(false);
 									dispatch('select', e.detail);
@@ -316,7 +322,7 @@
 								alignment="start"
 								overflow="wrap"
 								target="email"
-								bind:selected={$sessionStore.recipient}
+								bind:selectedContent={$sessionStore.recipient}
 								on:select={(e) => {
 									setExpand(false);
 									dispatch('select', e.detail);

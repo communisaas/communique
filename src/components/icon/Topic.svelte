@@ -1,17 +1,15 @@
-<icon>
-	<svg width="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<line x1="7.07696" y1="7.99014" x2="8.81762" y2="7.99014" stroke="#D7FEF0" stroke-width="3" />
-		<line x1="14.7693" y1="7.99014" x2="19.121" y2="7.99014" stroke="#D7FEF0" stroke-width="3" />
-		<line x1="10.1539" y1="7.99014" x2="13.6352" y2="7.99014" stroke="#D7FEF0" stroke-width="3" />
-		<path
-			d="M20.4037 16.5414H4.75V4.75H14.2523H23.7546V13.6516V19.1713L20.8913 16.7215L20.6807 16.5414H20.4037Z"
-			stroke="#D7FEF0"
-			stroke-width="1.5"
-		/>
-		<path
-			d="M11.9139 22.7508H27.5676V10.9594H18.0653H8.56297V19.861V25.3807L11.4263 22.9309L11.6368 22.7508H11.9139Z"
-			stroke="#D7FEF0"
-			stroke-width="1.5"
-		/>
-	</svg>
-</icon>
+<svg width="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<line x1="7" y1="8.75" x2="9" y2="8.75" stroke="#D7FEF0" stroke-width="2.5" />
+	<line x1="15" y1="8.75" x2="20" y2="8.75" stroke="#D7FEF0" stroke-width="2.5" />
+	<line x1="10" y1="8.75" x2="14" y2="8.75" stroke="#D7FEF0" stroke-width="2.5" />
+	<path
+		d="M20.1895 17.5359H4.75V5.75H14.1184H23.4868V14.6477V20.1508L20.6806 17.7191L20.4692 17.5359H20.1895Z"
+		stroke="#D7FEF0"
+		stroke-width="1.5"
+	/>
+	<path
+		d="M11.8105 23.7427H27.25V11.9568H17.8816H8.51318V20.8545V26.3577L11.3194 23.926L11.5308 23.7427H11.8105Z"
+		stroke="#D7FEF0"
+		stroke-width="1.5"
+	/>
+</svg>
