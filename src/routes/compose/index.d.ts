@@ -6,6 +6,7 @@ interface ComposeSchema {
 }
 
 interface RawEmailForm {
+	shortid: string;
 	subject: string;
 	body: string;
 	topic_list: string;

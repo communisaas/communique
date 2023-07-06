@@ -1,7 +1,7 @@
 import objectMapper from '$lib/database';
+import type { LayoutServerLoad } from './$types';
 
-/** @type {import('./$types').LayoutServerLoad} */
-export async function load({ setHeaders }) {
+export const load = (async ({ setHeaders }) => {
 	// TODO: compound queries, lazy load
 	const loudestTopics = await objectMapper.topic.findMany({ take: 10 });
 
@@ -40,4 +40,4 @@ export async function load({ setHeaders }) {
 			}
 		}
 	};
-}
+}) satisfies LayoutServerLoad;
