@@ -49,7 +49,7 @@ export function convertHtmlToText(node: Node): string {
 }
 
 export async function handleMailto(dispatch: (name: string, detail?: unknown) => void) {
-	const sessionStore = (await import('$lib/sessionStorage')).store;
+	const sessionStore = (await import('$lib/data/sessionStorage')).store;
 	const mailBaseURL = new URL(`mailto:${get(sessionStore).email.content.recipient_list.join(',')}`);
 	const mailSubject = `?subject=${encodeURI(get(sessionStore).email.content.subject)}`;
 
@@ -76,7 +76,7 @@ export async function handleMailto(dispatch: (name: string, detail?: unknown) =>
 }
 
 export async function setActiveEmail(id: string) {
-	const sessionStore = (await import('$lib/sessionStorage')).store;
+	const sessionStore = (await import('$lib/data/sessionStorage')).store;
 	try {
 		const email: email = await (await fetch(`data/email/${id}`)).json();
 		sessionStore.update((sessionData) => {

@@ -1,10 +1,9 @@
-import objectMapper from '$lib/database';
+import objectMapper from '$lib/data/database';
 import type { LayoutServerLoad } from './$types';
 
-export const load = (async ({ setHeaders }) => {
+export const load = (async ({ setHeaders, locals }) => {
 	// TODO: compound queries, lazy load
 	const loudestTopics = await objectMapper.topic.findMany({ take: 10 });
-
 	setHeaders({
 		'cache-control': 'public, max-age=3600'
 	});
@@ -38,6 +37,7 @@ export const load = (async ({ setHeaders }) => {
 				alignment: 'start',
 				cardList: await spotlightEmails
 			}
-		}
+		},
+		session: await locals.getSession()
 	};
 }) satisfies LayoutServerLoad;

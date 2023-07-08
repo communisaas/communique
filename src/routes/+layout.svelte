@@ -1,21 +1,24 @@
 <script lang="ts">
 	import '../app.postcss';
 	import './styles.css';
-	import colors from '$lib/colors';
+	import colors from '$lib/ui/colors';
 	import Navigation from '$components/Navigation.svelte';
 
 	import { onMount } from 'svelte';
+	import { signIn, signOut } from '@auth/sveltekit/client';
 	import type { topic } from '@prisma/client';
 	import Selector from '$components/Selector.svelte';
 	import Tag from '$components/Tag.svelte';
 	import type { Writable } from 'svelte/store';
-	import { handleSelect } from '$lib/endpoint';
+	import { handleSelect } from '$lib/data/endpoint';
+	import { page } from '$app/stores';
+	import { goto, invalidateAll } from '$app/navigation';
 
 	export let data: LayoutSchema;
 
 	let sessionStore: Writable<UserState>;
 	onMount(async () => {
-		sessionStore = (await import('$lib/sessionStorage')).store;
+		sessionStore = (await import('$lib/data/sessionStorage')).store;
 		$sessionStore.topic = $sessionStore.topic || { id: topicNames[0], type: 'topic' };
 		$sessionStore.recipient = $sessionStore.recipient || {
 			id: '',
@@ -24,9 +27,11 @@
 		$sessionStore.spotlight = $sessionStore.spotlight || { id: 'custom', type: 'recipient' };
 		$sessionStore.email = $sessionStore.email || { id: '', type: 'email' };
 		$sessionStore.template = $sessionStore.template || data.template;
+
 	});
 
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
+	$: console.log('session: ', $page.data.session);
 </script>
 
 <div class="app flex flex-col">
@@ -52,6 +57,30 @@
 						}}
 					/>
 				{/if}
+				<span class="ml-auto flex h-10 gap-3 items-center">
+					{#if $page.data.session}
+						{#if $page.data.session.user?.image}
+							<img src={$page.data.session.user.image} alt="avatar" class="h-10 w-10" />
+						{/if}
+						<span class="signedInText">
+							<small>Signed in as</small><br />
+							<strong>{$page.data.session.user?.name ?? 'User'}</strong>
+						</span>
+						<button
+							on:click={async () => 
+								{signOut(); location.reload()}
+							}
+							class="self-end"
+						>
+							Sign out
+						</button>
+					{:else}
+						<span class="notSignedInText">You are not signed in</span>
+						<button
+							on:click={async () => signIn()}>Sign In</button
+						>
+					{/if}
+				</span>
 			</header>
 			<slot />
 		</div>

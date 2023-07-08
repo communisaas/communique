@@ -7,6 +7,7 @@
 
 	import { writable, type Writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
+	import { page } from '$app/stores';
 
 	export let data: ComposeSchema;
 
@@ -15,7 +16,14 @@
 
 	$: recipientEmails = [] as (string | FormDataEntryValue)[];
 	$: topics = [] as (string | FormDataEntryValue)[];
+
+	$: console.log($page.data.session);
 </script>
+
+<svelte:head>
+	<title>Compose | Communique</title>
+	<meta name="description" content="Write & share email templates!" />
+</svelte:head>
 
 <section class="gradient-background py-8">
 	<form

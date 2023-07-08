@@ -39,7 +39,7 @@
 	];
 
 	onMount(async () => {
-		sessionStore = (await import('$lib/sessionStorage')).store;
+		sessionStore = (await import('$lib/data/sessionStorage')).store;
 	});
 
 	afterUpdate(() => {

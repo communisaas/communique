@@ -3,6 +3,7 @@
 
 import { page } from '$app/stores';
 import { get } from 'svelte/store';
+import { redirect } from '@sveltejs/kit';
 
 export async function handleSelect(e: CustomEvent) {
 	const dataFetcher = async (endpoint: string) => {
@@ -12,7 +13,7 @@ export async function handleSelect(e: CustomEvent) {
 		return (await fetch(dataURL.toString())).json();
 	};
 
-	// selector | to fetch
+	// selector | to fetch (as number to avoid type errors with boolean logic)
 	switch ((e.detail.type | e.detail.target) as number) {
 		case 'recipient' | 'email' | ('email' | 'email'): {
 			return await dataFetcher('/data/email');

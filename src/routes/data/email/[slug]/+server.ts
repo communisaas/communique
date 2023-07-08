@@ -1,5 +1,5 @@
 // TODO endpoint to handle short IDs for email: https://www.npmjs.com/package/hashids
-import { find } from '$lib/database';
+import { find } from '$lib/data/database';
 import { error } from '@sveltejs/kit';
 
 function isUUID(s: string) {

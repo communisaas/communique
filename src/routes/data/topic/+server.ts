@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { find } from '$lib/database';
+import { find } from '$lib/data/database';
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url }) {

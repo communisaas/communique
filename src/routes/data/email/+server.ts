@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { find } from '$lib/database';
+import { find } from '$lib/data/database';
 
 const emailFieldMap: FieldMap = {
 	topic: 'topic_list',

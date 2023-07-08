@@ -14,7 +14,7 @@
 	let tagWidth: number;
 	$: context ? (tagWidth = context.measureText(item).width + 20) : null,
 		onMount(async () => {
-			store = (await import('$lib/sessionStorage')).store;
+			store = (await import('$lib/data/sessionStorage')).store;
 
 			canvas = document.createElement('canvas');
 			context = canvas.getContext('2d') as CanvasRenderingContext2D;

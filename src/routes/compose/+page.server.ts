@@ -1,14 +1,17 @@
 import { TINYMCE_KEY } from '$env/static/private';
 import { v4 as uuidv4 } from 'uuid';
 import type { RequestEvent, PageServerLoad } from './$types';
+import { authenticate } from '$lib/data/endpoint';
 
-import objectMapper from '$lib/database';
+import objectMapper from '$lib/data/database';
 import { fail, redirect } from '@sveltejs/kit';
+import { error } from 'console';
 
 class EmailForm {
 	inputFields: EmailFormInput = {
 		subject: '',
 		body: '',
+		shortid: '',
 		topic_list: [],
 		recipient_list: []
 	};
@@ -154,45 +157,7 @@ export const actions = {
 	}
 };
 
-export const load = (async ({ fetch, locals }) => {
-	let url = '';
-	try {
-		const session = await locals.getSession();
-		if (!session?.user) {
-			const tokenCall = await fetch('/auth/csrf');
-			const csrfTokenResponse = await new Response(tokenCall.body).json();
-			const csrfToken = csrfTokenResponse.csrfToken;
-
-			const params = new URLSearchParams();
-			params.append('scope', 'api openid profile email');
-
-			const formData = new URLSearchParams();
-			formData.append('redirect', 'false');
-			formData.append('csrfToken', csrfToken);
-
-			const signInRequest = await fetch('/auth/signin/auth0? ' + params.toString(), {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					'X-Auth-Return-Redirect': '1'
-				},
-				body: formData.toString()
-			});
-			const signInResponse = await new Response(signInRequest.body).json();
-			console.log('Sign in response: ', signInResponse);
-
-			// TODO handle email verification for Twitter
-			if (signInResponse?.url) {
-				url = signInResponse.url;
-			}
-		}
-	} catch (e: unknown) {
-		console.log('Exception thrown while auto-sign-in: ', e);
-	}
-
-	if (url) {
-		throw redirect(302, url);
-	}
+export const load = (async () => {
 	return {
 		editorKey: TINYMCE_KEY
 	};

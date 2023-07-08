@@ -2,8 +2,8 @@
 	import Email from '$components/Email.svelte';
 	import Panel from '$components/Panel.svelte';
 	import Modal from '$components/Modal.svelte';
-	import modal from '$lib/modal';
-	import { handleSelect } from '$lib/endpoint';
+	import modal from '$lib/ui/modal';
+	import { handleSelect } from '$lib/data/endpoint';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
@@ -17,7 +17,7 @@
 	const dispatch = createEventDispatcher();
 
 	onMount(async () => {
-		sessionStore = (await import('$lib/sessionStorage')).store;
+		sessionStore = (await import('$lib/data/sessionStorage')).store;
 		// Watch for changes to the URL hash
 		const slug = window.location.hash.substring(1).replaceAll('#', '');
 		if (slug) {

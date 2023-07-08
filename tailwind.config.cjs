@@ -1,4 +1,4 @@
-import colors from './src/lib/colors';
+import colors from './src/lib/ui/colors';
 
 const config = {
 	content: ['./src/**/*.{html,js,svelte,ts}'],

@@ -11,7 +11,7 @@
 
 	let store: Writable<UserState>;
 	onMount(async () => {
-		store = (await import('$lib/sessionStorage')).store;
+		store = (await import('$lib/data/sessionStorage')).store;
 	});
 </script>
 

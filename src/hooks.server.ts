@@ -1,30 +1,73 @@
 import { SvelteKitAuth, type SvelteKitAuthConfig } from '@auth/sveltekit';
-import Auth0Provider from '@auth/core/providers/auth0';
+import Discord from '@auth/core/providers/discord';
+import Facebook from '@auth/core/providers/facebook';
+import Instagram from '@auth/core/providers/instagram';
+import Linkedin from '@auth/core/providers/linkedin';
+import Reddit from '@auth/core/providers/reddit';
+import Twitter from '@auth/core/providers/twitter';
+
 import type { Provider } from '@auth/core/providers';
-import type { Handle } from '@sveltejs/kit';
-import {
-	AUTH0_CLIENT_ID,
-	AUTH0_CLIENT_SECRET,
-	AUTH0_DOMAIN,
-	PROVIDER_SECRET
-} from '$env/static/private';
+import { redirect, type Handle } from '@sveltejs/kit';
+import { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, PROVIDER_SECRET } from '$env/static/private';
+import { sequence } from '@sveltejs/kit/hooks';
+import { goto } from '$app/navigation';
+
+async function authorization({ event, resolve }) {
+	// Protect any routes under /authenticated
+	const session = await event.locals.getSession();
+	if (event.url.pathname.startsWith('/compose')) {
+		if (!session) {
+			const tokenCall = await event.fetch('/auth/csrf');
+			const csrfTokenResponse = await new Response(tokenCall.body).json();
+			const csrfToken = csrfTokenResponse.csrfToken;
+
+			const params = new URLSearchParams();
+			params.append('scope', 'api openid profile email');
+			const authData = new URLSearchParams();
+
+			authData.append('callbackUrl', '/');
+			authData.append('csrfToken', csrfToken);
+
+			const loginRequest = await event.fetch('/auth/signin/?' + params.toString(), {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'X-Auth-Return-Redirect': '1'
+				},
+				body: authData.toString()
+			});
+			const loginResponse = await loginRequest.json();
+			throw redirect(302, loginResponse.url);
+		}
+	}
+
+	if (event.url.pathname.includes('/auth/callback')) {
+		console.log('Callback detected');
+		return goto('/', { replaceState: true });
+	}
+
+	// If the request is still here, just proceed as normally
+	return resolve(event);
+}
 
 const config: SvelteKitAuthConfig = {
 	providers: [
-		Auth0Provider({
-			id: 'auth0',
-			name: 'Auth0',
-			clientId: AUTH0_CLIENT_ID,
-			clientSecret: AUTH0_CLIENT_SECRET,
-			issuer: AUTH0_DOMAIN + '/',
-			wellKnown: AUTH0_DOMAIN + '/.well-known/openid-configuration'
+		Facebook({}) as Provider,
+		Instagram({}) as Provider,
+		Linkedin({}) as Provider,
+		Twitter({}) as Provider,
+		Reddit({}) as Provider,
+		Discord({
+			clientId: DISCORD_CLIENT_ID,
+			clientSecret: DISCORD_CLIENT_SECRET
 		}) as Provider
 	],
 	secret: PROVIDER_SECRET,
 	debug: true,
+	trustHost: true,
 	session: {
 		maxAge: 1800 // 30 mins
 	}
 };
 
-export const handle = SvelteKitAuth(config) satisfies Handle;
+export const handle = sequence(SvelteKitAuth(config), authorization) satisfies Handle;
