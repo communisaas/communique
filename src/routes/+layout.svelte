@@ -56,7 +56,7 @@
 						}}
 					/>
 				{/if}
-				<!-- <span class="ml-auto flex h-10 gap-3 items-center">
+				<span class="ml-auto flex h-10 gap-3 items-center">
 					{#if $page.data.session}
 						{#if $page.data.session.user?.image}
 							<img src={$page.data.session.user.image} alt="avatar" class="h-10 w-10" />
@@ -74,7 +74,7 @@
 							Sign in	
 						</button>
 					{/if}
-				</span> -->
+				</span>
 			</header>
 			<slot />
 		</div>

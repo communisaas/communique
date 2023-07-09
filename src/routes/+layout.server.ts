@@ -34,7 +34,7 @@ export const load = (async ({ locals }) => {
 				alignment: 'start',
 				cardList: await spotlightEmails
 			}
-		}
-		// session: await locals.getSession()
+		},
+		session: await locals.getSession()
 	};
 }) satisfies LayoutServerLoad;
