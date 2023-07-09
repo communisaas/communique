@@ -31,7 +31,6 @@
 	});
 
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
-	$: console.log('session: ', $page.data.session);
 </script>
 
 <div class="app flex flex-col">
@@ -66,19 +65,14 @@
 							<small>Signed in as</small><br />
 							<strong>{$page.data.session.user?.name ?? 'User'}</strong>
 						</span>
-						<button
-							on:click={async () => 
-								{signOut(); location.reload()}
-							}
-							class="self-end"
-						>
+						<button on:click={() => signOut({callbackUrl: '/'})}>
 							Sign out
 						</button>
 					{:else}
 						<span class="notSignedInText">You are not signed in</span>
-						<button
-							on:click={async () => signIn()}>Sign In</button
-						>
+						<button on:click={() => signIn({callbackUrl: '/'})}>
+							Sign in	
+						</button>
 					{/if}
 				</span>
 			</header>

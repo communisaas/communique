@@ -1,12 +1,9 @@
 import objectMapper from '$lib/data/database';
 import type { LayoutServerLoad } from './$types';
 
-export const load = (async ({ setHeaders, locals }) => {
-	// TODO: compound queries, lazy load
+export const load = (async ({ locals }) => {
+	// TODO: compound queries, lazy load, caching
 	const loudestTopics = await objectMapper.topic.findMany({ take: 10 });
-	setHeaders({
-		'cache-control': 'public, max-age=3600'
-	});
 	const loudestTopicEmails = objectMapper.email.findMany({
 		where: {
 			topic_list: {

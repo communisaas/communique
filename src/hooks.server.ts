@@ -10,12 +10,10 @@ import type { Provider } from '@auth/core/providers';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, PROVIDER_SECRET } from '$env/static/private';
 import { sequence } from '@sveltejs/kit/hooks';
-import { goto } from '$app/navigation';
 
-async function authorization({ event, resolve }) {
-	// Protect any routes under /authenticated
-	const session = await event.locals.getSession();
+async function protect({ event, resolve }) {
 	if (event.url.pathname.startsWith('/compose')) {
+		const session = await event.locals.getSession();
 		if (!session) {
 			const tokenCall = await event.fetch('/auth/csrf');
 			const csrfTokenResponse = await new Response(tokenCall.body).json();
@@ -41,12 +39,6 @@ async function authorization({ event, resolve }) {
 		}
 	}
 
-	if (event.url.pathname.includes('/auth/callback')) {
-		console.log('Callback detected');
-		return goto('/', { replaceState: true });
-	}
-
-	// If the request is still here, just proceed as normally
 	return resolve(event);
 }
 
@@ -62,12 +54,12 @@ const config: SvelteKitAuthConfig = {
 			clientSecret: DISCORD_CLIENT_SECRET
 		}) as Provider
 	],
+
 	secret: PROVIDER_SECRET,
-	debug: true,
 	trustHost: true,
 	session: {
 		maxAge: 1800 // 30 mins
 	}
 };
 
-export const handle = sequence(SvelteKitAuth(config), authorization) satisfies Handle;
+export const handle = sequence(SvelteKitAuth(config), protect) satisfies Handle;
