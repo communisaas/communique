@@ -10,9 +10,8 @@
 	import Selector from '$components/Selector.svelte';
 	import Tag from '$components/Tag.svelte';
 	import type { Writable } from 'svelte/store';
-	import { handleSelect } from '$lib/data/endpoint';
+	import { handleSelect } from '$lib/data/select';
 	import { page } from '$app/stores';
-	import { goto, invalidateAll } from '$app/navigation';
 
 	export let data: LayoutSchema;
 
@@ -27,16 +26,14 @@
 		$sessionStore.spotlight = $sessionStore.spotlight || { id: 'custom', type: 'recipient' };
 		$sessionStore.email = $sessionStore.email || { id: '', type: 'email' };
 		$sessionStore.template = $sessionStore.template || data.template;
-
 	});
 
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
 </script>
 
 <div class="app flex flex-col">
-	<main class="flex min-h-screen">
+	<main class="flex">
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
-
 		<div class="whitespace-nowrap w-full">
 			<header aria-label="Popular topics list" class="flex py-2 px-3 pb-2 bg-peacockFeather-700">
 				{#if $sessionStore && $sessionStore.template}
@@ -65,13 +62,13 @@
 							<small>Signed in as</small><br />
 							<strong>{$page.data.session.user?.name ?? 'User'}</strong>
 						</span>
-						<button on:click={() => signOut({callbackUrl: '/'})}>
+						<button on:click={() => signOut({ callbackUrl: '/', redirect: false })}>
 							Sign out
 						</button>
 					{:else}
 						<span class="notSignedInText">You are not signed in</span>
-						<button on:click={() => signIn({callbackUrl: '/'})}>
-							Sign in	
+						<button on:click={() => signIn({ callbackUrl: '/', redirect: false })}>
+							Sign in
 						</button>
 					{/if}
 				</span>
@@ -120,3 +117,13 @@
 		</div>
 	</footer>
 </div>
+
+<style>
+	.gradient-background {
+		background: linear-gradient(
+			90deg,
+			theme('colors.peacockFeather.600'),
+			theme('colors.teal.700')
+		);
+	}
+</style>

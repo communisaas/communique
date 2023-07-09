@@ -10,7 +10,7 @@
 	import { createEventDispatcher } from 'svelte';
 
 	import he from 'he';
-	import { convertHtmlToText, handleMailto } from '$lib/email';
+	import { convertHtmlToText, handleMailto } from '$lib/data/email';
 
 	export let item: email;
 
@@ -184,6 +184,8 @@
 			transform: scale(0.99);
 		}
 	}
+
+	// TODO consolidate button styles
 	button {
 		background: rgba(255, 255, 255, 0.15);
 		border-radius: 16px;

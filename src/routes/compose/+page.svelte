@@ -25,7 +25,7 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<section class="gradient-background py-8">
+<section class="py-8">
 	<form
 		class="flex flex-col gap-y-5 rounded-full"
 		method="POST"
@@ -152,11 +152,4 @@
 		transition: 0.1s all ease-in;
 	}
 
-	.gradient-background {
-		background: linear-gradient(
-			90deg,
-			theme('colors.peacockFeather.600'),
-			theme('colors.teal.700')
-		);
-	}
 </style>

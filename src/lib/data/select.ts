@@ -3,7 +3,6 @@
 
 import { page } from '$app/stores';
 import { get } from 'svelte/store';
-import { redirect } from '@sveltejs/kit';
 
 export async function handleSelect(e: CustomEvent) {
 	const dataFetcher = async (endpoint: string) => {

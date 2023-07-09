@@ -3,26 +3,36 @@
 	import Panel from '$components/Panel.svelte';
 	import Modal from '$components/Modal.svelte';
 	import modal from '$lib/ui/modal';
-	import { handleSelect } from '$lib/data/endpoint';
+	import { handleSelect } from '$lib/data/select';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
-	import { setActiveEmail, handleMailto } from '$lib/email';
+	import { setActiveEmail, handleMailto } from '$lib/data/email';
 	import Share from '$components/Share.svelte';
 	import Tag from '$components/Tag.svelte';
+	import Login from '$components/Login.svelte';
+	import { page } from '$app/stores';
+	
+	export let data;
 
 	let sessionStore: Writable<UserState>;
 	let showSharePopover = false;
+	let showLoginPopover = false;
 
 	const dispatch = createEventDispatcher();
-
+	
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
-		// Watch for changes to the URL hash
+		// check the URL hash
 		const slug = window.location.hash.substring(1).replaceAll('#', '');
 		if (slug) {
-			// If the hash matches an email slug and email has been set as a selection target, show the modal
-			if (
+			// if the hash matches an internal route 
+				// or email slug and email has been set as a selection target, show the modal
+			if (slug == 'signin') {
+				if (!$page.data.session) showLoginPopover = true;
+				else goto(`/`, { noScroll: true });
+			}
+			else if (
 				$sessionStore &&
 				'email' in $sessionStore &&
 				'content' in $sessionStore.email &&
@@ -47,7 +57,7 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<div role="feed" aria-label="Welcome to communique, you are at the home page" class="flex flex-col">
+<div role="feed" aria-label="Welcome to communique, you are at the home page" class="flex flex-col min-h-screen">
 	{#if $sessionStore && $sessionStore.hasOwnProperty('template')}
 		{#each Object.entries($sessionStore.template) as [index, panel]}
 			{#key panel.header}
@@ -101,3 +111,19 @@
 		/>
 	</div>
 {/if}
+
+{#if showLoginPopover}
+	<div use:modal>
+		<Modal
+			popoverComponent={Login}
+			bind:item={data.authProviders}
+			on:popover={(e) => {
+				showLoginPopover = e.detail;
+				if (!showLoginPopover) {
+					goto('/', { noScroll: true });
+				}
+			}}
+		/>
+	</div>
+{/if}
+
