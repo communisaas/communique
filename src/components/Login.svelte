@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { signIn } from "@auth/sveltekit/client";
 	import { createEventDispatcher } from "svelte";
+	import { fade, scale } from "svelte/transition";
     
     export let item: AuthSchema;
 
@@ -14,19 +15,30 @@
 	}
 </script>
 
-<section class="flex flex-col items-center">
-    <p class="mb-4">{!chosenProvider ? 'Sign in with' : `Going to ${chosenProvider}...`}</p>
+<section class="flex flex-col items-center relative">
+        {#if !chosenProvider}
+        <p class="absolute mb-4 w-max mx-auto -top-8" out:fade={{duration: 30}}>Sign in with</p>
+        {:else}
+        <p class="absolute mb-4 w-max mx-auto -top-8" in:fade={{delay: 30, duration: 150}}>{`Going to ${chosenProvider}...`}</p>
+        {/if}
     <article class="flex flex-col gap-3">
         <div class="flex gap-3">
             {#each Object.entries(item.providers) as [id, attributes]}
-                <button on:click={() => {signIn(id); setPopover(false); chosenProvider = attributes.name}} class="flex flex-col items-center justify-center m-2 w-14 h-14">
-                    <img data-sveltekit-preload-code='eager' src={item.baseLogoURL + attributes.style.logoDark} alt='{attributes.name} logo'/>
+            {#if !chosenProvider || chosenProvider === attributes.name}
+                <button on:click={() => {signIn(id); chosenProvider = attributes.name}} class="flex flex-col items-center justify-center m-2 w-14 h-14">
+                    <img src={item.baseLogoURL + attributes.style.logoDark} alt='{attributes.name} logo'/>
                 </button>
+                {/if}
             {/each}
         </div>
-        <button class="w-full h-10" on:click={() => setPopover(false)}>
-            Close
-        </button>
+        <div class="w-full h-10">
+            {#if !chosenProvider}
+            <button out:scale={{ delay: 20, duration: 150 }} class="w-full h-full" on:click={() => setPopover(false)}>
+                Close
+            </button>
+        {/if}
+        </div>
+        
     </article>
 </section>
 

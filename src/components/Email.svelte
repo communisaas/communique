@@ -71,6 +71,7 @@
 	}
 
 	async function handleSelect() {
+		// TODO fix tab navigation for nested menu items
 		if (selected.id != item.rowid) {
 			selected.id = item.rowid;
 		}
@@ -120,14 +121,16 @@
 	}}
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
-	class="{style} flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
-		justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl"
+	class="card flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
+		justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl {style}"
 	class:cursor-alias={expand}
 	class:clickable={!nestedHover}
 	style="min-width: {expand ? '99%' : '95%'};"
 >
 	{#if showMenu}
 		<div
+			role="menu"
+			tabindex="0"
 			on:click|stopPropagation={() => {
 				if (expand) {
 					showMenu = !showMenu;
@@ -149,7 +152,8 @@
 		>
 			<Menu on:mouseenter={() => (nestedHover = true)}>
 				{#each menuItems.filter((item) => item.show) as item (item.name)}
-					<li
+					<li animate:flip={{ delay: 50, duration: 500, easing: quintOut }}>
+						<button
 						class="menu__item"
 						on:click={() => {
 							if (item.nestedActions) focusMenuItem(item.name);
@@ -165,29 +169,32 @@
 							x: 500,
 							easing: quintOut
 						}}
-						animate:flip={{ delay: 50, duration: 500, easing: quintOut }}
+						
 					>
 						{item.name}
+						<button/>
 					</li>
 				{/each}
-				<li
-					class="menu__item menu__item--close"
-					on:click={() => {
-						showMenu = false;
-						nestedHover = false;
-						selectedMenuItem = '';
-						menuItems = menuItems.map((i) => ({ ...i, show: true }));
-					}}
-					on:keypress={(e) => {
-						if (e.key === 'Enter') {
+				<li>
+					<button
+						class="menu__item menu__item--close"
+						on:click={() => {
 							showMenu = false;
 							nestedHover = false;
 							selectedMenuItem = '';
 							menuItems = menuItems.map((i) => ({ ...i, show: true }));
-						}
-					}}
-				>
-					Close
+						}}
+						on:keypress={(e) => {
+							if (e.key === 'Enter') {
+								showMenu = false;
+								nestedHover = false;
+								selectedMenuItem = '';
+								menuItems = menuItems.map((i) => ({ ...i, show: true }));
+							}
+						}}
+					>
+						Close
+					</button>
 				</li>
 			</Menu>
 		</div>
@@ -241,7 +248,7 @@
 					{item.subject}
 				</h1>
 				{#if expand}
-					<icon
+					<button
 						title="Menu"
 						on:click|stopPropagation={() => {
 							showMenu = !showMenu;
@@ -258,7 +265,7 @@
 						out:scale={{ delay: 50, duration: 300, easing: expoOut }}
 					>
 						<MenuIcon />
-					</icon>
+					</button>
 				{/if}
 			</span>
 			<article
@@ -332,16 +339,18 @@
 						</div>
 					</div>
 				</div>
-				<div
+				<details
 					style="text-align: initial; margin-top: {!expand ? '-1.5rem' : '0'};"
-					class="whitespace-normal flex flex-col"
+					class="whitespace-normal flex flex-col appearance-none"
 				>
 					{#if expand}
 						<p aria-label="Info text" class="text-center"><i>click again to send...</i></p>
 					{/if}
-					<div
+					<summary
+						aria-expanded={expand}
+						tabindex="-1"
 						aria-label="Email body"
-						class="{expand ? 'bg-artistBlue-800' : 'mt-[1.5rem]'} rounded mt-4 p-2 min-w-full"
+						class="{expand ? 'bg-artistBlue-800' : 'mt-[1.5rem]'} rounded mt-6 p-2 min-w-full appearance-none"
 						on:click={(e) => {
 							if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 								e.stopPropagation();
@@ -356,8 +365,8 @@
 						}}
 					>
 						<Reader {expand} email={item} />
-					</div>
-				</div>
+					</summary>
+				</details>
 			</article>
 		{/if}
 	</section>
@@ -375,7 +384,7 @@
 			width: 100%;
 		}
 	}
-	button {
+	.card {
 		transition: 0.2s ease-out;
 		color: theme('colors.paper.500');
 		&:hover {
@@ -474,5 +483,14 @@
 		right: 0;
 		bottom: 0;
 		background: linear-gradient(to right, theme('colors.artistBlue.600') 3%, transparent 15%);
+	}
+
+	summary {
+		transition: 0.2s ease-out;
+  		list-style: none; /* works in firefox */
+		&::-webkit-details-marker {
+			display: none;
+		}
+
 	}
 </style>

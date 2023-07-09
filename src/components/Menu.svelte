@@ -10,7 +10,7 @@
 	on:mouseenter
 	on:mouseleave
 >
-	<div on:click|stopPropagation on:keypress|stopPropagation class="pt-[0.75rem] w-full">
+	<div role="menu" tabindex="0" on:click|stopPropagation on:keypress|stopPropagation class="pt-[0.75rem] w-full">
 		<ul transition:slide={{ delay: 50, axis: 'x', easing: quintOut }} class="flex flex-col gap-y-2">
 			<slot />
 		</ul>

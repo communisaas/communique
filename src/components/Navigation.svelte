@@ -55,6 +55,8 @@
 	.active {
 		transform: scale(1);
 		height: 100%;
+		filter: contrast(0.4);
+
 	}
 
 	a::before {
@@ -80,9 +82,7 @@
 		padding: 1em 0.5em;
 		display: block;
 	}
-	.active {
-		filter: contrast(0.4);
-	}
+
 	.active a::before {
 		border-right: 4px solid theme('colors.larimarGreen.600');
 		display: block;

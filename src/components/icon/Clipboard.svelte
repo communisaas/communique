@@ -80,7 +80,7 @@
 	</svg>
 	<!-- {overflowHeight <= 0 ? 'after::invisible' : ''} -->
 	<div class="content">
-		<div bind:this={content} class="content-inner" style="zoom: {contentZoomRatio}">
+		<div bind:this={content} class="content-inner">
 			<slot />
 		</div>
 	</div>
@@ -108,7 +108,7 @@
 		max-width: 66%;
 		height: 75%;
 		&::after {
-			background: linear-gradient(to top, rgba(0, 50, 64, 1) 3%, transparent 10%);
+			background: linear-gradient(to top, rgba(0, 50, 64, 0.8) 3%, transparent 10%);
 			content: '';
 			position: absolute;
 			bottom: 3%;
@@ -122,10 +122,10 @@
 		margin-top: 0;
 		height: 97%;
 		max-width: fit-content;
-		background-color: rgba(0, 50, 64, 0.8);
 		padding-bottom: 2%;
 		color: white;
 		box-sizing: border-box;
 		overflow: hidden;
+		text-align: justify;
 	}
 </style>
