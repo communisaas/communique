@@ -43,7 +43,7 @@
 							name="search item"
 							placeholder={'Search'}
 							style="h-14 w-fit bg-transparent"
-							tagStyle="text-xl underline font-bold bg-transparent rounded px-2 py-1 text-paper-500"
+							tagStyle="text-xl underline font-bold bg-transparent rounded px-2 pr-1 text-paper-500"
 							addIconStyle="add bg-peacockFeather-500 h-12 w-12 text-5xl inline-block leading-12"
 							tagList={[initialSelection]}
 						/>
@@ -61,9 +61,10 @@
 		<Selector
 			{selectable}
 			{items}
-			{alignment}
+			alignment="center"
 			selectorStyle="flex-col min-h-[13rem]"
 			target={selected.type}
+			scrollable={false}
 			bind:selectedContent={selected}
 			on:select={async (e) => {
 				if (e.detail.type === selected.type) {
@@ -99,6 +100,7 @@
 		filter: drop-shadow(1px 2px 1px theme('colors.artistBlue.500'));
 		&__start {
 			margin-left: -1.25rem;
+			align-items: start;
 			& .space {
 				clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
 				padding: 0.5em 0;
@@ -109,11 +111,11 @@
 		&__end {
 			margin-right: -1.25rem;
 			& .space {
-				padding: 0.5em 2.25em;
-				justify-content: center;
+				padding: 0.5em 1.25em;
+				padding-left: 0.5em;
+				justify-content: start;
 				align-items: center;
-
-				clip-path: polygon(0 0, 100% 0, 100% 100%, 10% 100%);
+				clip-path: polygon(0 0, 100% 0, 100% 100%, 2em 100%);
 			}
 		}
 	}

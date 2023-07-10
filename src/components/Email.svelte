@@ -122,7 +122,7 @@
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
 	class="card flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
-		justify-center min-w-[95%] min-h-[15.5rem] max-w-4xl {style}"
+		justify-center w-[97%] max-w-4xl {style}"
 	class:cursor-alias={expand}
 	class:clickable={!nestedHover}
 	style="min-width: {expand ? '99%' : '95%'};"
@@ -154,25 +154,25 @@
 				{#each menuItems.filter((item) => item.show) as item (item.name)}
 					<li animate:flip={{ delay: 50, duration: 500, easing: quintOut }}>
 						<button
-						class="menu__item"
-						on:click={() => {
-							if (item.nestedActions) focusMenuItem(item.name);
-						}}
-						on:keypress={(e) => {
-							if (e.key === 'Enter' && item.nestedActions) focusMenuItem(item.name);
-						}}
-						class:z-10={selectedMenuItem === item.name}
-						class:z-0={selectedMenuItem !== item.name}
-						out:fly={{
-							delay: 50,
-							duration: 500,
-							x: 500,
-							easing: quintOut
-						}}
-						
-					>
-						{item.name}
-						<button/>
+							class="menu__item"
+							on:click={() => {
+								if (item.nestedActions) focusMenuItem(item.name);
+							}}
+							on:keypress={(e) => {
+								if (e.key === 'Enter' && item.nestedActions) focusMenuItem(item.name);
+							}}
+							class:z-10={selectedMenuItem === item.name}
+							class:z-0={selectedMenuItem !== item.name}
+							out:fly={{
+								delay: 50,
+								duration: 500,
+								x: 500,
+								easing: quintOut
+							}}
+						>
+							{item.name}
+							<button />
+						</button>
 					</li>
 				{/each}
 				<li>
@@ -213,6 +213,7 @@
 					bind:this={header}
 					on:wheel={(e) => {
 						if (scrollPosition.header.remainingWidth > 0) {
+							e.stopPropagation();
 							e.preventDefault();
 							header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
 							scrollPosition.header.x = header.scrollLeft;
@@ -226,6 +227,7 @@
 					}}
 					on:touchmove={(e) => {
 						if (scrollPosition.header.remainingWidth > 0) {
+							e.stopPropagation();
 							e.preventDefault();
 							const x = e.touches[0].pageX;
 							const walk = (x - scrollPosition.header.startX) * 2;
@@ -350,7 +352,9 @@
 						aria-expanded={expand}
 						tabindex="-1"
 						aria-label="Email body"
-						class="{expand ? 'bg-artistBlue-800' : 'mt-[1.5rem]'} rounded mt-6 p-2 min-w-full appearance-none"
+						class="{expand
+							? 'bg-artistBlue-800'
+							: 'mt-[1.5rem]'} rounded mt-6 p-2 min-w-full appearance-none"
 						on:click={(e) => {
 							if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 								e.stopPropagation();
@@ -487,10 +491,9 @@
 
 	summary {
 		transition: 0.2s ease-out;
-  		list-style: none; /* works in firefox */
+		list-style: none; /* works in firefox */
 		&::-webkit-details-marker {
 			display: none;
 		}
-
 	}
 </style>
