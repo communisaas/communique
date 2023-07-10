@@ -2,7 +2,7 @@ import { TINYMCE_KEY } from '$env/static/private';
 import { v4 as uuidv4 } from 'uuid';
 import type { RequestEvent, PageServerLoad } from './$types';
 
-import objectMapper from '$lib/data/database';
+import { objectMapper } from '$lib/data/database';
 import { fail } from '@sveltejs/kit';
 import { EmailForm } from '$lib/data/email';
 
