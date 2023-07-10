@@ -12,7 +12,7 @@
 	import Tag from '$components/Tag.svelte';
 	import Login from '$components/Login.svelte';
 	import { page } from '$app/stores';
-	
+
 	export let data;
 
 	let sessionStore: Writable<UserState>;
@@ -20,19 +20,18 @@
 	let showLoginPopover = false;
 
 	const dispatch = createEventDispatcher();
-	
+
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
 		// check the URL hash
 		const slug = window.location.hash.substring(1).replaceAll('#', '');
 		if (slug) {
-			// if the hash matches an internal route 
-				// or email slug and email has been set as a selection target, show the modal
+			// if the hash matches an internal route
+			// or email slug and email has been set as a selection target, show the modal
 			if (slug == 'signin') {
 				if (!$page.data.session) showLoginPopover = true;
 				else goto(`/`, { noScroll: true });
-			}
-			else if (
+			} else if (
 				$sessionStore &&
 				'email' in $sessionStore &&
 				'content' in $sessionStore.email &&
@@ -57,7 +56,11 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<div role="feed" aria-label="Welcome to communique, you are at the home page" class="flex flex-col min-h-screen">
+<div
+	role="feed"
+	aria-label="Welcome to communique, you are at the home page"
+	class="flex flex-col h-full"
+>
 	{#if $sessionStore && $sessionStore.hasOwnProperty('template')}
 		{#each Object.entries($sessionStore.template) as [index, panel]}
 			{#key panel.header}
@@ -126,4 +129,3 @@
 		/>
 	</div>
 {/if}
-

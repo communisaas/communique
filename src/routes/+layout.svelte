@@ -32,7 +32,7 @@
 </script>
 
 <div class="app flex flex-col">
-	<main class="flex">
+	<main class="flex min-h-screen">
 		<div class="grow-0 shrink-0 w-20"><Navigation /></div>
 		<div class="whitespace-nowrap w-full">
 			<header aria-label="Popular topics list" class="flex py-2 px-3 pb-2 bg-peacockFeather-700">
@@ -77,7 +77,7 @@
 		</div>
 	</main>
 	<!-- TODO aria labels for footer -->
-	<footer class="bg-gray-900 text-white py-6">
+	<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full">
 		<div class="container mx-auto flex flex-wrap justify-between px-4">
 			<div class="w-full md:w-1/3 mb-4 md:mb-0">
 				<div class="flex justify-center md:justify-start">
@@ -118,12 +118,5 @@
 	</footer>
 </div>
 
-<style>
-	.gradient-background {
-		background: linear-gradient(
-			90deg,
-			theme('colors.peacockFeather.600'),
-			theme('colors.teal.700')
-		);
-	}
+<style lang="scss">
 </style>

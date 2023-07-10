@@ -40,13 +40,10 @@ export const load = (async ({ locals }) => {
 		session: await locals.getSession(),
 		authProviders: {
 			baseLogoURL: baseProviderLogoURL.toString() as `https://${string}.svg`,
-			providers: providers.reduce(
-				(accumulator, provider) => {
-					accumulator[provider.id] = { name: provider.name, style: provider.style };
-					return accumulator;
-				},
-				{} as { [key: string]: ProviderAttributes }
-			)
+			providers: providers.reduce((accumulator, provider) => {
+				accumulator[provider.id] = { name: provider.name, style: provider.style };
+				return accumulator;
+			}, {} as { [key: string]: ProviderAttributes })
 		}
 	};
 }) satisfies LayoutServerLoad;
