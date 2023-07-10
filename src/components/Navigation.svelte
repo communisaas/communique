@@ -11,7 +11,7 @@
 
 <aside class="object-cover inline-flex h-full">
 	<div class="flex flex-col items-center h-full bg-peacockFeather-700 shadow-nav z-50">
-		<nav aria-label="Page navigation" class="flex flex-col">
+		<nav aria-label="Page navigation" class="flex flex-col sticky top-0">
 			{#each Object.entries(navLinks) as [route, link]}
 				<span
 					class:active={$page.route.id == route}
@@ -56,7 +56,6 @@
 		transform: scale(1);
 		height: 100%;
 		filter: contrast(0.4);
-
 	}
 
 	a::before {
