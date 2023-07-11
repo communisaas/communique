@@ -202,7 +202,7 @@
 	<section
 		class="flex flex-col relative {!expand
 			? 'cardWrapper'
-			: ''} min-h-[14.5rem] min-w-full overflow-hidden"
+			: ''} min-w-full min-h-fit overflow-hidden"
 	>
 		{#if sessionStore}
 			<span class="flex max-w-full relative">
@@ -271,7 +271,7 @@
 				{/if}
 			</span>
 			<article
-				class="flex justify-between min-w-full"
+				class="flex grow justify-between min-w-full h-full"
 				style="flex-direction:{!expand ? 'row' : 'column'}"
 			>
 				<div class="flex flex-col min-h-full">
@@ -303,7 +303,7 @@
 					</div>
 
 					<div
-						class="tags min-w-[25rem]"
+						class="tags min-w-[25rem] h-full justify-between"
 						aria-label="Topic and recepient lists"
 						style="max-width: {!expand ? '35rem' : '100%'};"
 					>

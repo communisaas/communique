@@ -25,7 +25,7 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<section class="py-8">
+<section class="py-8 min-h-screen">
 	<form
 		class="flex flex-col gap-y-5 rounded-full"
 		method="POST"
@@ -151,5 +151,4 @@
 		transform: scale(1);
 		transition: 0.1s all ease-in;
 	}
-
 </style>
