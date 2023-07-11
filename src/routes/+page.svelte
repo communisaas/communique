@@ -63,9 +63,9 @@
 				}
 
 				if (hashParams.has('callbackUrl')) {
-					// handle callbackUrl
-					$sessionStore.loginCallbackURL = decodeURIComponent(hashParams.get('callbackUrl') ?? '');
-					// process callbackUrl...
+					$sessionStore.loginCallbackURL = decodeURIComponent(
+						hashParams.get('callbackUrl') ?? ''
+					) as `/${string}`;
 				}
 
 				// handle other hashes...

@@ -76,7 +76,7 @@
 	}
 </script>
 
-<section class="relative h-full overflow-hidden">
+<section class="relative h-full overflow-auto">
 	<div
 		bind:this={list}
 		style="--backgroundColor: {backgroundColor}"

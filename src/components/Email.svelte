@@ -71,6 +71,7 @@
 	}
 
 	async function handleSelect() {
+		console.log('focus');
 		// TODO fix tab navigation for nested menu items
 		if (selected.id != item.rowid) {
 			selected.id = item.rowid;
@@ -93,6 +94,7 @@
 		);
 	}
 
+	$: console.log(expand);
 	function handleBlur(event: FocusEvent) {
 		if (document.activeElement == event.target) return; // keep expanded if focus is on the card
 		if (event.relatedTarget instanceof HTMLElement) {
@@ -114,11 +116,6 @@
 <button
 	bind:this={card}
 	on:click={handleSelect}
-	on:keypress={(e) => {
-		if (e.key === 'Enter') {
-			handleSelect();
-		}
-	}}
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
 	class="card flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
@@ -135,7 +132,7 @@
 				if (expand) {
 					showMenu = !showMenu;
 				} else {
-					expand = true;
+					setExpand(true);
 					handleSelect();
 				} // if menu recently closed but not yet destroyed, still expand the card
 			}}
@@ -144,14 +141,14 @@
 					if (expand) {
 						showMenu = !showMenu;
 					} else {
-						expand = true;
+						setExpand(true);
 						handleSelect();
 					}
 				}
 			}}
 		>
 			<Menu on:mouseenter={() => (nestedHover = true)}>
-				{#each menuItems.filter((item) => item.show) as item (item.name)}
+				{#each menuItems.filter((item) => item.show) as item, index (item.name)}
 					<li animate:flip={{ delay: 50, duration: 500, easing: quintOut }}>
 						<button
 							class="menu__item"
@@ -171,7 +168,6 @@
 							}}
 						>
 							{item.name}
-							<button />
 						</button>
 					</li>
 				{/each}
@@ -182,6 +178,7 @@
 							showMenu = false;
 							nestedHover = false;
 							selectedMenuItem = '';
+							card.focus();
 							menuItems = menuItems.map((i) => ({ ...i, show: true }));
 						}}
 						on:keypress={(e) => {
@@ -205,7 +202,7 @@
 			: ''} min-w-full min-h-fit overflow-hidden"
 	>
 		{#if sessionStore}
-			<span class="flex max-w-full relative">
+			<span class="flex max-w-full items-center h-fit relative">
 				<h1
 					aria-label="Subject line"
 					aria-describedby={item.subject}
@@ -255,14 +252,10 @@
 						on:click|stopPropagation={() => {
 							showMenu = !showMenu;
 						}}
-						on:keypress|stopPropagation={(e) => {
-							if (e.key === 'Enter') {
-								showMenu = !showMenu;
-							}
-						}}
+						on:keypress|stopPropagation
 						on:mouseenter={() => (nestedHover = true)}
 						on:mouseleave={() => (nestedHover = false)}
-						class="z-10 flex items-center max-w-[24px] cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
+						class="z-10 max-w-[28px] max-h-fit cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
 						in:fade={{ delay: 50, duration: 200, easing: expoIn }}
 						out:scale={{ delay: 50, duration: 300, easing: expoOut }}
 					>
@@ -341,16 +334,16 @@
 						</div>
 					</div>
 				</div>
+				{#if expand}
+					<p aria-label="Info text" class="text-center mt-1"><i>click again to send...</i></p>
+				{/if}
 				<details
 					style="text-align: initial; margin-top: {!expand ? '-1.5rem' : '0'};"
 					class="whitespace-normal flex flex-col appearance-none"
 				>
-					{#if expand}
-						<p aria-label="Info text" class="text-center"><i>click again to send...</i></p>
-					{/if}
 					<summary
-						aria-expanded={expand}
 						tabindex="-1"
+						aria-expanded={expand}
 						aria-label="Email body"
 						class="{expand
 							? 'bg-artistBlue-800'
@@ -368,7 +361,7 @@
 							}
 						}}
 					>
-						<Reader {expand} email={item} />
+						<Reader bind:expand email={item} contextElement={card} />
 					</summary>
 				</details>
 			</article>
@@ -392,7 +385,6 @@
 		transition: 0.2s ease-out;
 		color: theme('colors.paper.500');
 		&:hover {
-			transform: scale(1.0073);
 			box-shadow: theme('colors.larimarGreen.700') 0 0 2px 2px;
 			transition: 0.1s ease-in;
 		}

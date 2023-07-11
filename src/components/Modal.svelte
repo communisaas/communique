@@ -6,7 +6,9 @@
 
 	export let popoverComponent: ComponentType;
 	export let item: email | AuthSchema;
+
 	let show: boolean;
+	let menu: HTMLElement;
 
 	const dispatch = createEventDispatcher();
 
@@ -26,6 +28,7 @@
 		class="absolute text-paper-800 flex flex-col gap-y-2 justify-center items-center min-w-[100vw] min-h-[100vh]"
 		in:fade={{ delay: 15, duration: 150, easing: expoIn }}
 		out:fade={{ delay: 25, duration: 200, easing: expoOut }}
+		bind:this={menu}
 	>
 		<svelte:component
 			this={popoverComponent}
