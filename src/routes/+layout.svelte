@@ -28,7 +28,6 @@
 		$sessionStore.email = $sessionStore.email || { id: '', type: 'email' };
 		$sessionStore.template = $sessionStore.template || data.template;
 	});
-
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
 </script>
 

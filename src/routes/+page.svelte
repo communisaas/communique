@@ -23,14 +23,18 @@
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
-		// check the URL hash
-		const slug = window.location.hash.substring(1).replaceAll('#', '');
-		if (slug) {
-			// if the hash matches an internal route
-			// or email slug and email has been set as a selection target, show the modal
-			if (slug == 'signin') {
-				if (!$page.data.session) showLoginPopover = true;
-				else goto(`/`, { noScroll: true });
+		// Extract the hash values
+		const hashes = window.location.hash.substring(1).split('#');
+		// If there's only one hash, handle the case for email short id
+		if (hashes.length === 1 && hashes[0]) {
+			const slug = hashes[0];
+
+			if (slug === 'signin') {
+				if (!$page.data.session) {
+					showLoginPopover = true;
+				} else {
+					goto(`/`, { noScroll: true });
+				}
 			} else if (
 				$sessionStore &&
 				'email' in $sessionStore &&
@@ -45,6 +49,27 @@
 				showSharePopover = true;
 				handleMailto(dispatch);
 			}
+		} else {
+			// Iterate over each hash
+			hashes.forEach(async (hash) => {
+				const hashParams = new URLSearchParams(hash);
+
+				if (hashParams.has('signin')) {
+					if (!$page.data.session) {
+						showLoginPopover = true;
+					} else {
+						goto(`/`, { noScroll: true });
+					}
+				}
+
+				if (hashParams.has('callbackUrl')) {
+					// handle callbackUrl
+					$sessionStore.loginCallbackURL = decodeURIComponent(hashParams.get('callbackUrl') ?? '');
+					// process callbackUrl...
+				}
+
+				// handle other hashes...
+			});
 		}
 	});
 

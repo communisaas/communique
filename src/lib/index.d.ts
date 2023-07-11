@@ -5,6 +5,7 @@ interface UserState {
 	recipient: Selectable;
 	spotlight: Selectable;
 	template: Layout;
+	loginCallbackURL?: `/${string}`;
 	[key: string];
 }
 

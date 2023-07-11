@@ -7,7 +7,7 @@ async function protect({ event, resolve }) {
 	if (event.url.pathname.startsWith('/compose')) {
 		const session = await event.locals.getSession();
 		if (!session) {
-			throw redirect(302, '/sign/in');
+			throw redirect(302, '/sign/in?callbackUrl=/compose');
 		}
 	}
 

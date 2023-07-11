@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 
 export const GET = (async ({ url }) => {
-	console.log(url);
-	throw redirect(302, `/#signin`);
+	const searchParams = url.searchParams.toString();
+	throw redirect(302, `/#signin#${searchParams}`);
 }) satisfies RequestHandler;

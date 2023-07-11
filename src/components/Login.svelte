@@ -1,9 +1,18 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { signIn } from '@auth/sveltekit/client';
 	import { createEventDispatcher } from 'svelte';
+	import type { Writable } from 'svelte/store';
 	import { fade, scale } from 'svelte/transition';
+	import { onMount } from 'svelte';
 
 	export let item: AuthSchema;
+
+	let sessionStore: Writable<UserState>;
+	onMount(async () => {
+		sessionStore = (await import('$lib/data/sessionStorage')).store;
+		console.log($sessionStore.loginCallbackURL);
+	});
 
 	let show: boolean;
 	let chosenProvider: string;
@@ -29,7 +38,7 @@
 				{#if !chosenProvider || chosenProvider === attributes.name}
 					<button
 						on:click={() => {
-							signIn(id);
+							signIn(id, { callbackUrl: $sessionStore.loginCallbackURL });
 							chosenProvider = attributes.name;
 						}}
 						class="flex flex-col items-center justify-center m-2 w-14 h-14"
