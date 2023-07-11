@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { redirect, type RequestHandler } from '@sveltejs/kit';
 
 export const GET = (({ params }) => {
 	// TODO differentiate email slugs from internal routes
