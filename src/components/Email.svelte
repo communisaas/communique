@@ -94,7 +94,6 @@
 		);
 	}
 
-	$: console.log(expand);
 	function handleBlur(event: FocusEvent) {
 		if (document.activeElement == event.target) return; // keep expanded if focus is on the card
 		if (event.relatedTarget instanceof HTMLElement) {
