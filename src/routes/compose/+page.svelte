@@ -13,7 +13,7 @@
 	import { routeModal } from '$lib/ui/hash';
 	import { goto } from '$app/navigation';
 	import Modal from '$components/Modal.svelte';
-	import modal from '$lib/ui/modal';
+	import modal, { handlePopover } from '$lib/ui/modal';
 
 	export let data: ComposeSchema;
 
@@ -33,7 +33,7 @@
 		await routeModal(hashes, $page, $sessionStore, dispatch);
 	});
 
-	let showMapping: ModalMap = {
+	let modalMapping: ModalMap = {
 		privacyPolicy: {
 			component: Reader,
 			props: () => ({ item: $page.data.privacyPolicy, inModal: true })
@@ -43,17 +43,6 @@
 			props: () => ({ item: $page.data.termsOfUse, inModal: true })
 		}
 	};
-
-	$: console.log(showMapping);
-
-	function handlePopover(modal: keyof ModalState) {
-		return (e: CustomEvent<boolean>) => {
-			$sessionStore.show[modal as keyof ModalState] = e.detail;
-			if (!e.detail) {
-				goto('/compose', { noScroll: true });
-			}
-		};
-	}
 </script>
 
 <svelte:head>
@@ -173,11 +162,14 @@
 {#if $sessionStore && $sessionStore.hasOwnProperty('show')}
 	<div use:modal>
 		{#each Object.keys($sessionStore.show) as modal (modal)}
-			{#if $sessionStore.show[modal] && showMapping.hasOwnProperty(modal)}
+			{#if $sessionStore.show[modal] && modalMapping.hasOwnProperty(modal)}
 				<Modal
-					popoverComponent={showMapping[modal].component}
-					props={showMapping[modal].props()}
-					on:popover={handlePopover(modal)}
+					popoverComponent={modalMapping[modal].component}
+					props={modalMapping[modal].props()}
+					on:popover={async (e) => {
+						await handlePopover(e, sessionStore, modal, '/compose');
+						console.log('?');
+					}}
 				/>
 			{/if}
 		{/each}

@@ -11,5 +11,5 @@ interface Layout {
 }
 
 interface ModalMap {
-	[key: keyof ModalState]: Props;
+	[key: keyof ModalState]: { component: ComponentType; props: ComponentProps };
 }

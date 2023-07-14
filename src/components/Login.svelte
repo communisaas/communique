@@ -38,6 +38,7 @@
 						on:click={() => {
 							signIn(id, { callbackUrl: $sessionStore.loginCallbackURL });
 							chosenProvider = attributes.name;
+							$sessionStore.show.login = false;
 						}}
 						class="flex flex-col items-center justify-center m-2 w-14 h-14"
 					>

@@ -21,3 +21,6 @@ interface Selectable {
 interface Props {
 	[key: string]: unknown;
 }
+
+// load props from a function that runs after the component mounts
+type ComponentProps = () => Props;
