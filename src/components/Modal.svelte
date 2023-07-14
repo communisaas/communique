@@ -5,7 +5,7 @@
 	import type { email } from '@prisma/client';
 
 	export let popoverComponent: ComponentType;
-	export let item: email | AuthSchema;
+	export let props: Props;
 
 	let show: boolean;
 	let menu: HTMLElement;
@@ -32,7 +32,7 @@
 	>
 		<svelte:component
 			this={popoverComponent}
-			bind:item
+			{...props}
 			on:popover={(e) => {
 				setPopover(e.detail);
 			}}

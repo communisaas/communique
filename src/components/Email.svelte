@@ -345,9 +345,6 @@
 						tabindex="-1"
 						aria-expanded={expand}
 						aria-label="Email body"
-						class="{expand
-							? 'bg-artistBlue-800'
-							: 'mt-[1.5rem]'} rounded mt-6 p-2 min-w-full appearance-none"
 						on:click={(e) => {
 							if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 								e.stopPropagation();
@@ -361,7 +358,7 @@
 							}
 						}}
 					>
-						<Reader bind:expand email={item} contextElement={card} />
+						<Reader bind:expand item={item.body} />
 					</summary>
 				</details>
 			</article>

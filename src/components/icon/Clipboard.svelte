@@ -108,7 +108,7 @@
 		max-width: 66%;
 		height: 75%;
 		&::after {
-			background: linear-gradient(to top, rgba(0, 50, 64, 0.8) 3%, transparent 10%);
+			background: linear-gradient(to top, rgba(0, 50, 64, 1) 3%, transparent 10%);
 			content: '';
 			position: absolute;
 			bottom: 3%;
@@ -117,8 +117,7 @@
 			width: 100%;
 		}
 	}
-
-	.content-inner {
+	:global(.content-inner) {
 		margin-top: 0;
 		height: 97%;
 		max-width: fit-content;
@@ -126,6 +125,12 @@
 		color: white;
 		box-sizing: border-box;
 		overflow: hidden;
-		text-align: justify;
+		text-align: left;
+		font-size: 0.5rem;
+
+		:global(h1) {
+			font-size: 1rem;
+			line-height: 18px;
+		}
 	}
 </style>

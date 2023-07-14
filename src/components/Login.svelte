@@ -6,7 +6,7 @@
 	import { fade, scale } from 'svelte/transition';
 	import { onMount } from 'svelte';
 
-	export let item: AuthSchema;
+	export let providers: AuthSchema;
 
 	let sessionStore: Writable<UserState>;
 	onMount(async () => {
@@ -14,13 +14,11 @@
 		console.log($sessionStore.loginCallbackURL);
 	});
 
-	let show: boolean;
 	let chosenProvider: string;
 	const dispatch = createEventDispatcher();
 	// TODO focus traps
 	function setPopover(value: boolean) {
-		show = value;
-		dispatch('popover', show);
+		dispatch('popover', value);
 	}
 </script>
 
@@ -34,7 +32,7 @@
 	{/if}
 	<article class="flex flex-col gap-3">
 		<div class="flex gap-3">
-			{#each Object.entries(item.providers) as [id, attributes]}
+			{#each Object.entries(providers.providers) as [id, attributes]}
 				{#if !chosenProvider || chosenProvider === attributes.name}
 					<button
 						on:click={() => {
@@ -43,7 +41,10 @@
 						}}
 						class="flex flex-col items-center justify-center m-2 w-14 h-14"
 					>
-						<img src={item.baseLogoURL + attributes.style.logoDark} alt="{attributes.name} logo" />
+						<img
+							src={providers.baseLogoURL + attributes.style.logoDark}
+							alt="{attributes.name} logo"
+						/>
 					</button>
 				{/if}
 			{/each}

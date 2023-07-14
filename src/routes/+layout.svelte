@@ -27,6 +27,12 @@
 		$sessionStore.spotlight = $sessionStore.spotlight || { id: 'custom', type: 'recipient' };
 		$sessionStore.email = $sessionStore.email || { id: '', type: 'email' };
 		$sessionStore.template = $sessionStore.template || data.template;
+		$sessionStore.show = $sessionStore.show || {
+			login: false,
+			share: false,
+			privacyPolicy: false,
+			termsOfUse: false
+		};
 	});
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
 </script>
@@ -81,7 +87,7 @@
 </main>
 <!-- TODO aria labels for footer -->
 <footer class="bg-gray-900 text-white py-6 static bottom-0 w-full">
-	<div class="container mx-auto flex flex-wrap justify-between px-4">
+	<div class="container mx-auto flex flex-wrap items-center justify-between px-4">
 		<div class="w-full md:w-1/3 mb-4 md:mb-0">
 			<div class="flex justify-center md:justify-start">
 				<h4 class="font-bold text-lg mb-2 mr-2">Communique</h4>
@@ -92,7 +98,7 @@
 				</span>
 			</div>
 		</div>
-		<div class="w-full md:w-1/3 text-center mb-4 md:mb-0">
+		<!-- <div class="w-full md:w-1/3 text-center mb-4 md:mb-0">
 			<h4 class="font-bold text-lg mb-2">Get Involved</h4>
 			<ul class="list-reset">
 				<li><a href="#" class="text-teal-400 hover:text-teal-500">Find legislators</a></li>
@@ -108,15 +114,20 @@
 				<li><a href="#" class="text-teal-400 hover:text-teal-500">Instagram</a></li>
 			</ul>
 		</div>
-	</div>
-	<div class="text-gray-400 text-sm mt-6 flex justify-center items-center">
-		<span class="mr-2">&copy; 2023 Communique DAO. All rights reserved.</span>
-		<span class="border-l border-gray-600 pl-2 ml-2">
-			<a href="#" class="text-teal-400 hover:text-teal-500">Terms of Use</a>
-		</span>
-		<span class="border-l border-gray-600 pl-2 ml-2">
-			<a href="#" class="text-teal-400 hover:text-teal-500">Privacy Policy</a>
-		</span>
+	</div> -->
+		<div class="text-gray-400 text-sm mt-6 flex justify-center items-center">
+			<span class="mr-2">&copy; 2023 Communique DAO. All rights reserved.</span>
+			<span class="border-l border-gray-600 pl-2 ml-2">
+				<a href="#" class="text-teal-400 hover:text-teal-500">Terms of Use</a>
+			</span>
+			<span class="border-l border-gray-600 pl-2 ml-2">
+				<a
+					href="#privacy-policy"
+					on:click={() => ($sessionStore.show.privacyPolicy = true)}
+					class="text-teal-400 hover:text-teal-500">Privacy Policy</a
+				>
+			</span>
+		</div>
 	</div>
 </footer>
 

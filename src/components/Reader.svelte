@@ -1,18 +1,19 @@
 <script lang="ts">
-	import type { email } from '@prisma/client';
-	import { onMount, afterUpdate, beforeUpdate } from 'svelte';
+	import { onMount, afterUpdate, beforeUpdate, createEventDispatcher } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import DOMPurify from 'dompurify';
 
-	export let expand = false;
-	export let email: email;
-	export let contextElement: HTMLElement;
+	export let expand = true;
+	export let inModal = false;
+	export let item: string;
 
 	let expandable: HTMLElement;
 	let focusableElements: NodeListOf<Element>;
 	let lastFocusableElement: HTMLElement;
 
 	let store: Writable<UserState>;
+	const dispatch = createEventDispatcher();
+
 	onMount(async () => {
 		store = (await import('$lib/data/sessionStorage')).store;
 	});
@@ -23,49 +24,76 @@
 			lastFocusableElement.removeEventListener('blur', transferFocus);
 		}
 	});
-
 	afterUpdate(() => {
 		focusableElements = expandable.querySelectorAll(
 			'a, button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
 		);
-
-		focusableElements.forEach((element: HTMLElement) => {
+		focusableElements.forEach((element: Element) => {
 			if (expand) {
 				element.removeAttribute('tabindex');
 			} else {
 				element.setAttribute('tabindex', '-1');
 			}
 		});
-
 		// Add a blur event listener to each focusable element
-		focusableElements.forEach((element: HTMLElement) => {
-			element.addEventListener('blur', transferFocus);
+		focusableElements.forEach((element: Element) => {
+			(element as HTMLElement).addEventListener('blur', transferFocus);
 		});
 	});
 
 	function transferFocus(event: FocusEvent) {
-		// Check if the relatedTarget (the element receiving focus) is inside the expandable element
-		console.log(expandable.contains(event.relatedTarget as Node));
 		if (!expandable.contains(event.relatedTarget as Node)) {
 			expand = false; // set expand to false if the focus is outside of the expandable element
 		}
 	}
+
+	function setPopover(value: boolean) {
+		dispatch('popover', value);
+	}
 </script>
 
-<aside
-	tabindex="-1"
-	style="text-align: initial; max-height: {expand ? 'fit-content' : '0'}, overflow: visible"
-	bind:this={expandable}
-	on:click|preventDefault
-	on:keypress|preventDefault
->
-	<div
+<section class="flex flex-col gap-2 {inModal ? 'm-10 markdown-content' : 'w-full'}">
+	<aside
 		tabindex="-1"
-		aria-label="Email content"
-		style="max-height: {expand ? 'fit-content' : '11rem'}; pointer-events: {expand
-			? 'auto'
-			: 'none'}"
+		style="text-align: initial;"
+		class="
+		{expand ? 'bg-artistBlue-800' : 'mt-[1.5rem]'} 
+		{inModal ? 'p-5 overflow-auto max-h-[80vh] bg-artistBlue-800' : 'mt-6 p-2 w-full max-h-fit'}
+		rounded appearance-none"
+		bind:this={expandable}
 	>
-		{@html DOMPurify.sanitize(email.body)}
-	</div>
-</aside>
+		<div
+			tabindex="-1"
+			aria-label="content"
+			style="max-height: {expand
+				? 'fit-content'
+				: inModal
+				? 'fit-content'
+				: '11rem'}; pointer-events: {expand ? 'auto' : 'none'}"
+		>
+			{@html DOMPurify.sanitize(item)}
+		</div>
+	</aside>
+	{#if inModal}
+		<button class="w-full h-10" on:click={() => setPopover(false)}> Close </button>
+	{/if}
+</section>
+
+<style lang="scss">
+	button {
+		background: rgba(255, 255, 255, 0.15);
+		border-radius: 0 0 16px 16px;
+		box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.1);
+		padding: 2px 5px;
+		transition: ease-in-out 0.1s;
+
+		&:hover {
+			background: rgba(255, 255, 255, 0.25);
+			transform: translateY(-1px);
+		}
+		&:active {
+			transform: translateY(1px);
+			background: rgba(255, 255, 255, 0.15);
+		}
+	}
+</style>

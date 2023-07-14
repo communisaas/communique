@@ -14,7 +14,6 @@
 
 	export let item: email;
 
-	let show: boolean;
 	let emailCopied = false;
 
 	let sent = false;
@@ -22,8 +21,7 @@
 	const dispatch = createEventDispatcher();
 
 	function setPopover(value: boolean) {
-		show = value;
-		dispatch('popover', show);
+		dispatch('popover', value);
 	}
 
 	async function handleCopy() {

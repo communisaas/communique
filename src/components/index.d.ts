@@ -17,3 +17,7 @@ interface Selectable {
 	index?: number;
 	content?: email;
 }
+
+interface Props {
+	[key: string]: unknown;
+}

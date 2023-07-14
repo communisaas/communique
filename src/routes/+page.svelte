@@ -7,70 +7,32 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
-	import { setActiveEmail, handleMailto } from '$lib/data/email';
+	import { handleMailto } from '$lib/data/email';
 	import Share from '$components/Share.svelte';
 	import Tag from '$components/Tag.svelte';
 	import Login from '$components/Login.svelte';
 	import { page } from '$app/stores';
+	import { routeModal } from '$lib/ui/hash';
+	import { marked } from 'marked';
+
+	import termsOfUse from '$lib/policies/serviceTerms.md';
+	import privacyPolicy from '$lib/policies/privacyPolicy.md';
+	import Reader from '$components/Reader.svelte';
 
 	export let data;
 
 	let sessionStore: Writable<UserState>;
-	let showSharePopover = false;
-	let showLoginPopover = false;
+	let privacyPolicyHTML: string;
 
 	const dispatch = createEventDispatcher();
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
-		// Extract the hash values
+		privacyPolicyHTML = marked(await (await fetch(privacyPolicy)).text());
+
 		const hashes = window.location.hash.substring(1).split('#');
-		// If there's only one hash, handle the case for email short id
-		if (hashes.length === 1 && hashes[0]) {
-			const slug = hashes[0];
-
-			if (slug === 'signin') {
-				if (!$page.data.session) {
-					showLoginPopover = true;
-				} else {
-					goto(`/`, { noScroll: true });
-				}
-			} else if (
-				$sessionStore &&
-				'email' in $sessionStore &&
-				'content' in $sessionStore.email &&
-				$sessionStore.email.content.shortid === slug
-			) {
-				showSharePopover = true;
-				handleMailto(dispatch);
-			} else {
-				// Otherwise, resolve the slug
-				await setActiveEmail(slug);
-				showSharePopover = true;
-				handleMailto(dispatch);
-			}
-		} else {
-			// Iterate over each hash
-			hashes.forEach(async (hash) => {
-				const hashParams = new URLSearchParams(hash);
-
-				if (hashParams.has('signin')) {
-					if (!$page.data.session) {
-						showLoginPopover = true;
-					} else {
-						goto(`/`, { noScroll: true });
-					}
-				}
-
-				if (hashParams.has('callbackUrl')) {
-					$sessionStore.loginCallbackURL = decodeURIComponent(
-						hashParams.get('callbackUrl') ?? ''
-					) as `/${string}`;
-				}
-
-				// handle other hashes...
-			});
-		}
+		// TODO use enum
+		await routeModal(hashes, $page, $sessionStore, dispatch);
 	});
 
 	// TODO loading placeholders
@@ -115,7 +77,7 @@
 					on:externalAction={async (e) => {
 						if (e.detail.type === 'email') {
 							goto(`/#${e.detail.context.shortid}`, { noScroll: true });
-							showSharePopover = true;
+							$sessionStore.show.share = true;
 							handleMailto(dispatch);
 						}
 					}}
@@ -125,32 +87,44 @@
 	{/if}
 </div>
 
-{#if showSharePopover}
+{#if $sessionStore && $sessionStore.hasOwnProperty('show')}
 	<div use:modal>
-		<Modal
-			popoverComponent={Share}
-			bind:item={$sessionStore.email.content}
-			on:popover={(e) => {
-				showSharePopover = e.detail;
-				if (!showSharePopover) {
-					goto('/', { noScroll: true });
-				}
-			}}
-		/>
-	</div>
-{/if}
-
-{#if showLoginPopover}
-	<div use:modal>
-		<Modal
-			popoverComponent={Login}
-			bind:item={data.authProviders}
-			on:popover={(e) => {
-				showLoginPopover = e.detail;
-				if (!showLoginPopover) {
-					goto('/', { noScroll: true });
-				}
-			}}
-		/>
+		{#if $sessionStore.show.share}
+			<Modal
+				popoverComponent={Share}
+				props={{ item: $sessionStore.email.content }}
+				on:popover={(e) => {
+					$sessionStore.show.share = e.detail;
+					if (!$sessionStore.show.share) {
+						goto('/', { noScroll: true });
+					}
+				}}
+			/>
+		{:else if $sessionStore.show.login}
+			<Modal
+				popoverComponent={Login}
+				props={{ providers: data.authProviders }}
+				on:popover={(e) => {
+					$sessionStore.show.login = e.detail;
+					if (!$sessionStore.show.login) {
+						goto('/', { noScroll: true });
+					}
+				}}
+			/>
+		{:else if $sessionStore.show.privacyPolicy}
+			<Modal
+				popoverComponent={Reader}
+				props={{
+					item: privacyPolicyHTML,
+					inModal: true
+				}}
+				on:popover={(e) => {
+					$sessionStore.show.privacyPolicy = e.detail;
+					if (!$sessionStore.show.privacyPolicy) {
+						goto('/', { noScroll: true });
+					}
+				}}
+			/>
+		{/if}
 	</div>
 {/if}
