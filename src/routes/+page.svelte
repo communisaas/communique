@@ -13,27 +13,42 @@
 	import Login from '$components/Login.svelte';
 	import { page } from '$app/stores';
 	import { routeModal } from '$lib/ui/hash';
-	import { marked } from 'marked';
-
-	import termsOfUse from '$lib/policies/serviceTerms.md';
-	import privacyPolicy from '$lib/policies/privacyPolicy.md';
 	import Reader from '$components/Reader.svelte';
 
 	export let data;
 
 	let sessionStore: Writable<UserState>;
-	let privacyPolicyHTML: string;
 
 	const dispatch = createEventDispatcher();
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
-		privacyPolicyHTML = marked(await (await fetch(privacyPolicy)).text());
-
 		const hashes = window.location.hash.substring(1).split('#');
 		// TODO use enum
 		await routeModal(hashes, $page, $sessionStore, dispatch);
 	});
+
+	let showMapping: ModalMap = {
+		share: { component: Share, props: () => ({ item: $sessionStore.email.content }) },
+		login: { component: Login, props: () => ({ providers: data.authProviders }) },
+		privacyPolicy: {
+			component: Reader,
+			props: () => ({ item: $page.data.privacyPolicy, inModal: true })
+		},
+		termsOfUse: {
+			component: Reader,
+			props: () => ({ item: $page.data.termsOfUse, inModal: true })
+		}
+	};
+
+	function handlePopover(modal: keyof ModalState) {
+		return (e: CustomEvent<boolean>) => {
+			$sessionStore.show[modal as keyof ModalState] = e.detail;
+			if (!e.detail) {
+				goto('/', { noScroll: true });
+			}
+		};
+	}
 
 	// TODO loading placeholders
 </script>
@@ -89,42 +104,14 @@
 
 {#if $sessionStore && $sessionStore.hasOwnProperty('show')}
 	<div use:modal>
-		{#if $sessionStore.show.share}
-			<Modal
-				popoverComponent={Share}
-				props={{ item: $sessionStore.email.content }}
-				on:popover={(e) => {
-					$sessionStore.show.share = e.detail;
-					if (!$sessionStore.show.share) {
-						goto('/', { noScroll: true });
-					}
-				}}
-			/>
-		{:else if $sessionStore.show.login}
-			<Modal
-				popoverComponent={Login}
-				props={{ providers: data.authProviders }}
-				on:popover={(e) => {
-					$sessionStore.show.login = e.detail;
-					if (!$sessionStore.show.login) {
-						goto('/', { noScroll: true });
-					}
-				}}
-			/>
-		{:else if $sessionStore.show.privacyPolicy}
-			<Modal
-				popoverComponent={Reader}
-				props={{
-					item: privacyPolicyHTML,
-					inModal: true
-				}}
-				on:popover={(e) => {
-					$sessionStore.show.privacyPolicy = e.detail;
-					if (!$sessionStore.show.privacyPolicy) {
-						goto('/', { noScroll: true });
-					}
-				}}
-			/>
-		{/if}
+		{#each Object.keys($sessionStore.show) as modal (modal)}
+			{#if $sessionStore.show[modal]}
+				<Modal
+					popoverComponent={showMapping[modal].component}
+					props={showMapping[modal].props()}
+					on:popover={handlePopover(modal)}
+				/>
+			{/if}
+		{/each}
 	</div>
 {/if}

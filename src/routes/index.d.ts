@@ -9,3 +9,7 @@ interface Layout {
 	secondary: Panel;
 	[key: string];
 }
+
+interface ModalMap {
+	[key: keyof ModalState]: Props;
+}

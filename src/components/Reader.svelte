@@ -16,6 +16,7 @@
 
 	onMount(async () => {
 		store = (await import('$lib/data/sessionStorage')).store;
+		expandable.scrollTop = 0;
 	});
 
 	beforeUpdate(() => {

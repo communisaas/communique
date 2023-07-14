@@ -4,20 +4,56 @@
 	import AddRecipient from '$components/icon/Recipient.svelte';
 	import AddTopic from '$components/icon/Topic.svelte';
 	import Post from '$components/icon/Post.svelte';
+	import Reader from '$components/Reader.svelte';
 
 	import { writable, type Writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
+	import { createEventDispatcher, onMount } from 'svelte';
+	import { routeModal } from '$lib/ui/hash';
+	import { goto } from '$app/navigation';
+	import Modal from '$components/Modal.svelte';
+	import modal from '$lib/ui/modal';
 
 	export let data: ComposeSchema;
 
 	let composed: Writable<string> = writable('');
 	let postButtonHovered = writable(false);
+	let sessionStore: Writable<UserState>;
+
+	const dispatch = createEventDispatcher();
 
 	$: recipientEmails = [] as (string | FormDataEntryValue)[];
 	$: topics = [] as (string | FormDataEntryValue)[];
 
-	$: console.log($page.data.session);
+	onMount(async () => {
+		sessionStore = (await import('$lib/data/sessionStorage')).store;
+		const hashes = window.location.hash.substring(1).split('#');
+		// TODO use enum
+		await routeModal(hashes, $page, $sessionStore, dispatch);
+	});
+
+	let showMapping: ModalMap = {
+		privacyPolicy: {
+			component: Reader,
+			props: () => ({ item: $page.data.privacyPolicy, inModal: true })
+		},
+		termsOfUse: {
+			component: Reader,
+			props: () => ({ item: $page.data.termsOfUse, inModal: true })
+		}
+	};
+
+	$: console.log(showMapping);
+
+	function handlePopover(modal: keyof ModalState) {
+		return (e: CustomEvent<boolean>) => {
+			$sessionStore.show[modal as keyof ModalState] = e.detail;
+			if (!e.detail) {
+				goto('/compose', { noScroll: true });
+			}
+		};
+	}
 </script>
 
 <svelte:head>
@@ -133,6 +169,20 @@
 		</button>
 	</form>
 </section>
+
+{#if $sessionStore && $sessionStore.hasOwnProperty('show')}
+	<div use:modal>
+		{#each Object.keys($sessionStore.show) as modal (modal)}
+			{#if $sessionStore.show[modal] && showMapping.hasOwnProperty(modal)}
+				<Modal
+					popoverComponent={showMapping[modal].component}
+					props={showMapping[modal].props()}
+					on:popover={handlePopover(modal)}
+				/>
+			{/if}
+		{/each}
+	</div>
+{/if}
 
 <style>
 	:global(.mce-content-body) {

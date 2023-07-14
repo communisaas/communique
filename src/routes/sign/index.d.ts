@@ -8,11 +8,12 @@ interface ProviderStyle {
 }
 
 type ProviderAttributes = {
+	id: string;
 	name: string;
 	style: ProviderStyle;
 };
 
 interface AuthSchema {
 	baseLogoURL: `https://${string}.svg`;
-	providers: Record<string, ProviderAttributes>;
+	providers: Record<'id', ProviderAttributes>;
 }

@@ -15,6 +15,7 @@ interface ModalState {
 	share: boolean;
 	termsOfUse: boolean;
 	privacyPolicy: boolean;
+	[key: string];
 }
 
 interface BigInt {

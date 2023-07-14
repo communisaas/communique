@@ -118,7 +118,11 @@
 		<div class="text-gray-400 text-sm mt-6 flex justify-center items-center">
 			<span class="mr-2">&copy; 2023 Communique DAO. All rights reserved.</span>
 			<span class="border-l border-gray-600 pl-2 ml-2">
-				<a href="#" class="text-teal-400 hover:text-teal-500">Terms of Use</a>
+				<a
+					href="#terms-of-use"
+					on:click={() => ($sessionStore.show.termsOfUse = true)}
+					class="text-teal-400 hover:text-teal-500">Terms of Use</a
+				>
 			</span>
 			<span class="border-l border-gray-600 pl-2 ml-2">
 				<a
