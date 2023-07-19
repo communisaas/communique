@@ -13,6 +13,7 @@
 	import type { Writable } from 'svelte/store';
 	import { handleSelect } from '$lib/data/select';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 
 	export let data: LayoutSchema;
 
@@ -58,6 +59,7 @@
 						if ($sessionStore.template.primary) {
 							$sessionStore.template.primary.cardList = await handleSelect(e);
 							$sessionStore.template.primary.focus = e.detail.id;
+							await goto('/');
 						}
 					}}
 				/>

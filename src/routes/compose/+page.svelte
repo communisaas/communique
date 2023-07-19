@@ -70,7 +70,7 @@
 			}
 
 			const letterInput = document.querySelector("input[name='body']");
-			// TODO validate & sanitize email body
+			// TODO validate & sanitize email body, use openAI moderation API + cheapest model to generate a shortID
 
 			// const webProfile = (
 			// 	await FingerprintJS.load({
