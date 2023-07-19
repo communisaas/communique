@@ -1,38 +1,28 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { writable, derived } from 'svelte/store';
 
 	let content: HTMLDivElement;
 	let clipboardArea: SVGRectElement;
 	let contentHeight: number;
-	let contentZoomRatio: number;
 
 	let resizeObserver: ResizeObserver;
 
-	// onMount(() => {
-	// 	resizeObserver = new ResizeObserver(() => {
-	// 		// Update the height of the content and the clipboard area
-	// 		let clipboardHeight = clipboardArea?.getBBox().height;
-	// 		contentHeight = Math.abs(content?.clientHeight - content?.scrollHeight);
+	let baseFontSize = writable(0.75);
+	onMount(() => {
+		resizeObserver = new ResizeObserver(() => {
+			let clipboardHeight = clipboardArea?.getBBox().height;
+			contentHeight = Math.abs(content?.clientHeight - content?.scrollHeight);
+			baseFontSize.set(contentHeight / content?.scrollHeight || 1); // 1 if not overflowing
+		});
 
-	// 		// Calculate the new content zoom ratio
-	// 		contentZoomRatio = clipboardHeight / contentHeight;
+		resizeObserver.observe(content);
+		resizeObserver.observe(clipboardArea);
+	});
 
-	// 		// Log the new values
-	// 		console.log(`content: ${contentHeight}`);
-	// 		console.log(`overflow: ${content?.scrollHeight}`);
-	// 		console.log(`clipboard: ${clipboardHeight}`);
-	// 		console.log(contentZoomRatio);
-	// 	});
-
-	// 	// Start observing the elements
-	// 	resizeObserver.observe(content);
-	// 	resizeObserver.observe(clipboardArea);
-	// });
-
-	// onDestroy(() => {
-	// 	// Disconnect the observer when the component is destroyed to avoid memory leaks
-	// 	resizeObserver.disconnect();
-	// });
+	onDestroy(() => {
+		resizeObserver.disconnect();
+	});
 </script>
 
 <div class="container">
@@ -79,7 +69,11 @@
 		</defs>
 	</svg>
 	<div class="content">
-		<div bind:this={content} class="content-inner">
+		<div
+			bind:this={content}
+			class="markdown-content content-inner"
+			style={`--scaled-font-size: ${$baseFontSize}`}
+		>
 			<slot />
 		</div>
 	</div>
@@ -116,7 +110,7 @@
 			width: 100%;
 		}
 	}
-	:global(.content-inner) {
+	:global(.markdown-content.content-inner) {
 		margin-top: 0;
 		height: 97%;
 		max-width: fit-content;
@@ -125,11 +119,38 @@
 		box-sizing: border-box;
 		overflow: hidden;
 		text-align: left;
-		font-size: 0.5rem;
+		font-size: calc(1rem * var(--scaled-font-size));
 
 		:global(h1) {
-			font-size: 1rem;
-			line-height: 18px;
+			font-size: calc(2.6rem * var(--scaled-font-size));
+		}
+
+		:global(h2) {
+			font-size: calc(2rem * var(--scaled-font-size));
+		}
+
+		:global(h3) {
+			font-size: calc(1.6rem * var(--scaled-font-size));
+		}
+
+		:global(h4) {
+			font-size: calc(1.4rem * var(--scaled-font-size));
+		}
+
+		:global(h5) {
+			font-size: calc(1.2rem * var(--scaled-font-size));
+		}
+
+		:global(h6) {
+			font-size: calc(1rem * var(--scaled-font-size));
+		}
+
+		:global(p) {
+			font-size: calc(1rem * var(--scaled-font-size));
+		}
+
+		:global(code) {
+			font-size: calc(0.85rem * var(--scaled-font-size));
 		}
 	}
 </style>

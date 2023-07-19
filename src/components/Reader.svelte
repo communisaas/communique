@@ -53,13 +53,13 @@
 	}
 </script>
 
-<section class="flex flex-col gap-2 {inModal ? 'm-10 markdown-content' : 'w-full'}">
+<section class="flex flex-col gap-2 markdown-content {inModal ? 'm-10 ' : 'w-full'}">
 	<aside
 		tabindex="-1"
 		style="text-align: initial;"
 		class="
-		{expand ? 'bg-artistBlue-800' : 'mt-[1.5rem]'} 
-		{inModal ? 'p-5 overflow-auto max-h-[80vh] bg-artistBlue-800' : 'mt-6 p-2 w-full max-h-fit'}
+		{expand ? 'bg-artistBlue-800 p-5' : 'mt-[1.5rem]'} 
+		{inModal ? ' overflow-auto max-h-[80vh] bg-artistBlue-800' : 'mt-6 w-full max-h-fit'}
 		rounded appearance-none"
 		bind:this={expandable}
 	>

@@ -78,6 +78,7 @@
 		}
 		if (expand) {
 			dispatch('externalAction', { type: 'email', context: item });
+			setExpand(false);
 		} else {
 			setExpand(true);
 			scrollToCard = true;
@@ -479,7 +480,7 @@
 
 	summary {
 		transition: 0.2s ease-out;
-		list-style: none; /* works in firefox */
+		list-style: none;
 		&::-webkit-details-marker {
 			display: none;
 		}

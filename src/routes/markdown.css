@@ -60,6 +60,7 @@
 .markdown-content ul,
 .markdown-content ol {
     padding-left: 2em;
+    list-style-type: revert; /* undo tailwind default */
 }
 
 .markdown-content ul.no-list,
