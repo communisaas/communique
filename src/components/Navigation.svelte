@@ -28,7 +28,6 @@
 							<svelte:component this={link.component} />
 						</icon>
 					</a>
-
 					<ins
 						style="transform-origin: center right;"
 						class:active={$page.route.id == route}

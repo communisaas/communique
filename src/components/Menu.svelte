@@ -10,14 +10,16 @@
 	let lastFocusableElement: HTMLElement;
 
 	onMount(() => {
-		[focusableElements, firstFocusableElement, lastFocusableElement] =
-			updateFocusableElements(menu);
+		[focusableElements, firstFocusableElement, lastFocusableElement] = updateFocusableElements(
+			menu
+		) as [HTMLElement[], HTMLElement, HTMLElement];
 		trapFocus(menu, firstFocusableElement, lastFocusableElement, focusableElements);
 	});
 
 	afterUpdate(() => {
-		[focusableElements, firstFocusableElement, lastFocusableElement] =
-			updateFocusableElements(menu);
+		[focusableElements, firstFocusableElement, lastFocusableElement] = updateFocusableElements(
+			menu
+		) as [HTMLElement[], HTMLElement, HTMLElement];
 	});
 </script>
 

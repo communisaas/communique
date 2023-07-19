@@ -21,6 +21,9 @@ export class EmailForm {
 	set body(text: string) {
 		this.inputFields.body = text;
 	}
+	set shortid(text: string) {
+		this.inputFields.shortid = text;
+	}
 	set topic_list(tagList: string) {
 		this.inputFields.topic_list = tagList.split('␞');
 	}
@@ -87,7 +90,10 @@ export function convertHtmlToText(node: Node): string {
 	return text.trim();
 }
 
-export async function handleMailto(dispatch: (name: string, detail?: unknown) => void) {
+export async function handleMailto(
+	dispatch: (name: string, detail?: unknown) => void,
+	includeBody = true
+) {
 	const sessionStore = (await import('$lib/data/sessionStorage')).store;
 	const mailBaseURL = new URL(`mailto:${get(sessionStore).email.content.recipient_list.join(',')}`);
 	const mailSubject = `?subject=${encodeURI(get(sessionStore).email.content.subject)}`;
@@ -98,16 +104,20 @@ export async function handleMailto(dispatch: (name: string, detail?: unknown) =>
 		DOMPurify.sanitize(get(sessionStore).email.content.body),
 		'text/html'
 	);
-	let plainBody = convertHtmlToText(doc.body);
 
-	// Decode any HTML entities
-	plainBody = he.decode(plainBody);
+	let mailBody = '';
+	if (includeBody) {
+		let plainBody = convertHtmlToText(doc.body);
 
-	// Collapse consecutive newlines
-	plainBody = plainBody.replace(/\n{4,}/g, '\n');
+		// Decode any HTML entities
+		plainBody = he.decode(plainBody);
 
-	// URL encode the plain text body
-	const mailBody = `&body=${encodeURIComponent(plainBody)}`;
+		// Collapse consecutive newlines
+		plainBody = plainBody.replace(/\n{4,}/g, '\n');
+
+		// URL encode the plain text body
+		mailBody = `&body=${encodeURIComponent(plainBody)}`;
+	}
 	const mailURL = mailBaseURL.href + mailSubject + mailBody;
 
 	dispatch('externalAction', { type: 'email', url: mailURL });

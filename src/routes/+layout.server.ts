@@ -48,7 +48,7 @@ export const load = (async ({ locals }) => {
 				return accumulator;
 			}, {} as Record<string, ProviderAttributes>)
 		},
-		privacyPolicy: marked(privacyPolicyMarkdown),
-		termsOfUse: marked(termsOfUseMarkdown)
+		privacyPolicy: marked(privacyPolicyMarkdown, { mangle: false, headerIds: false }),
+		termsOfUse: marked(termsOfUseMarkdown, { mangle: false, headerIds: false }) // clear deprecation warnings for mangle & headerIds
 	};
 }) satisfies LayoutServerLoad;
