@@ -78,7 +78,6 @@
 			</filter>
 		</defs>
 	</svg>
-	<!-- {overflowHeight <= 0 ? 'after::invisible' : ''} -->
 	<div class="content">
 		<div bind:this={content} class="content-inner">
 			<slot />
@@ -105,7 +104,7 @@
 		padding: 3%;
 		padding-top: 1%;
 		pointer-events: none;
-		max-width: 66%;
+		width: 66%;
 		height: 75%;
 		&::after {
 			background: linear-gradient(to top, rgba(0, 50, 64, 1) 3%, transparent 10%);
