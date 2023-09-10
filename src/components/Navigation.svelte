@@ -24,7 +24,7 @@
 						aria-label={link.label}
 						href={route}
 					>
-						<icon>
+						<icon class="lg:w-fit md:w-16 w-14">
 							<svelte:component this={link.component} />
 						</icon>
 					</a>

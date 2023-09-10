@@ -45,19 +45,19 @@
 </script>
 
 <main class="flex">
-	<div class="grow-0 shrink-0 w-20"><Navigation /></div>
+	<div class="grow-0 shrink-0 lg:w-20"><Navigation /></div>
 	<div class="w-full relative flex flex-col min-h-full">
 		<section class="min-h-screen">
 			<header
 				aria-label="Popular topics list"
-				class="flex px-3 bg-peacockFeather-700 items-center relative h-14"
+				class="flex px-3 md:h-12 h-10 bg-peacockFeather-700 items-center relative align-middle"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
 						selectable={Tag}
 						target="email"
-						itemStyle="bg-peacockFeather-500 text-paper-500"
-						selectorStyle="py-3"
+						itemStyle="md:text-sm whitespace-nowrap text-xs bg-peacockFeather-500 text-paper-500 w-fit"
+						selectorStyle="md:py-2 pb-1.5"
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}
@@ -80,16 +80,23 @@
 				<span class="ml-auto flex items-center h-full text-paper-500">
 					{#if $page.data.session}
 						{#if $page.data.session.user?.image}
-							<img src={$page.data.session.user.image} alt="avatar" class="h-10 w-10" />
+							<img
+								src={$page.data.session.user.image}
+								alt="avatar"
+								class="h-7 w-7 md:h-10 md:w-10"
+							/>
 						{/if}
 
 						<button on:click={() => signOut({ callbackUrl: '/', redirect: false })}>
 							Sign out
 						</button>
 					{:else}
-						<span class="whitespace-nowrap text-xs self-end justify-self-end -mr-4">Sign in</span>
+						<span
+							class="whitespace-nowrap text-xs self-end justify-self-end -mr-3 sm:-mr-4 sm:-mt-4 sm:mb-0"
+							>Sign in</span
+						>
 						<button
-							class="w-10 -mt-2"
+							class="sm:w-8 w-6 -mt-2"
 							on:click={() => signIn({ callbackUrl: '/', redirect: false })}
 						>
 							<LoginIcon />
@@ -104,10 +111,10 @@
 			<div class="container mx-auto flex flex-wrap items-center justify-center px-4">
 				<div class="mb-4 md:mb-0">
 					<div class="flex justify-center md:justify-start">
-						<h4 class="font-bold text-lg mb-2 mr-2">Communique</h4>
+						<h4 class="font-bold md:text-lg sm:text-base text-sm mb-2 mr-2">Communique</h4>
 
 						<span class="border-l border-gray-600 pl-2 w-1/2">
-							<p class="text-sm text-gray-400">
+							<p class="md:text-sm sm:text-xs text-[0.5rem] text-gray-400">
 								Changing the world is too important to be left unread.
 							</p>
 						</span>
@@ -131,7 +138,9 @@
 		</div>
 	</div> -->
 
-				<div class="text-gray-400 text-sm mt-6 flex justify-center items-center">
+				<div
+					class="text-gray-400 md:text-sm sm:text-xs text-[0.5rem] mt-6 flex justify-center items-center"
+				>
 					<span class="mr-2">&copy; 2023 Communique. All rights reserved.</span>
 
 					<span class="border-l border-gray-600 pl-2 ml-2">

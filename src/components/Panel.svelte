@@ -93,7 +93,7 @@
 	<aside class="flex pb-3" style="justify-content: {alignment}">
 		{#if filterable && selectorTarget != 'spotlight'}
 			<h1
-				class="text-paper-500 h-fit self-center justify-self-start mx-2 my-1"
+				class="text-paper-500 h-fit self-center justify-self-start md:mx-2 my-1 text-xl md:text-3xl leading-tight md:leading-normal"
 				style="background-color: transparent; padding: unset"
 			>
 				{header}
@@ -107,8 +107,8 @@
 						name="search item"
 						placeholder={'Search'}
 						style="h-14 w-fit bg-transparent"
-						tagStyle="text-xl underline font-bold bg-transparent rounded px-2 pr-1 text-paper-500"
-						addIconStyle="add bg-peacockFeather-500 h-12 w-12 text-5xl inline-block leading-12"
+						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded px-2 pr-1 text-paper-500"
+						addIconStyle="add bg-peacockFeather-500 h-12 w-12 text-5xl text-3xl inline-block leading-12"
 						autocomplete={true}
 						bind:tagList={selectionList}
 						bind:searchResults

@@ -10,19 +10,9 @@
 	const dispatch = createEventDispatcher();
 
 	let tag: HTMLButtonElement;
-	let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
-	let tagWidth: number;
-	$: context ? (tagWidth = context.measureText(item).width + 20) : null,
-		onMount(async () => {
-			store = (await import('$lib/data/sessionStorage')).store;
-
-			canvas = document.createElement('canvas');
-			context = canvas.getContext('2d') as CanvasRenderingContext2D;
-			if (context && tag) {
-				context.font = getComputedStyle(tag).font;
-				tagWidth = context.measureText(item).width + 20;
-			}
-		});
+	onMount(async () => {
+		store = (await import('$lib/data/sessionStorage')).store;
+	});
 
 	function handleSelect() {
 		if (selected.id != item) {
@@ -35,8 +25,7 @@
 <span class="max-w-fit">
 	<button
 		aria-label={item}
-		class="cursor-pointer text-center px-2 py-1 rounded overflow-visible {style} "
-		style:width="{tagWidth}px"
+		class="cursor-pointer text-center px-2 py-1 rounded overflow-visible w-fit {style} "
 		bind:this={tag}
 		on:click|stopPropagation={() => {
 			handleSelect();

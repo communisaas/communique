@@ -8,7 +8,7 @@
 	import SentIcon from './icon/Sent.svelte';
 	import MenuIcon from './icon/Menu.svelte';
 	import { scale, fade, slide, fly } from 'svelte/transition';
-	import { expoIn, expoOut, quintOut } from 'svelte/easing';
+	import { expoIn, expoOut } from 'svelte/easing';
 	import Menu from './Menu.svelte';
 	import { handleCopy } from '$lib/data/select';
 	import { page } from '$app/stores';
