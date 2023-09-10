@@ -12,27 +12,27 @@ export async function GET({ params }) {
         SELECT 
             'email' AS source, 
             subject AS id, 
-            ts_rank(to_tsvector('english', subject), to_tsquery('english', ${searchQuery})) AS rank
+            ts_rank(to_tsvector('english', subject), plainto_tsquery('english', ${searchQuery})) AS rank
         FROM email 
-        WHERE to_tsvector('english', subject) @@ to_tsquery('english', ${searchQuery})
+        WHERE to_tsvector('english', subject) @@ plainto_tsquery('english', ${searchQuery})
         LIMIT 10
     ),
     recipient_search AS (
         SELECT 
             'recipient' AS source, 
             address AS id, 
-            ts_rank(to_tsvector('english', address), to_tsquery('english', ${searchQuery})) AS rank
+            ts_rank(to_tsvector('english', address), plainto_tsquery('english', ${searchQuery})) AS rank
         FROM recipient 
-        WHERE to_tsvector('english', address) @@ to_tsquery('english', ${searchQuery})
+        WHERE to_tsvector('english', address) @@ plainto_tsquery('english', ${searchQuery})
         LIMIT 10
     ),
     topic_search AS (
         SELECT 
             'topic' AS source, 
             name AS id, 
-            ts_rank(to_tsvector('english', name), to_tsquery('english', ${searchQuery})) AS rank
+            ts_rank(to_tsvector('english', name), plainto_tsquery('english', ${searchQuery})) AS rank
         FROM topic 
-        WHERE to_tsvector('english', name) @@ to_tsquery('english', ${searchQuery})
+        WHERE to_tsvector('english', name) @@ plainto_tsquery('english', ${searchQuery})
         LIMIT 10
     )
     SELECT * FROM email_search
