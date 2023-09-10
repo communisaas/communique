@@ -88,7 +88,6 @@
 		class:scrolledY__max={scrollY.scrolledMax}
 		on:wheel={(e) => {
 			if (scrollable) {
-				e.preventDefault();
 				list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
 				list.scrollTop += Math.abs(e.deltaY) > 0 ? e.deltaY : e.deltaX * 0.33;
 				scrollPosition.x = list.scrollLeft + 1;
@@ -97,7 +96,6 @@
 		}}
 		on:touchstart={(e) => {
 			if (scrollable) {
-				e.preventDefault();
 				scrollPosition.startX = e.touches[0].clientX;
 				scrollPosition.startY = e.touches[0].clientY;
 				scrollPosition.startScrollTop = list.scrollTop;
@@ -157,7 +155,6 @@
 
 		&X {
 			&::before {
-				pointer-events: none;
 				content: '';
 				pointer-events: none;
 				display: block;
