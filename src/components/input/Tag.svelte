@@ -10,7 +10,7 @@
 		tagStyle: string,
 		autocomplete: boolean = false;
 	export let tagList: Descriptor<string>[] = [];
-	export let searchResults: Descriptor<string>[] | null = null;
+	export let searchResults: Descriptor<string>[] = [];
 	export let inputStyle =
 		'rounded bg-paper-500 shadow-artistBlue shadow-card w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center';
 	export let addIconStyle =
@@ -18,6 +18,8 @@
 
 	let inputVisible: boolean = false;
 	$: searching = false;
+
+	let autocompleted = true;
 	let deleteVisible: FlagMap = {}; // A map to hold visibility states
 
 	let inputField: HTMLInputElement;
@@ -60,7 +62,7 @@
 		}
 	}
 
-	function handleBlur(e: FocusEvent) {
+	async function handleBlur(e: FocusEvent) {
 		if (
 			!Object.keys(deleteVisible).some((k) => deleteVisible[k]) &&
 			!completionList.contains(e.relatedTarget as Node)
@@ -68,32 +70,43 @@
 			searching = false;
 			inputVisible = false;
 			inputValueWidth = placeholderWidth;
+			groupedResults = {};
 			dispatch('blur', e.detail);
 		}
 	}
 
-	function handleSubmit() {
-		if (searching) return;
+	function handleSubmit(autocompleted = false) {
+		if (searching && !groupedResults) return;
 
-		if (autocomplete && visibleSearchResults !== null && visibleSearchResults.length > 0) {
+		if (autocompleted && visibleSearchResults !== null && visibleSearchResults.length > 0) {
 			// Trigger the autocomplete item at `autocompleteIndex`
 			addTag(visibleSearchResults[autocompleteIndex]);
 			inputValueWidth = placeholderWidth;
 		} else if (inputField.value.length < 3) {
 			inputField.setCustomValidity('Too short!');
 			inputField.reportValidity();
-		} else if (inputField.value.length > 0) {
+		} else if (
+			inputField.value.length > 0 &&
+			!visibleSearchResults.some((result) => result.item === inputField.value)
+		) {
 			inputField.setCustomValidity('Nothing here! Try adding it?');
 			inputField.reportValidity();
 		} else {
 			if (inputField.checkValidity()) {
-				addTag({ type, item: inputField.value.toString() });
+				const matchingItem = visibleSearchResults.find(
+					(result) => result.item === inputField.value
+				);
+				if (matchingItem) {
+					addTag(matchingItem);
+				} else {
+					addTag({ item: inputField.value, type: 'text' });
+				}
 				inputValueWidth = placeholderWidth;
 			} else {
 				inputField.reportValidity();
 			}
 		}
-		searchResults = null;
+		searchResults = [];
 	}
 
 	$: if (inputVisible) inputField.focus();
@@ -105,6 +118,16 @@
 				(result) => !tagList.some((tag) => tag.item === result.item && tag.type === result.type)
 		  )
 		: [];
+	$: groupedResults = visibleSearchResults.reduce(
+		(accumulator: { [key: string]: Descriptor<string>[] }, result) => {
+			if (!accumulator[result.type]) {
+				accumulator[result.type] = [];
+			}
+			accumulator[result.type].push(result);
+			return accumulator;
+		},
+		{}
+	);
 
 	let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
 	let inputValueWidth: number, placeholderWidth: number;
@@ -226,7 +249,7 @@
 							}
 						}
 
-						if (e.key === 'Escape' || e.key === 'Tab') {
+						if (e.key === 'Escape' || (e.key === 'Tab' && !visibleSearchResults)) {
 							e.preventDefault();
 							inputField.blur();
 						}
@@ -240,10 +263,15 @@
 					class:p-1={inputVisible}
 					{type}
 				/>
-				<ul bind:this={completionList} class="autocomplete flex flex-col bg-paper-500 mx-2">
+				<ul
+					bind:this={completionList}
+					class="autocomplete flex flex-col bg-paper-500 py-1"
+					class:px-4={Object.keys(groupedResults).length > 0 && inputVisible}
+				>
 					{#if searching}
-						<li class="relative">
+						<li class="relative px-1">
 							<ContentLoader
+								uniqueKey="autocomplete"
 								width={inputValueWidth}
 								height={20}
 								secondaryColor={colors.larimarGreen[700]}
@@ -251,23 +279,28 @@
 							/>
 						</li>
 					{:else if visibleSearchResults && visibleSearchResults.length > 0 && inputVisible}
-						{#each visibleSearchResults as result, index}
-							<li class="relative">
-								<input
-									type="button"
-									class="p-2 cursor-pointer w-full"
-									class:bg-paper-800={autocompleteIndex === index}
-									class:hidden={tagList.some(
-										(tag) => tag.item === result.item && tag.type === result.type
-									)}
-									on:mouseenter={() => (autocompleteIndex = index)}
-									on:click|preventDefault|stopPropagation={(e) => {
-										handleSubmit();
-										inputField.focus();
-									}}
-									value={result.item}
-								/>
-							</li>
+						{#each Object.keys(groupedResults) as type}
+							<li class="-ml-1">{type}s</li>
+							{#each groupedResults[type] as result, index}
+								<li class="relative">
+									<input
+										type="button"
+										class="p-1 rounded mr-2 cursor-pointer w-full text-xs"
+										class:bg-paper-800={visibleSearchResults[autocompleteIndex] &&
+											visibleSearchResults[autocompleteIndex].item === result.item}
+										on:mouseenter={() =>
+											(autocompleteIndex = visibleSearchResults.findIndex(
+												(r) => r.item === result.item
+											))}
+										on:click|preventDefault|stopPropagation={(e) => {
+											autocompleted = autocomplete;
+											handleSubmit(autocomplete);
+											inputField.focus();
+										}}
+										value={result.item}
+									/>
+								</li>
+							{/each}
 						{/each}
 					{/if}
 				</ul>
@@ -291,7 +324,6 @@
 <style lang="scss">
 	input {
 		transition: all 0.2s;
-		font-size: 1rem;
 		color: black;
 	}
 	button span {
@@ -349,8 +381,11 @@
 		right: 0;
 		max-height: 200px;
 		overflow-y: auto;
+		overflow-x: visible;
+		box-sizing: border-box;
 		border-radius: 4px;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		min-width: fit-content;
 	}
 
 	.show {
