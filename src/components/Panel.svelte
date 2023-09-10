@@ -67,13 +67,15 @@
 		}
 	}
 
-	async function handleFilter(e) {
+	async function handleFilter() {
 		// Grouping by fields
-		const grouped = selectionList.reduce((accumulator: Descriptor<string>, { item, source }) => {
-			if (!accumulator[source]) accumulator[source] = [];
-			accumulator[source].push(item);
+		const grouped = selectionList.reduce((accumulator, { item, source }) => {
+			if (typeof source === 'string') {
+				if (!accumulator[source]) accumulator[source] = [];
+				accumulator[source].push(item);
+			}
 			return accumulator;
-		}, {} as Descriptor<string>);
+		}, {} as Record<string, string[]>);
 
 		// Construct the query string from the grouped object
 		const tagString = Object.entries(grouped)
@@ -116,10 +118,10 @@
 						on:delete={async (e) => {
 							lastSelection = e.detail;
 							lastItems = items;
-							items = await handleFilter(e);
+							items = await handleFilter();
 						}}
 						on:add={async (e) => {
-							items = await handleFilter(e);
+							items = await handleFilter();
 						}}
 						on:blur={() => {
 							if (selectionList.length < 1) {
