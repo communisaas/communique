@@ -7,8 +7,6 @@
 	import RecipientIcon from './icon/Recipient.svelte';
 	import SentIcon from './icon/Sent.svelte';
 	import MenuIcon from './icon/Menu.svelte';
-	import { scale, fade, slide, fly } from 'svelte/transition';
-	import { expoIn, expoOut } from 'svelte/easing';
 	import Menu from './Menu.svelte';
 	import { handleCopy } from '$lib/data/select';
 	import { page } from '$app/stores';
@@ -50,6 +48,18 @@
 				setTimeout(() => {
 					menuItems[0].name = 'Get link';
 				}, 2000);
+			}
+		},
+		{
+			name: 'Open',
+			key: 'open',
+			class: 'menu__item',
+			show: true,
+			actionToggled: false,
+			actionComponent: undefined,
+
+			onClick: async () => {
+				dispatch('externalAction', { type: 'email', context: item });
 			}
 		},
 		{
@@ -145,6 +155,7 @@
 			scrollToCard = false;
 		}
 		if (card && header) {
+			console.log('scrolled');
 			scrollableElements = { card, header };
 			updateScrollableElements(scrollableElements);
 		}
@@ -171,7 +182,6 @@
 			selected.id = item.rowid;
 		}
 		if (expand && !justFocused && !showMenu) {
-			dispatch('externalAction', { type: 'email', context: item });
 			setExpand(false);
 		} else {
 			setExpand(true);
@@ -235,7 +245,7 @@
 	aria-label="Email with a subject: {item.subject}"
 	class="card flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
 		justify-center w-48 {style}"
-	class:cursor-alias={expand}
+	class:cursor-default={expand}
 	class:clickable={!nestedHover}
 	style="min-width: {expand ? '99%' : '95%'};"
 >
@@ -270,7 +280,7 @@
 			: ''} min-w-full min-h-fit overflow-hidden"
 	>
 		{#if sessionStore}
-			<span class="flex max-w-full items-center h-fit relative">
+			<span class="flex max-w-full h-fit items-center relative">
 				<h1
 					aria-label="Subject line"
 					aria-describedby={item.subject}
@@ -314,28 +324,6 @@
 				>
 					{item.subject}
 				</h1>
-				{#if expand}
-					<div
-						role="button"
-						tabindex="0"
-						title="Menu"
-						on:click|stopPropagation={() => {
-							showMenu = !showMenu;
-						}}
-						on:keypress|stopPropagation={(e) => {
-							if (e.key === 'Enter') {
-								showMenu = !showMenu;
-							}
-						}}
-						on:mouseenter={() => (nestedHover = true)}
-						on:mouseleave={() => (nestedHover = false)}
-						class="z-10 max-w-[28px] max-h-fit cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
-						in:fade={{ delay: 50, duration: 200, easing: expoIn }}
-						out:scale={{ delay: 50, duration: 300, easing: expoOut }}
-					>
-						<MenuIcon />
-					</div>
-				{/if}
 			</span>
 			<article
 				class="flex grow justify-between min-w-full h-full flex-col"
@@ -378,7 +366,7 @@
 							<Selector
 								selectable={Tag}
 								items={item.topic_list}
-								itemStyle="text-[11px] text-paper-500 bg-peacockFeather-500 hover:-translate-y-0.5"
+								itemStyle="sm:text-sm text-paper-500 bg-peacockFeather-500"
 								alignment="start"
 								overflow="wrap"
 								target="email"
@@ -394,7 +382,7 @@
 							<Selector
 								selectable={Tag}
 								items={item.recipient_list}
-								itemStyle="text-[11px] text-paper-500 bg-peacockFeather-600 hover:-translate-y-0.5"
+								itemStyle="sm:text-sm text-paper-500 bg-peacockFeather-600"
 								alignment="start"
 								overflow="wrap"
 								target="email"
@@ -409,7 +397,43 @@
 					</div>
 				</div>
 				{#if expand}
-					<p aria-label="Info text" class="text-center mt-1"><i>click again to send...</i></p>
+					<span class="flex max-w-full gap-5">
+						<p aria-label="Info text" class="text-center ml-auto mt-1">
+							<i>
+								<span
+									role="link"
+									tabindex="0"
+									class="underline cursor-alias"
+									on:click={() => {
+										dispatch('externalAction', { type: 'email', context: item });
+									}}
+									on:keypress={() => {
+										dispatch('externalAction', { type: 'email', context: item });
+									}}
+								>
+									click here
+								</span> to send...
+							</i>
+						</p>
+						<div
+							role="button"
+							tabindex="0"
+							title="Menu"
+							on:click|stopPropagation={() => {
+								showMenu = !showMenu;
+							}}
+							on:keypress|stopPropagation={(e) => {
+								if (e.key === 'Enter') {
+									showMenu = !showMenu;
+								}
+							}}
+							on:mouseenter={() => (nestedHover = true)}
+							on:mouseleave={() => (nestedHover = false)}
+							class="w-[22%] mr-auto self-start max-w-[28px] max-h-fit cursor-context-menu mx-1 hover:scale-125 active:scale-100 ease-in-out duration-150"
+						>
+							<MenuIcon />
+						</div>
+					</span>
 				{/if}
 				<details
 					style="text-align: initial; margin-top: {!expand ? '-1.5rem' : '0'};"
@@ -446,6 +470,7 @@
 		&::after {
 			background: linear-gradient(to top, theme('colors.artistBlue.600') 0%, transparent 10%);
 			content: '';
+			z-index: 10;
 			position: absolute;
 			bottom: -1px;
 			margin-bottom: -1px;
@@ -503,6 +528,7 @@
 
 		&::before {
 			content: '';
+			z-index: 10;
 			display: block;
 			position: absolute;
 			top: 0;
@@ -514,6 +540,7 @@
 	}
 
 	.scrolled::before {
+		z-index: 10;
 		background: linear-gradient(
 			to right,
 			theme('colors.artistBlue.600') 3%,
@@ -524,6 +551,7 @@
 	}
 
 	.scrolled__max::before {
+		z-index: 10;
 		content: '';
 		display: block;
 		top: 0;

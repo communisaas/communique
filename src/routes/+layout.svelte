@@ -50,14 +50,14 @@
 		<section class="min-h-screen">
 			<header
 				aria-label="Popular topics list"
-				class="flex px-3 md:h-12 h-10 bg-peacockFeather-700 items-center relative align-middle"
+				class="flex px-3 md:h-12 h-14 bg-peacockFeather-700 items-center relative align-middle"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
 						selectable={Tag}
 						target="email"
-						itemStyle="md:text-sm whitespace-nowrap text-xs bg-peacockFeather-500 text-paper-500 w-fit"
-						selectorStyle="md:py-2 pb-1.5"
+						itemStyle="md:text-sm whitespace-nowrap text-base bg-peacockFeather-500 text-paper-500 w-fit"
+						selectorStyle="md:py-2 "
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}
@@ -77,7 +77,7 @@
 						}}
 					/>
 				{/if}
-				<span class="ml-auto flex items-center h-full text-paper-500">
+				<span class="ml-auto pl-[7px] flex items-center h-full text-paper-500">
 					{#if $page.data.session}
 						{#if $page.data.session.user?.image}
 							<img
@@ -167,6 +167,3 @@
 		</footer>
 	</div>
 </main>
-
-<style lang="scss">
-</style>

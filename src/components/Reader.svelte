@@ -71,6 +71,7 @@
 				: inModal
 				? 'fit-content'
 				: '11rem'}; pointer-events: {expand ? 'auto' : 'none'}"
+			class="cursor-text"
 		>
 			{@html DOMPurify.sanitize(item)}
 		</div>

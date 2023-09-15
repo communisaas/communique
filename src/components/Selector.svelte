@@ -88,8 +88,8 @@
 		class:scrolledY__max={scrollY.scrolledMax}
 		on:wheel={(e) => {
 			if (scrollable) {
-				list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-				list.scrollTop += Math.abs(e.deltaY) > 0 ? e.deltaY : e.deltaX * 0.33;
+				list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY;
+				list.scrollTop += Math.abs(e.deltaY) > 0 ? e.deltaY : e.deltaX;
 				scrollPosition.x = list.scrollLeft + 1;
 				scrollPosition.y = list.scrollTop + 1;
 			}
@@ -156,6 +156,7 @@
 		&X {
 			&::before {
 				content: '';
+				z-index: 20;
 				pointer-events: none;
 				display: block;
 				position: absolute;
@@ -171,6 +172,7 @@
 		&Y {
 			&::before {
 				content: '';
+				z-index: 20;
 				pointer-events: none;
 				display: block;
 				position: absolute;
@@ -186,6 +188,7 @@
 
 	.scrolledX {
 		&::before {
+			z-index: 20;
 			pointer-events: none;
 			background-image: linear-gradient(
 				to right,
@@ -200,6 +203,7 @@
 
 	.scrolledX__max {
 		&::before {
+			z-index: 20;
 			pointer-events: none;
 			content: '';
 			display: block;
@@ -214,6 +218,7 @@
 
 	.scrolledY {
 		&::before {
+			z-index: 20;
 			background-image: linear-gradient(
 					to bottom,
 					var(--backgroundColor) 3%,
@@ -235,6 +240,7 @@
 	.scrolledY__max {
 		&::before {
 			content: '';
+			z-index: 20;
 			display: block;
 			top: 0;
 			right: 0;

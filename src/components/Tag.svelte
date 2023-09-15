@@ -48,7 +48,7 @@
 		margin: 0;
 		transition: 0.1s ease-in;
 		&:hover {
-			margin-top: -0.25rem;
+			margin-top: -2px;
 			box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
 
 			transition: 0.1s ease-in;
