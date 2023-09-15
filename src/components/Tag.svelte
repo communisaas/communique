@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount, type DispatchOptions } from 'svelte/internal';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	export let item: string;
 	export let selected: Selectable;
@@ -9,7 +9,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	let tag: HTMLButtonElement;
+	let tag: HTMLElement;
 	onMount(async () => {
 		store = (await import('$lib/data/sessionStorage')).store;
 	});
@@ -23,9 +23,11 @@
 </script>
 
 <span class="max-w-fit">
-	<button
+	<div
+		tabindex="0"
+		role="button"
 		aria-label={item}
-		class="cursor-pointer text-center px-2 py-1 rounded overflow-visible w-fit {style} "
+		class="button cursor-pointer text-center px-2 py-1 rounded overflow-visible w-fit {style} "
 		bind:this={tag}
 		on:click|stopPropagation={() => {
 			handleSelect();
@@ -38,11 +40,11 @@
 		on:blur
 	>
 		{item}
-	</button>
+	</div>
 </span>
 
 <style lang="scss">
-	button {
+	.button {
 		margin: 0;
 		transition: 0.1s ease-in;
 		&:hover {

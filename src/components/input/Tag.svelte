@@ -64,8 +64,9 @@
 
 	async function handleBlur(e: FocusEvent) {
 		if (
-			!Object.keys(deleteVisible).some((k) => deleteVisible[k]) &&
-			!completionList.contains(e.relatedTarget as Node)
+			(!Object.keys(deleteVisible).some((k) => deleteVisible[k]) &&
+				!completionList.contains(e.relatedTarget as Node)) ||
+			e.relatedTarget === null
 		) {
 			searching = false;
 			inputVisible = false;
@@ -225,28 +226,23 @@
 						const resultsLength = visibleSearchResults ? visibleSearchResults.length : 0;
 
 						if (resultsLength > 0) {
-							if (e.key === 'Tab') {
+							if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
 								e.preventDefault();
+								autocompleteIndex = (autocompleteIndex + 1) % resultsLength;
+							}
+							if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
+								e.preventDefault();
+								if (autocompleteIndex === 0) {
+									autocompleteIndex = resultsLength - 1;
+								} else {
+									autocompleteIndex = (autocompleteIndex - 1 + resultsLength) % resultsLength;
+								}
 							}
 						}
 
 						if (e.key === 'Enter') {
 							e.preventDefault();
-							handleSubmit();
-						}
-
-						if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
-							e.preventDefault();
-							autocompleteIndex = (autocompleteIndex + 1) % resultsLength;
-						}
-
-						if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
-							e.preventDefault();
-							if (autocompleteIndex === 0) {
-								autocompleteIndex = resultsLength - 1;
-							} else {
-								autocompleteIndex = (autocompleteIndex - 1 + resultsLength) % resultsLength;
-							}
+							handleSubmit(autocomplete);
 						}
 
 						if (e.key === 'Escape' || (e.key === 'Tab' && !visibleSearchResults)) {

@@ -26,7 +26,7 @@
 		card: { x: 0, remainingWidth: 0, startX: 0, startScrollLeft: 0 }
 	};
 	let header: HTMLHeadingElement;
-	let card: HTMLButtonElement;
+	let card: HTMLElement;
 	let menu: HTMLElement;
 	let scrollableElements: { [key: string]: HTMLElement };
 	// state
@@ -211,9 +211,12 @@
 	}
 </script>
 
-<button
+<div
+	role="button"
+	tabindex="0"
 	bind:this={card}
 	on:focus={() => {
+		console.log('focus');
 		handleSelect();
 		justFocused = true;
 		setTimeout(() => {
@@ -222,6 +225,11 @@
 	}}
 	on:click={() => {
 		handleSelect();
+	}}
+	on:keydown={(e) => {
+		if (e.key === 'Enter') {
+			handleSelect();
+		}
 	}}
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
@@ -307,12 +315,18 @@
 					{item.subject}
 				</h1>
 				{#if expand}
-					<button
+					<div
+						role="button"
+						tabindex="0"
 						title="Menu"
 						on:click|stopPropagation={() => {
 							showMenu = !showMenu;
 						}}
-						on:keypress|stopPropagation
+						on:keypress|stopPropagation={(e) => {
+							if (e.key === 'Enter') {
+								showMenu = !showMenu;
+							}
+						}}
 						on:mouseenter={() => (nestedHover = true)}
 						on:mouseleave={() => (nestedHover = false)}
 						class="z-10 max-w-[28px] max-h-fit cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
@@ -320,7 +334,7 @@
 						out:scale={{ delay: 50, duration: 300, easing: expoOut }}
 					>
 						<MenuIcon />
-					</button>
+					</div>
 				{/if}
 			</span>
 			<article
@@ -425,7 +439,7 @@
 			</article>
 		{/if}
 	</section>
-</button>
+</div>
 
 <style lang="scss">
 	.cardWrapper {
