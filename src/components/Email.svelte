@@ -27,6 +27,7 @@
 	let card: HTMLElement;
 	let menu: HTMLElement;
 	let scrollableElements: { [key: string]: HTMLElement };
+
 	// state
 	let scrollToCard = false;
 	let expand = false;
@@ -155,7 +156,6 @@
 			scrollToCard = false;
 		}
 		if (card && header) {
-			console.log('scrolled');
 			scrollableElements = { card, header };
 			updateScrollableElements(scrollableElements);
 		}
@@ -318,8 +318,7 @@
 					}}
 					class:scrollable={scrollPosition.header.remainingWidth > 0}
 					class:scrolled={scrollPosition.header.x > 1}
-					class:scrolled__max={scrollPosition.header.remainingWidth > 0 &&
-						scrollPosition.header.remainingWidth == scrollPosition.header.x}
+					class:scrolled__max={scrollPosition.header.remainingWidth - scrollPosition.header.x < 1}
 					class=" inline-block mr-1"
 				>
 					{item.subject}
