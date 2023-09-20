@@ -12,6 +12,7 @@
 	import { page } from '$app/stores';
 	import type { Writable } from 'svelte/store';
 	import Preferences from './input/Preferences.svelte';
+	import { fade, scale } from 'svelte/transition';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -151,7 +152,7 @@
 		if (scrollToCard) {
 			// TODO more contextual fix for resolving pending events after DOM update
 			setTimeout(() => {
-				card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
 			});
 			scrollToCard = false;
 		}
@@ -319,7 +320,7 @@
 					class:scrollable={scrollPosition.header.remainingWidth > 0}
 					class:scrolled={scrollPosition.header.x > 1}
 					class:scrolled__max={scrollPosition.header.remainingWidth - scrollPosition.header.x < 1}
-					class=" inline-block mr-1"
+					class="inline-block mr-1 w-full text-left"
 				>
 					{item.subject}
 				</h1>
@@ -328,7 +329,7 @@
 				class="flex grow justify-between min-w-full h-full flex-col"
 				class:md:flex-row={!expand}
 			>
-				<div class="flex flex-col min-h-full">
+				<div class="flex flex-col min-h-full" class:md:max-w-[50%]={!expand}>
 					<div class="stats p-1 flex flex-row gap-x-5">
 						<span title="Read count" aria-label="Number of reads" class="flex items-center">
 							<icon
@@ -357,7 +358,7 @@
 					</div>
 
 					<div
-						class="tags min-w-[25rem] h-full justify-between"
+						class="tags max-w-[full] h-full justify-between"
 						aria-label="Topic and recepient lists"
 						style="max-width: {!expand ? '35rem' : '100%'};"
 					>
@@ -366,6 +367,7 @@
 								selectable={Tag}
 								items={item.topic_list}
 								itemStyle="sm:text-sm text-paper-500 bg-peacockFeather-500"
+								selectorStyle="pt-2 max-w-full"
 								alignment="start"
 								overflow="wrap"
 								target="email"
@@ -382,6 +384,7 @@
 								selectable={Tag}
 								items={item.recipient_list}
 								itemStyle="sm:text-sm text-paper-500 bg-peacockFeather-600"
+								selectorStyle="pt-1 max-w-full"
 								alignment="start"
 								overflow="wrap"
 								target="email"
@@ -443,15 +446,21 @@
 						tabindex="-1"
 						aria-expanded={expand}
 						aria-label="Email body"
+						class="cursor-alias"
+						class:mt-6={expand}
 						on:click={(e) => {
 							if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 								e.stopPropagation();
+							} else {
+								dispatch('externalAction', { type: 'email', context: item });
 							}
 						}}
 						on:keypress={(e) => {
 							if (e.key === 'Enter') {
 								if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 									e.stopPropagation();
+								} else {
+									dispatch('externalAction', { type: 'email', context: item });
 								}
 							}
 						}}

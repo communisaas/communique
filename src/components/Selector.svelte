@@ -12,11 +12,9 @@
 	export let selectorStyle: string = '';
 	export let backgroundColor: string = '';
 
-	const listStyle = `p-1 flex grow h-full items-${alignment} ${
+	const listStyle = `mx-1 flex grow h-full items-${alignment} ${
 		alignment == 'end' ? 'flex-row-reverse' : 'flex-row'
-	} gap-3 gap-y-1.5 ${
-		overflow == 'wrap' ? 'flex-wrap gap-y-1' : 'overflow-' + overflow
-	} ${selectorStyle}`;
+	}  gap-1.5 ${overflow == 'wrap' ? 'flex-wrap gap-y-1' : 'overflow-' + overflow} ${selectorStyle}`;
 
 	let scrollPosition = {
 		x: 0,
@@ -74,7 +72,7 @@
 	}
 </script>
 
-<section class="relative h-full overflow-auto">
+<section class="relative h-full overflow-hidden">
 	<div
 		bind:this={list}
 		style="--backgroundColor: {backgroundColor}"
@@ -112,7 +110,7 @@
 					list.scrollTop = scrollPosition.startScrollTop - deltaY;
 				} else {
 					// Scroll horizontally
-					const walk = deltaX * 2;
+					const walk = deltaX;
 					list.scrollLeft = scrollPosition.startScrollLeft - walk;
 					scrollPosition.x = list.scrollLeft + 1;
 				}
@@ -176,9 +174,9 @@
 				pointer-events: none;
 				display: block;
 				position: absolute;
-				top: 0;
+				top: -1px;
 				right: 0;
-				bottom: 0;
+				bottom: -1px;
 				left: 0;
 				background-image: linear-gradient(to bottom, transparent 85%, var(--backgroundColor) 97%);
 				background-repeat: no-repeat;

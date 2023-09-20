@@ -69,8 +69,8 @@
 			{`Going to ${chosenProvider}...`}
 		</p>
 	{/if}
-	<article class="flex flex-col gap-3">
-		<div class="flex gap-3">
+	<article class="flex flex-col gap-3 max-w-[100vw]">
+		<div class="flex gap-5">
 			{#each Object.entries(providers.providers) as [id, attributes]}
 				{#if !chosenProvider || chosenProvider === attributes.name}
 					<button
@@ -78,11 +78,12 @@
 							signIn(id, { callbackUrl: $sessionStore.loginCallbackURL });
 							chosenProvider = attributes.name;
 						}}
-						class="flex flex-col items-center justify-center m-2 w-14 h-14"
+						class="flex flex-col items-center justify-center md:w-14 md:h-14 h-fit w-fit"
 					>
 						<img
 							src={providers.baseLogoURL + attributes.style.logoDark}
 							alt="{attributes.name} logo"
+							class="p-2"
 						/>
 					</button>
 				{/if}

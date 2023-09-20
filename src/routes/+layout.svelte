@@ -47,7 +47,7 @@
 <main class="flex">
 	<div class="grow-0 shrink-0 lg:w-20"><Navigation /></div>
 	<div class="w-full relative flex flex-col min-h-full">
-		<section class="min-h-screen">
+		<section class="min-h-screen mb-3">
 			<header
 				aria-label="Popular topics list"
 				class="flex px-3 md:h-12 h-14 bg-peacockFeather-700 items-center relative align-middle"
@@ -57,7 +57,7 @@
 						selectable={Tag}
 						target="email"
 						itemStyle="md:text-sm whitespace-nowrap text-base bg-peacockFeather-500 text-paper-500 w-fit"
-						selectorStyle="md:py-2 "
+						selectorStyle="md:py-2"
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}
@@ -77,7 +77,7 @@
 						}}
 					/>
 				{/if}
-				<span class="ml-auto pl-[7px] flex items-center h-full text-paper-500">
+				<span class="ml-auto flex flex-col items-center justify-center h-full text-paper-500">
 					{#if $page.data.session}
 						{#if $page.data.session.user?.image}
 							<img
@@ -91,12 +91,11 @@
 							Sign out
 						</button>
 					{:else}
-						<span
-							class="whitespace-nowrap text-xs self-end justify-self-end -mr-3 sm:-mr-4 sm:-mt-4 sm:mb-0"
+						<span class="whitespace-nowrap text-xs self-end justify-self-end mr-2 -mb-0.5"
 							>Sign in</span
 						>
 						<button
-							class="sm:w-8 w-6 -mt-2"
+							class="w-8 justify-self-end -mr-4"
 							on:click={() => signIn({ callbackUrl: '/', redirect: false })}
 						>
 							<LoginIcon />
@@ -114,7 +113,7 @@
 						<h4 class="font-bold md:text-lg sm:text-base text-sm mb-2 mr-2">Communique</h4>
 
 						<span class="border-l border-gray-600 pl-2 w-1/2">
-							<p class="md:text-sm sm:text-xs text-[0.5rem] text-gray-400">
+							<p class="md:text-sm text-xs text-gray-400">
 								Changing the world is too important to be left unread.
 							</p>
 						</span>
@@ -138,9 +137,7 @@
 		</div>
 	</div> -->
 
-				<div
-					class="text-gray-400 md:text-sm sm:text-xs text-[0.5rem] mt-6 flex justify-center items-center"
-				>
+				<div class="text-gray-400 md:text-sm text-xs mt-6 flex justify-center items-center">
 					<span class="mr-2">&copy; 2023 Communique. All rights reserved.</span>
 
 					<span class="border-l border-gray-600 pl-2 ml-2">

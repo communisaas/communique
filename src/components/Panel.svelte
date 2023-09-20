@@ -90,16 +90,16 @@
 </script>
 
 <section class="flex flex-col relative px-5 gradient-background h-full">
-	<aside class="flex pb-3" style="justify-content: {alignment}">
+	<aside class="flex flex-nowrap pb-3 max-w-full" style="justify-content: {alignment}">
 		{#if filterable && selectorTarget != 'spotlight'}
 			<h1
-				class="text-paper-500 h-fit self-center justify-self-start md:mx-2 my-1 text-xl md:text-3xl leading-tight md:leading-normal"
+				class="text-paper-500 h-fit self-center md:mx-2 my-1 text-xl md:text-3xl leading-tight md:leading-normal"
 				style="background-color: transparent; padding: unset"
 			>
 				{header}
 			</h1>
 		{/if}
-		<div class="tab tab__{alignment}">
+		<div class="tab tab__{alignment} sm:max-w-[85%] max-w-[calc(90%-1rem)]">
 			<span class="space">
 				{#if filterable && selectorTarget != 'spotlight'}
 					<TagInput
@@ -108,7 +108,7 @@
 						placeholder={'Search'}
 						style="h-14 w-fit bg-transparent"
 						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded px-2 pr-1 text-paper-500"
-						addIconStyle="add bg-peacockFeather-500 h-12 w-12 text-5xl text-3xl inline-block leading-12"
+						addIconStyle="add bg-peacockFeather-500 h-12 w-12 text-5xl inline-block leading-12"
 						autocomplete={true}
 						bind:tagList={selectionList}
 						bind:searchResults
@@ -146,6 +146,7 @@
 		{items}
 		alignment="center"
 		selectorStyle="flex-col items-center min-h-[13rem] max-w-7xl m-auto"
+		overflow="visible"
 		target={selected.type}
 		scrollable={false}
 		bind:selectedContent={selected}
@@ -192,7 +193,7 @@
 				&::before {
 					content: '';
 					position: absolute;
-					top: 0;
+					top: -1px;
 					left: 0;
 					right: 0;
 					bottom: 0;
@@ -206,14 +207,14 @@
 		&__end {
 			margin-right: -1.25rem;
 			& .space {
-				padding: 0.5em 1.25em;
+				padding: 0.5em 0;
 				padding-left: 0.5em;
 				align-items: center;
 
 				&::before {
 					content: '';
 					position: absolute;
-					top: 0;
+					top: -1px;
 					left: 0;
 					right: 0;
 					bottom: 0;

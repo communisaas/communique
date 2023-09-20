@@ -59,7 +59,7 @@
 		style="text-align: initial;"
 		class="
 		{expand ? 'bg-artistBlue-800 p-5' : 'mt-[1.5rem]'} 
-		{inModal ? ' overflow-auto max-h-[80vh] bg-artistBlue-800' : 'mt-6 w-full max-h-fit'}
+		{inModal ? ' overflow-auto max-h-[75vh] bg-artistBlue-800' : 'w-full max-h-fit'}
 		rounded appearance-none"
 		bind:this={expandable}
 	>

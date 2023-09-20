@@ -68,6 +68,7 @@
 				!completionList.contains(e.relatedTarget as Node)) ||
 			e.relatedTarget === null
 		) {
+			console.log(e);
 			searching = false;
 			inputVisible = false;
 			inputValueWidth = placeholderWidth;
@@ -144,27 +145,27 @@
 	});
 </script>
 
-<div class="px-5 rounded h-max flex flex-nowrap items-center justify-center z-10 {style}">
+<div class="px-5 rounded max-w-full h-max inline-block items-center justify-center z-10 {style}">
 	<form
 		autocomplete="off"
-		class="flex"
+		class="flex flex-nowrap max-w-full"
 		on:submit|preventDefault={() => {
 			searching = false;
 			handleSubmit();
 		}}
 	>
 		<ul
-			class="inline-flex flex-row flex-wrap items-center"
+			class="shrink min-w-0 inline-flex flex-row flex-wrap items-center max-w-full"
 			aria-label="{name} list"
 			aria-describedby="List of {name}s with an add button"
 		>
 			{#each tagList as tag}
-				<li class="relative mx-2 {tagStyle}">
+				<li class="relative mx-2 min-w-0 {tagStyle}">
 					<span
-						class="relative"
-						style="width: 100%; height: 100%;"
+						class="relative h-full shrink flow-root whitespace-nowrap"
 						on:mouseenter={() => (deleteVisible[tag.item] = true)}
 						on:mouseleave={() => (deleteVisible[tag.item] = false)}
+						on:touchend={() => (deleteVisible[tag.item] = false)}
 						on:mousemove={(event) => {
 							const containerRect = event.currentTarget.getBoundingClientRect();
 
@@ -202,112 +203,127 @@
 							<!-- x sign -->
 							&#215;
 						</button>
-						{tag.item}
+						<span class="overflow-ellipsis overflow-hidden max-w-full inline-block underline">
+							{tag.item}
+						</span>
 					</span>
 				</li>
 			{/each}
+		</ul>
+		<li class="flex gap-3 justify-center ml-auto flex-wrap items-center relative">
+			<input
+				required={tagList.length <= 0}
+				{name}
+				role="textbox"
+				aria-label="{name} input"
+				aria-describedby="Add a {name} here"
+				{placeholder}
+				inputmode={type}
+				bind:this={inputField}
+				on:blur={handleBlur}
+				on:focus={() => (inputVisible = true)}
+				on:keydown|self={(e) => {
+					// clear earlier validation errors
+					inputField.setCustomValidity('');
 
-			<li class="flex gap-3 justify-center flex-wrap items-center relative">
-				<input
-					required={tagList.length <= 0}
-					{name}
-					role="textbox"
-					aria-label="{name} input"
-					aria-describedby="Add a {name} here"
-					{placeholder}
-					inputmode={type}
-					bind:this={inputField}
-					on:blur={handleBlur}
-					on:focus={() => (inputVisible = true)}
-					on:keydown|self={(e) => {
-						// clear earlier validation errors
-						inputField.setCustomValidity('');
+					const resultsLength = visibleSearchResults ? visibleSearchResults.length : 0;
 
-						const resultsLength = visibleSearchResults ? visibleSearchResults.length : 0;
-
-						if (resultsLength > 0) {
-							if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
-								e.preventDefault();
-								autocompleteIndex = (autocompleteIndex + 1) % resultsLength;
-							}
-							if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
-								e.preventDefault();
-								if (autocompleteIndex === 0) {
-									autocompleteIndex = resultsLength - 1;
-								} else {
-									autocompleteIndex = (autocompleteIndex - 1 + resultsLength) % resultsLength;
-								}
-							}
-						}
-
-						if (e.key === 'Enter') {
+					if (resultsLength > 0) {
+						if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
 							e.preventDefault();
-							handleSubmit(autocomplete);
+							autocompleteIndex = (autocompleteIndex + 1) % resultsLength;
 						}
-
-						if (e.key === 'Escape' || (e.key === 'Tab' && !visibleSearchResults)) {
+						if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
 							e.preventDefault();
-							inputField.blur();
+							if (autocompleteIndex === 0) {
+								autocompleteIndex = resultsLength - 1;
+							} else {
+								autocompleteIndex = (autocompleteIndex - 1 + resultsLength) % resultsLength;
+							}
 						}
-					}}
-					on:input={() => {
-						handleInput();
-					}}
-					style="width: {inputVisible ? inputValueWidth : 0}px;"
-					class={inputStyle}
-					class:show={inputVisible}
-					class:p-1={inputVisible}
-					{type}
-				/>
-				<ul
-					bind:this={completionList}
-					class="autocomplete flex flex-col bg-paper-500 py-1"
-					class:px-4={Object.keys(groupedResults).length > 0 && inputVisible}
-				>
-					{#if searching}
-						<li class="relative px-1">
-							<ContentLoader
-								uniqueKey="autocomplete"
-								width={inputValueWidth}
-								height={20}
-								secondaryColor={colors.larimarGreen[700]}
-								speed={0.5}
-							/>
-						</li>
-					{:else if visibleSearchResults && visibleSearchResults.length > 0 && inputVisible}
-						{#each Object.keys(groupedResults) as type}
-							<li class="-ml-1">{type}s</li>
-							{#each groupedResults[type] as result, index}
-								<li class="relative">
-									<input
-										type="button"
-										class="p-1 rounded mr-2 cursor-pointer w-full text-xs"
-										class:bg-paper-800={visibleSearchResults[autocompleteIndex] &&
-											visibleSearchResults[autocompleteIndex].item === result.item}
-										on:mouseenter={() =>
-											(autocompleteIndex = visibleSearchResults.findIndex(
-												(r) => r.item === result.item
-											))}
-										on:click|preventDefault|stopPropagation={(e) => {
+					}
+
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						handleSubmit(autocomplete);
+					}
+
+					if (e.key === 'Escape' || (e.key === 'Tab' && !visibleSearchResults)) {
+						e.preventDefault();
+						inputField.blur();
+					}
+				}}
+				on:input={() => {
+					handleInput();
+				}}
+				style="width: {inputVisible ? inputValueWidth : 0}px;"
+				class={inputStyle}
+				class:show={inputVisible}
+				class:p-1={inputVisible}
+				{type}
+			/>
+			<ul
+				bind:this={completionList}
+				class="autocomplete flex flex-col bg-paper-500 py-1 max-w-[80vw] w-fit"
+				class:px-4={Object.keys(groupedResults).length > 0 && inputVisible}
+			>
+				{#if searching}
+					<li class="relative px-1">
+						<ContentLoader
+							uniqueKey="autocomplete"
+							width={inputValueWidth}
+							height={20}
+							secondaryColor={colors.larimarGreen[700]}
+							speed={0.5}
+						/>
+					</li>
+				{:else if visibleSearchResults && visibleSearchResults.length > 0 && inputVisible}
+					{#each Object.keys(groupedResults) as type}
+						<li class="-ml-1">{type}s</li>
+						{#each groupedResults[type] as result, index}
+							<li class="relative">
+								<div
+									tabindex="0"
+									role="button"
+									class="p-1 rounded mr-2 cursor-pointer w-full text-xs overflow-hidden overflow-ellipsis"
+									class:bg-paper-800={visibleSearchResults[autocompleteIndex] &&
+										visibleSearchResults[autocompleteIndex].item === result.item}
+									on:mouseenter={() =>
+										(autocompleteIndex = visibleSearchResults.findIndex(
+											(r) => r.item === result.item
+										))}
+									on:click|preventDefault|stopPropagation={(e) => {
+										autocompleted = autocomplete;
+										handleSubmit(autocomplete);
+										inputField.focus();
+									}}
+									on:keypress|preventDefault|stopPropagation={(e) => {
+										if (e.key === 'Enter') {
 											autocompleted = autocomplete;
 											handleSubmit(autocomplete);
 											inputField.focus();
-										}}
-										value={result.item}
-									/>
-								</li>
-							{/each}
+										}
+									}}
+								>
+									{result.item}
+								</div>
+							</li>
 						{/each}
-					{/if}
-				</ul>
-			</li>
-		</ul>
-
+					{/each}
+				{/if}
+			</ul>
+		</li>
 		<button
 			type="submit"
 			name={`Add ${name}`}
 			aria-label="Add button for {name}s"
-			class="flex justify-center items-center relative"
+			class="flex justify-center items-center relative min-w-fit shrink-0"
+			on:click={(e) => {
+				if (!inputVisible) {
+					inputVisible = true;
+					e.preventDefault();
+				}
+			}}
 		>
 			<span title={`Add ${name}`} class="flex" class:active={inputVisible}>
 				<slot />
@@ -381,7 +397,7 @@
 		box-sizing: border-box;
 		border-radius: 4px;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-		min-width: fit-content;
+		z-index: 100;
 	}
 
 	.show {
