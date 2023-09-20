@@ -7,13 +7,12 @@
 	import RecipientIcon from './icon/Recipient.svelte';
 	import SentIcon from './icon/Sent.svelte';
 	import MenuIcon from './icon/Menu.svelte';
-	import { scale, fade, slide, fly } from 'svelte/transition';
-	import { expoIn, expoOut, quintOut } from 'svelte/easing';
 	import Menu from './Menu.svelte';
 	import { handleCopy } from '$lib/data/select';
 	import { page } from '$app/stores';
 	import type { Writable } from 'svelte/store';
 	import Preferences from './input/Preferences.svelte';
+	import { fade, scale } from 'svelte/transition';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -26,9 +25,10 @@
 		card: { x: 0, remainingWidth: 0, startX: 0, startScrollLeft: 0 }
 	};
 	let header: HTMLHeadingElement;
-	let card: HTMLButtonElement;
+	let card: HTMLElement;
 	let menu: HTMLElement;
 	let scrollableElements: { [key: string]: HTMLElement };
+
 	// state
 	let scrollToCard = false;
 	let expand = false;
@@ -50,6 +50,18 @@
 				setTimeout(() => {
 					menuItems[0].name = 'Get link';
 				}, 2000);
+			}
+		},
+		{
+			name: 'Open',
+			key: 'open',
+			class: 'menu__item',
+			show: true,
+			actionToggled: false,
+			actionComponent: undefined,
+
+			onClick: async () => {
+				dispatch('externalAction', { type: 'email', context: item });
 			}
 		},
 		{
@@ -140,7 +152,7 @@
 		if (scrollToCard) {
 			// TODO more contextual fix for resolving pending events after DOM update
 			setTimeout(() => {
-				card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
 			});
 			scrollToCard = false;
 		}
@@ -171,7 +183,6 @@
 			selected.id = item.rowid;
 		}
 		if (expand && !justFocused && !showMenu) {
-			dispatch('externalAction', { type: 'email', context: item });
 			setExpand(false);
 		} else {
 			setExpand(true);
@@ -211,7 +222,9 @@
 	}
 </script>
 
-<button
+<div
+	role="button"
+	tabindex="0"
 	bind:this={card}
 	on:focus={() => {
 		handleSelect();
@@ -223,11 +236,16 @@
 	on:click={() => {
 		handleSelect();
 	}}
+	on:keydown={(e) => {
+		if (e.key === 'Enter') {
+			handleSelect();
+		}
+	}}
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
 	class="card flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
 		justify-center w-48 {style}"
-	class:cursor-alias={expand}
+	class:cursor-default={expand}
 	class:clickable={!nestedHover}
 	style="min-width: {expand ? '99%' : '95%'};"
 >
@@ -262,7 +280,7 @@
 			: ''} min-w-full min-h-fit overflow-hidden"
 	>
 		{#if sessionStore}
-			<span class="flex max-w-full items-center h-fit relative">
+			<span class="flex max-w-full h-fit items-center relative">
 				<h1
 					aria-label="Subject line"
 					aria-describedby={item.subject}
@@ -300,34 +318,17 @@
 					}}
 					class:scrollable={scrollPosition.header.remainingWidth > 0}
 					class:scrolled={scrollPosition.header.x > 1}
-					class:scrolled__max={scrollPosition.header.remainingWidth > 0 &&
-						scrollPosition.header.remainingWidth == scrollPosition.header.x}
-					class=" inline-block mr-1"
+					class:scrolled__max={scrollPosition.header.remainingWidth - scrollPosition.header.x < 1}
+					class="inline-block mr-1 w-full text-left"
 				>
 					{item.subject}
 				</h1>
-				{#if expand}
-					<button
-						title="Menu"
-						on:click|stopPropagation={() => {
-							showMenu = !showMenu;
-						}}
-						on:keypress|stopPropagation
-						on:mouseenter={() => (nestedHover = true)}
-						on:mouseleave={() => (nestedHover = false)}
-						class="z-10 max-w-[28px] max-h-fit cursor-context-menu mx-1 hover:scale-125 ease-in-out duration-150"
-						in:fade={{ delay: 50, duration: 200, easing: expoIn }}
-						out:scale={{ delay: 50, duration: 300, easing: expoOut }}
-					>
-						<MenuIcon />
-					</button>
-				{/if}
 			</span>
 			<article
 				class="flex grow justify-between min-w-full h-full flex-col"
 				class:md:flex-row={!expand}
 			>
-				<div class="flex flex-col min-h-full">
+				<div class="flex flex-col min-h-full" class:md:max-w-[50%]={!expand}>
 					<div class="stats p-1 flex flex-row gap-x-5">
 						<span title="Read count" aria-label="Number of reads" class="flex items-center">
 							<icon
@@ -356,7 +357,7 @@
 					</div>
 
 					<div
-						class="tags min-w-[25rem] h-full justify-between"
+						class="tags max-w-[full] h-full justify-between"
 						aria-label="Topic and recepient lists"
 						style="max-width: {!expand ? '35rem' : '100%'};"
 					>
@@ -364,7 +365,8 @@
 							<Selector
 								selectable={Tag}
 								items={item.topic_list}
-								itemStyle="text-[11px] text-paper-500 bg-peacockFeather-500 hover:-translate-y-0.5"
+								itemStyle="sm:text-sm text-paper-500 bg-peacockFeather-500"
+								selectorStyle="pt-2 max-w-full"
 								alignment="start"
 								overflow="wrap"
 								target="email"
@@ -380,7 +382,8 @@
 							<Selector
 								selectable={Tag}
 								items={item.recipient_list}
-								itemStyle="text-[11px] text-paper-500 bg-peacockFeather-600 hover:-translate-y-0.5"
+								itemStyle="sm:text-sm text-paper-500 bg-peacockFeather-600"
+								selectorStyle="pt-1 max-w-full"
 								alignment="start"
 								overflow="wrap"
 								target="email"
@@ -395,7 +398,43 @@
 					</div>
 				</div>
 				{#if expand}
-					<p aria-label="Info text" class="text-center mt-1"><i>click again to send...</i></p>
+					<span class="flex max-w-full gap-5">
+						<p aria-label="Info text" class="text-center ml-auto mt-1">
+							<i>
+								<span
+									role="link"
+									tabindex="0"
+									class="underline cursor-alias"
+									on:click={() => {
+										dispatch('externalAction', { type: 'email', context: item });
+									}}
+									on:keypress={() => {
+										dispatch('externalAction', { type: 'email', context: item });
+									}}
+								>
+									click here
+								</span> to send...
+							</i>
+						</p>
+						<div
+							role="button"
+							tabindex="0"
+							title="Menu"
+							on:click|stopPropagation={() => {
+								showMenu = !showMenu;
+							}}
+							on:keypress|stopPropagation={(e) => {
+								if (e.key === 'Enter') {
+									showMenu = !showMenu;
+								}
+							}}
+							on:mouseenter={() => (nestedHover = true)}
+							on:mouseleave={() => (nestedHover = false)}
+							class="w-[22%] mr-auto self-start max-w-[28px] max-h-fit cursor-context-menu mx-1 hover:scale-125 active:scale-100 ease-in-out duration-150"
+						>
+							<MenuIcon />
+						</div>
+					</span>
 				{/if}
 				<details
 					style="text-align: initial; margin-top: {!expand ? '-1.5rem' : '0'};"
@@ -406,15 +445,21 @@
 						tabindex="-1"
 						aria-expanded={expand}
 						aria-label="Email body"
+						class="cursor-alias"
+						class:mt-6={expand}
 						on:click={(e) => {
 							if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 								e.stopPropagation();
+							} else {
+								dispatch('externalAction', { type: 'email', context: item });
 							}
 						}}
 						on:keypress={(e) => {
 							if (e.key === 'Enter') {
 								if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 									e.stopPropagation();
+								} else {
+									dispatch('externalAction', { type: 'email', context: item });
 								}
 							}
 						}}
@@ -425,13 +470,14 @@
 			</article>
 		{/if}
 	</section>
-</button>
+</div>
 
 <style lang="scss">
 	.cardWrapper {
 		&::after {
 			background: linear-gradient(to top, theme('colors.artistBlue.600') 0%, transparent 10%);
 			content: '';
+			z-index: 10;
 			position: absolute;
 			bottom: -1px;
 			margin-bottom: -1px;
@@ -489,6 +535,7 @@
 
 		&::before {
 			content: '';
+			z-index: 10;
 			display: block;
 			position: absolute;
 			top: 0;
@@ -500,6 +547,7 @@
 	}
 
 	.scrolled::before {
+		z-index: 10;
 		background: linear-gradient(
 			to right,
 			theme('colors.artistBlue.600') 3%,
@@ -510,6 +558,7 @@
 	}
 
 	.scrolled__max::before {
+		z-index: 10;
 		content: '';
 		display: block;
 		top: 0;

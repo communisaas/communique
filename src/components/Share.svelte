@@ -15,6 +15,7 @@
 	export let item: email;
 
 	let emailCopied = false;
+	let linkCopied = false;
 
 	let sent = false;
 
@@ -25,13 +26,13 @@
 	}
 </script>
 
-<article class="flex flex-col gap-y-1">
+<article class="flex flex-col gap-y-1 px-2 max-w-[100vw]">
 	<div
-		class="flex flex-row justify-around items-stretch py-2 gap-x-3"
+		class="flex flex-col sm:flex-row justify-around items-stretch py-2 gap-3"
 		in:scale={{ delay: 25, duration: 50, easing: backInOut }}
 		out:scale={{ delay: 25, duration: 250, easing: backInOut }}
 	>
-		<div class="info info__clipboard p-2 flex flex-col items-center self-center w-fit max-w-10">
+		<div class="info info__clipboard p-2 flex flex-col items-center self-center w-fit max-w-full">
 			<span class="pb-2 flex flex-col items-center">
 				{#if /<\/?[a-z][\s\S]*>/i.test(item.body)}
 					<p class="font-bold text-center">Click clipboard for a formatted copy.</p>
@@ -41,7 +42,7 @@
 					on:keypress={(e) => {
 						if (e.key === 'Enter') handleMailto(dispatch, false);
 					}}
-					class="text-sm opacity-75 hover:underline hover:cursor-pointer hover:bg-transparent"
+					class="text-sm opacity-75 underline hover:cursor-pointer hover:bg-transparent"
 					style="background: unset; box-shadow: unset"
 				>
 					(and here to reopen a blank template)
@@ -81,7 +82,7 @@
 				{/if}
 				<icon />
 				<icon
-					class="inline-block min-w-[40vh]"
+					class="inline-block sm:w-[40vh] md:w-[40vh] w-[35vh]"
 					class:clipboard-clicked={emailCopied}
 					class:blur-sm={emailCopied}
 					class:clipboard={!emailCopied}
@@ -94,17 +95,20 @@
 		</div>
 		<div class="info info__share flex flex-col items-center justify-center p-2">
 			<span class="flex flex-col items-center justify-center relative gap-2 h-full">
-				<Social
-					shortLink={new URL('/' + item.shortid, $page.url.origin)}
-					linkMessage="Share this email:"
-				/>
-				<div class="justify-self-end absolute bottom-4">
+				<div class="mt-auto">
+					<Social
+						bind:linkCopied
+						shortLink={new URL('/' + item.shortid, $page.url.origin)}
+						linkMessage="Share this email:"
+					/>
+				</div>
+				<div class="mt-auto" class:blur-sm={linkCopied}>
 					<input
 						bind:checked={sent}
 						name="Sent!"
 						id="sendStatus"
 						type="checkbox"
-						class="min-w-max"
+						class="max-w-full"
 					/>
 					<label for="sendStatus">Sent!</label>
 				</div>
@@ -119,12 +123,6 @@
 <style lang="scss">
 	:global(body:has(.popover)) {
 		overflow: hidden;
-	}
-
-	section {
-		overflow: auto;
-		background: rgba(0, 0, 0, 0.6);
-		backdrop-filter: blur(8px);
 	}
 
 	.info {

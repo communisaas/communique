@@ -1,28 +1,23 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount, type DispatchOptions } from 'svelte/internal';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	export let item: string;
 	export let selected: Selectable;
 	export let style = '';
 
-	let store: Writable<UserState>;
+	let store: Writable<UserState>,
+		overflowing = false;
 
 	const dispatch = createEventDispatcher();
 
-	let tag: HTMLButtonElement;
-	let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
-	let tagWidth: number;
-	$: context ? (tagWidth = context.measureText(item).width + 20) : null,
-		onMount(async () => {
-			store = (await import('$lib/data/sessionStorage')).store;
+	let tag: HTMLElement;
+	onMount(async () => {
+		store = (await import('$lib/data/sessionStorage')).store;
+	});
 
-			canvas = document.createElement('canvas');
-			context = canvas.getContext('2d') as CanvasRenderingContext2D;
-			if (context && tag) {
-				context.font = getComputedStyle(tag).font;
-				tagWidth = context.measureText(item).width + 20;
-			}
-		});
+	$: if (tag) {
+		overflowing = tag.scrollHeight > tag.clientHeight || tag.scrollWidth > tag.clientWidth;
+	}
 
 	function handleSelect() {
 		if (selected.id != item) {
@@ -32,12 +27,13 @@
 	}
 </script>
 
-<span class="max-w-fit">
-	<button
-		aria-label={item}
-		class="cursor-pointer text-center px-2 py-1 rounded overflow-visible {style} "
-		style:width="{tagWidth}px"
+<span title={overflowing ? item : ''} class="max-w-full">
+	<div
 		bind:this={tag}
+		tabindex="0"
+		role="button"
+		aria-label={item}
+		class="button cursor-pointer text-center px-2 py-1 max-w-full whitespace-nowrap overflow-hidden overflow-ellipsis rounded w-fit {style} "
 		on:click|stopPropagation={() => {
 			handleSelect();
 		}}
@@ -49,21 +45,21 @@
 		on:blur
 	>
 		{item}
-	</button>
+	</div>
 </span>
 
 <style lang="scss">
-	button {
+	.button {
 		margin: 0;
 		transition: 0.1s ease-in;
 		&:hover {
-			margin-top: -0.25rem;
+			transform: translateY(-2px);
 			box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
 
 			transition: 0.1s ease-in;
 		}
 		&:active {
-			margin-top: 0;
+			transform: translateY(0);
 			transition: 0.1s ease-in;
 		}
 	}

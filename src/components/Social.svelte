@@ -5,8 +5,7 @@
 
 	export let shortLink: URL;
 	export let linkMessage = '';
-
-	let linkCopied = false;
+	export let linkCopied = false;
 </script>
 
 <aside>
@@ -14,7 +13,7 @@
 		<div class="relative h-fit">
 			{#if linkCopied}
 				<div in:fade={{ delay: 25, duration: 200 }} out:fade={{ delay: 50, duration: 300 }}>
-					<icon class="absolute z-10 w-4/5 left-0 right-0 -top-[0.775rem] m-auto">
+					<icon class="absolute z-10 w-3/5 left-0 right-0 -top-[0.775rem] m-auto">
 						<Checkmark />
 					</icon>
 				</div>
@@ -23,7 +22,7 @@
 				<p
 					out:scale={{ delay: 20, duration: 150 }}
 					in:fade={{ delay: 0, duration: 150 }}
-					class="text-center m-2 absolute left-0 right-0 ml-auto mr-auto row-span-1"
+					class="text-center m-1 sm:m-2 absolute left-0 right-0 ml-auto mr-auto row-span-1"
 				>
 					{linkMessage}
 				</p>
@@ -32,14 +31,14 @@
 				<p
 					in:fade={{ delay: 0, duration: 150 }}
 					out:scale={{ delay: 20, duration: 150 }}
-					class="text-center m-2 absolute left-0 right-0 ml-auto mr-auto row-span-1"
+					class="text-center m-1 sm:m-2 absolute left-0 right-0 ml-auto mr-auto row-span-1"
 				>
 					<b>Copied!</b>
 				</p>
 			{/if}
 		</div>
 		<button
-			class="shortLink underline p-2 rounded inline-block"
+			class="shortLink underline p-1 sm:p-2 rounded inline-block"
 			class:blur-sm={linkCopied}
 			class:opacity-50={linkCopied}
 			aria-label="copy shortened link"

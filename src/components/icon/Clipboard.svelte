@@ -3,6 +3,7 @@
 	import { writable, derived } from 'svelte/store';
 
 	let content: HTMLDivElement;
+	let contentContainer: HTMLDivElement;
 	let clipboardArea: SVGRectElement;
 	let contentHeight: number;
 
@@ -11,13 +12,14 @@
 	let baseFontSize = writable(0.75);
 	onMount(() => {
 		resizeObserver = new ResizeObserver(() => {
-			let clipboardHeight = clipboardArea?.getBBox().height;
-			contentHeight = Math.abs(content?.clientHeight - content?.scrollHeight);
-			baseFontSize.set(contentHeight / content?.scrollHeight || 1); // 1 if not overflowing
+			if (content) {
+				let clipboardHeight = clipboardArea?.getBBox().height;
+				let fontSize = contentContainer.clientHeight / clipboardHeight;
+				baseFontSize.set(fontSize < 1 ? fontSize : 0.5); // 1 if not overflowing
+			}
 		});
 
-		resizeObserver.observe(content);
-		resizeObserver.observe(clipboardArea);
+		resizeObserver.observe(contentContainer);
 	});
 
 	onDestroy(() => {
@@ -68,7 +70,7 @@
 			</filter>
 		</defs>
 	</svg>
-	<div class="content">
+	<div class="content" bind:this={contentContainer}>
 		<div
 			bind:this={content}
 			class="markdown-content content-inner"

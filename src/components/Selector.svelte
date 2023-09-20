@@ -12,11 +12,9 @@
 	export let selectorStyle: string = '';
 	export let backgroundColor: string = '';
 
-	const listStyle = `p-1 flex grow h-full items-${alignment} ${
+	const listStyle = `mx-1 flex grow h-full items-${alignment} ${
 		alignment == 'end' ? 'flex-row-reverse' : 'flex-row'
-	} gap-3 gap-y-1.5 ${
-		overflow == 'wrap' ? 'flex-wrap gap-y-1' : 'overflow-' + overflow
-	} ${selectorStyle}`;
+	}  gap-1.5 ${overflow == 'wrap' ? 'flex-wrap gap-y-1' : 'overflow-' + overflow} ${selectorStyle}`;
 
 	let scrollPosition = {
 		x: 0,
@@ -74,7 +72,7 @@
 	}
 </script>
 
-<section class="relative h-full overflow-auto">
+<section class="relative h-full overflow-hidden">
 	<div
 		bind:this={list}
 		style="--backgroundColor: {backgroundColor}"
@@ -88,16 +86,14 @@
 		class:scrolledY__max={scrollY.scrolledMax}
 		on:wheel={(e) => {
 			if (scrollable) {
-				e.preventDefault();
-				list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-				list.scrollTop += Math.abs(e.deltaY) > 0 ? e.deltaY : e.deltaX * 0.33;
+				list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY;
+				list.scrollTop += Math.abs(e.deltaY) > 0 ? e.deltaY : e.deltaX;
 				scrollPosition.x = list.scrollLeft + 1;
 				scrollPosition.y = list.scrollTop + 1;
 			}
 		}}
 		on:touchstart={(e) => {
 			if (scrollable) {
-				e.preventDefault();
 				scrollPosition.startX = e.touches[0].clientX;
 				scrollPosition.startY = e.touches[0].clientY;
 				scrollPosition.startScrollTop = list.scrollTop;
@@ -114,7 +110,7 @@
 					list.scrollTop = scrollPosition.startScrollTop - deltaY;
 				} else {
 					// Scroll horizontally
-					const walk = deltaX * 2;
+					const walk = deltaX;
 					list.scrollLeft = scrollPosition.startScrollLeft - walk;
 					scrollPosition.x = list.scrollLeft + 1;
 				}
@@ -157,8 +153,8 @@
 
 		&X {
 			&::before {
-				pointer-events: none;
 				content: '';
+				z-index: 20;
 				pointer-events: none;
 				display: block;
 				position: absolute;
@@ -174,12 +170,13 @@
 		&Y {
 			&::before {
 				content: '';
+				z-index: 20;
 				pointer-events: none;
 				display: block;
 				position: absolute;
-				top: 0;
+				top: -1px;
 				right: 0;
-				bottom: 0;
+				bottom: -1px;
 				left: 0;
 				background-image: linear-gradient(to bottom, transparent 85%, var(--backgroundColor) 97%);
 				background-repeat: no-repeat;
@@ -189,6 +186,7 @@
 
 	.scrolledX {
 		&::before {
+			z-index: 20;
 			pointer-events: none;
 			background-image: linear-gradient(
 				to right,
@@ -203,6 +201,7 @@
 
 	.scrolledX__max {
 		&::before {
+			z-index: 20;
 			pointer-events: none;
 			content: '';
 			display: block;
@@ -217,6 +216,7 @@
 
 	.scrolledY {
 		&::before {
+			z-index: 20;
 			background-image: linear-gradient(
 					to bottom,
 					var(--backgroundColor) 3%,
@@ -238,6 +238,7 @@
 	.scrolledY__max {
 		&::before {
 			content: '';
+			z-index: 20;
 			display: block;
 			top: 0;
 			right: 0;
