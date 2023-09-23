@@ -33,13 +33,18 @@ type MenuItem = {
 	onClick: (MenuItemClickArgs?) => void;
 };
 
-interface SettablePages {
-	[key: number]: Settable[];
+interface SettablePage {
+	show: boolean;
+	class: string;
+	items: Settable[];
 }
 interface Settable {
 	name: string;
 	description: string;
-	inputType:
+	label: string;
+	class: string;
+	value?: string;
+	type:
 		| radio
 		| checkbox
 		| text
@@ -53,7 +58,8 @@ interface Settable {
 		| url
 		| search
 		| tel
-		| color;
+		| color
+		| 'menuitem';
 	key: string;
 	onUpdate: (e: FormEventHandler<HTMLInputElement>) => void;
 }

@@ -15,6 +15,9 @@ const config = {
 			},
 			transitionProperty: {
 				width: 'width'
+			},
+			screens: {
+				xs: '420px'
 			}
 		}
 	},

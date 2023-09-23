@@ -28,6 +28,8 @@
 	let menu: HTMLElement;
 	let scrollableElements: { [key: string]: HTMLElement };
 
+	let resizeObserver: ResizeObserver;
+
 	// state
 	let scrollToCard = false;
 	let expand = false;
@@ -38,7 +40,7 @@
 		{
 			name: 'Get link',
 			key: 'copy',
-			class: 'menu__item mb-4',
+			class: 'menu__item mb-4 hover:scale-105 active:scale-100',
 			show: true,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -54,7 +56,7 @@
 		{
 			name: 'Open',
 			key: 'open',
-			class: 'menu__item',
+			class: 'menu__item hover:scale-105 active:scale-100',
 			show: true,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -66,63 +68,121 @@
 		{
 			name: 'Not interested...',
 			key: 'interest',
-			class: 'menu__item mt-2',
+			class: 'menu__item mt-2 hover:scale-105 active:scale-100',
 			show: true,
 			actionToggled: false,
-			actionComponent: Preferences,
+			actionComponent: undefined,
 
 			onClick: () => {
-				menuItems = menuItems.map((item) => {
-					if (item.key !== 'interest' && item.key !== 'back') {
-						item.show = false;
-					} else {
-						item.show = true;
-					}
-					return item;
-				});
+				// TODO
 			}
 		},
 		{
 			name: 'Report',
 			key: 'moderation',
-			class: 'menu__item mt-2',
+			class: 'menu__item mt-2 hover:scale-105 active:scale-100',
 			show: true,
 			actionToggled: false,
 			actionComponent: {
 				component: Preferences,
 				props: {
-					flow: {
-						1: [
-							{
-								inputType: 'radio',
-								name: 'type',
-								onUpdate: () => {},
-								label: 'Spam',
-								class: 'option'
-							},
-							{
-								inputType: 'radio',
-								name: 'type',
-								onUpdate: () => {},
-								label: 'Harassment',
-								class: 'option'
-							},
-							{
-								inputType: 'radio',
-								name: 'type',
-								onUpdate: () => {},
-								label: 'Other',
-								class: 'option'
-							},
-							{
-								inputType: 'submit',
-								name: 'next',
-								onUpdate: () => {},
-								label: 'Next',
-								class: 'justify-center block'
-							}
-						]
-					}
+					flow: [
+						{
+							show: true,
+							class:
+								'grid grid-rows-5 grid-flow-col gap-2 mx-auto min-w-full text-xs sm:text-sm md:text-base',
+							items: [
+								{
+									type: 'radio',
+									name: 'type',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Spam',
+									class: 'option'
+								},
+								{
+									type: 'radio',
+									name: 'type',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Harassment',
+									class: 'option'
+								},
+								{
+									type: 'radio',
+									name: 'type',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Violence',
+									class: 'option'
+								},
+								{
+									type: 'radio',
+									name: 'type',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Privacy',
+									class: 'option'
+								},
+								{
+									type: 'radio',
+									name: 'type',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Misleading',
+									class: 'option'
+								},
+								{
+									type: 'radio',
+									name: 'type',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Other',
+									class: 'option'
+								},
+								{
+									type: 'submit',
+									name: 'next',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										console.log(e);
+										if (e.currentTarget) {
+											(e.currentTarget as HTMLInputElement).click();
+											e.preventDefault();
+										}
+									},
+									label: 'Next',
+									value: 'Next',
+									class: 'submit justify-center block'
+								}
+							]
+						},
+						{
+							show: false,
+							class: 'mx-auto min-w-full text-xs sm:text-sm md:text-base',
+							items: [
+								{
+									type: 'menuitem',
+									name: 'confirm',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										console.log(e);
+										if (e.currentTarget) {
+											(e.currentTarget as HTMLInputElement).click();
+											e.preventDefault();
+										}
+									},
+									label: 'confirm',
+									value: 'confirmed',
+									class: 'inline'
+								}
+							]
+						}
+					]
 				}
 			},
 
@@ -133,7 +193,7 @@
 						item.actionToggled = false;
 					} else {
 						item.show = true;
-						item.actionToggled = true;
+						if (item.key === 'moderation') item.actionToggled = true;
 					}
 					return item;
 				});
@@ -142,7 +202,7 @@
 		{
 			name: 'Close',
 			key: 'close',
-			class: 'menu__item menu__item--close mt-4',
+			class: 'menu__item menu__item--close mt-4 hover:scale-105 active:scale-100',
 			show: true,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -163,7 +223,7 @@
 		{
 			name: 'Back',
 			key: 'back',
-			class: 'menu__item menu__item--close mt-4',
+			class: 'menu__item menu__item--close mt-4 hover:scale-105 active:scale-100',
 			show: false,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -184,6 +244,11 @@
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
+		resizeObserver = new ResizeObserver(() => {
+			updateScrollableElements(scrollableElements);
+		});
+
+		resizeObserver.observe(card);
 	});
 
 	afterUpdate(() => {
@@ -249,7 +314,6 @@
 		}
 		showMenu = false;
 		activationState = null;
-		console.log('blurred');
 		menuItems = menuItems.map((item) => {
 			if (item.key !== 'back') {
 				item.show = true;
@@ -321,7 +385,9 @@
 	>
 		{#if sessionStore}
 			<span class="flex max-w-full h-fit items-start relative">
-				<span class="min-w-[90%] relative">
+				<span
+					class="max-w-[calc(85%-10vw)] xs:max-w-[calc(90%-6vw)] sm:max-w-[88%] md:max-w-[90%] lg:max-w-[95%] relative"
+				>
 					<h1
 						aria-label="Subject line"
 						aria-describedby={item.subject}
@@ -394,7 +460,11 @@
 				class="flex grow justify-between min-w-full h-full flex-col"
 				class:md:flex-row={!expand}
 			>
-				<div class="flex flex-col min-h-full" class:md:max-w-[50%]={!expand}>
+				<div
+					class="flex flex-col min-h-full"
+					class:md:max-w-[50%]={!expand}
+					class:md:pr-2={!expand}
+				>
 					<div
 						class="tags max-w-[full] h-full"
 						aria-label="Topic and recepient lists"
@@ -460,12 +530,14 @@
 							role="button"
 							tabindex="0"
 							title="Menu"
-							on:click|stopPropagation={() => {
+							on:click|stopPropagation={(e) => {
 								showMenu = !showMenu;
 							}}
 							on:keydown|stopPropagation={(e) => {
 								if (e.key === 'Enter') {
+									e.preventDefault();
 									showMenu = !showMenu;
+									console.log(showMenu);
 								}
 							}}
 							on:mouseenter={() => (nestedHover = true)}

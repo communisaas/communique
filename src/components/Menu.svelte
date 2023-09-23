@@ -10,8 +10,10 @@
 
 	let menu: HTMLElement;
 	let focusableElements = writable<HTMLElement[]>([]);
+	let nestedFocusableElements = writable<HTMLElement[]>([]);
 	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let lastFocusableElement = writable<HTMLElement | null>(null);
+	let firstFocus = true;
 
 	let focusHandler: (e: KeyboardEvent) => void;
 
@@ -25,17 +27,21 @@
 		firstFocusableElement.set(firstElem);
 		lastFocusableElement.set(lastElem);
 
+		focusHandler = (e) => {
+			lastElem.classList.remove('focus:outline-none');
+			firstFocus = false;
+			trapFocus(e, $focusableElements);
+		};
+
 		firstFocusableElement.update((first) => {
 			if (first) {
-				first.focus();
+				lastElem.focus();
+				lastElem.classList.add('focus:outline-none');
+				firstFocus = false;
 				return null;
 			}
 			return first;
 		});
-
-		focusHandler = (e) => {
-			trapFocus(e, $focusableElements);
-		};
 
 		menu.addEventListener('keydown', focusHandler);
 	});
@@ -46,12 +52,13 @@
 			HTMLElement,
 			HTMLElement
 		];
-		focusableElements.set(
-			focusElems.filter((element) => {
+		focusableElements.set([
+			...focusElems.filter((element) => {
 				const shownItems = items.filter((item) => item.show && item.key).map((item) => item.key);
 				if (shownItems.includes(element.id)) return element;
-			})
-		);
+			}),
+			...$nestedFocusableElements
+		]);
 	});
 
 	onDestroy(() => {
@@ -79,29 +86,31 @@
 					tabindex="0"
 					role="menuitem"
 					class="flex justify-center items-center cursor-pointer {item.class}"
-					style="flex-direction: {item.actionToggled ? 'column' : 'row'}"
+					class:flex-col={item.actionToggled}
 					class:cursor-default={item.actionToggled}
+					class:pointer-events-none={item.actionToggled}
+					class:scale-105={item.actionToggled}
 					id={item.key}
-					animate:flip={{ delay: 0, duration: 250, easing: quintOut }}
+					animate:flip={{ delay: 0, duration: 100, easing: quintOut }}
 					out:fly={{
-						delay: 0,
 						duration: 250,
 						x: 500,
 						easing: quintOut
 					}}
-					in:fade={{ delay: 0, duration: 250, easing: expoIn }}
+					in:fade={{ duration: 250, easing: expoIn }}
 					on:click|stopPropagation={(e) => {
 						item.onClick({ event: e, focusableElements: $focusableElements });
 					}}
-					on:keypress={(e) => {
+					on:keypress|stopPropagation={(e) => {
 						if (e.key === 'Enter') {
+							e.preventDefault();
 							item.onClick({ event: e, focusableElements: $focusableElements });
 						}
 					}}
 					on:blur
 				>
 					<span
-						transition:scale={{ delay: 50, duration: 250, easing: expoIn }}
+						transition:scale={{ duration: 250, easing: expoIn }}
 						class:cursor-default={item.actionToggled}
 					>
 						{item.name}
@@ -110,6 +119,8 @@
 						<svelte:component
 							this={item.actionComponent.component}
 							{...item.actionComponent.props}
+							on:blur
+							bind:focusableElements={nestedFocusableElements}
 						/>
 					{/if}
 				</div>
@@ -127,19 +138,13 @@
 		&__item {
 			min-width: 200%;
 			background-color: theme('colors.peacockFeather.500');
-			padding: 0.33em;
+			padding: 0.3em;
 			margin-left: -50%;
 			transition: ease-in-out 0.2s;
 
 			&--close {
 				background-color: theme('colors.peacockFeather.600');
 			}
-		}
-		&__item:hover {
-			transform: scale(1.08);
-		}
-		&__item:active {
-			transform: scale(0.92);
 		}
 	}
 </style>

@@ -15,7 +15,7 @@
 	let focusableElements = writable<HTMLElement[]>([]);
 	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let lastFocusableElement = writable<HTMLElement | null>(null);
-
+	let firstFocus = true;
 	let focusHandler: (e: KeyboardEvent) => void;
 
 	function handlePageshow(event: PageTransitionEvent) {
@@ -35,12 +35,16 @@
 		lastFocusableElement.set(lastElem);
 
 		focusHandler = (e) => {
+			lastElem.classList.remove('focus:outline-none');
+			firstFocus = false;
 			trapFocus(e, $focusableElements);
 		};
 
 		firstFocusableElement.update((first) => {
 			if (first) {
-				first.focus();
+				lastElem.focus();
+				lastElem.classList.add('focus:outline-none');
+				firstFocus = false;
 				return null;
 			}
 			return first;

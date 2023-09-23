@@ -13,7 +13,7 @@
 		<div class="relative h-fit">
 			{#if linkCopied}
 				<div in:fade={{ delay: 25, duration: 200 }} out:fade={{ delay: 50, duration: 300 }}>
-					<icon class="absolute z-10 w-3/5 left-0 right-0 -top-[0.775rem] m-auto">
+					<icon class="absolute z-10 w-5/6 left-0 right-0 -top-6 sm:-top-3 m-auto">
 						<Checkmark />
 					</icon>
 				</div>
