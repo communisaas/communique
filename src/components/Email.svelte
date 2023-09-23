@@ -12,7 +12,6 @@
 	import { page } from '$app/stores';
 	import type { Writable } from 'svelte/store';
 	import Preferences from './input/Preferences.svelte';
-	import { fade, scale } from 'svelte/transition';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -39,7 +38,7 @@
 		{
 			name: 'Get link',
 			key: 'copy',
-			class: 'menu__item',
+			class: 'menu__item mb-4',
 			show: true,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -67,7 +66,7 @@
 		{
 			name: 'Not interested...',
 			key: 'interest',
-			class: 'menu__item',
+			class: 'menu__item mt-2',
 			show: true,
 			actionToggled: false,
 			actionComponent: Preferences,
@@ -86,7 +85,7 @@
 		{
 			name: 'Report',
 			key: 'moderation',
-			class: 'menu__item',
+			class: 'menu__item mt-2',
 			show: true,
 			actionToggled: true,
 			actionComponent: undefined,
@@ -105,7 +104,7 @@
 		{
 			name: 'Close',
 			key: 'close',
-			class: 'menu__item menu__item--close',
+			class: 'menu__item menu__item--close mt-4',
 			show: true,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -126,7 +125,7 @@
 		{
 			name: 'Back',
 			key: 'back',
-			class: 'menu__item menu__item--close',
+			class: 'menu__item menu__item--close mt-4',
 			show: false,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -408,8 +407,9 @@
 									on:click={() => {
 										dispatch('externalAction', { type: 'email', context: item });
 									}}
-									on:keypress={() => {
-										dispatch('externalAction', { type: 'email', context: item });
+									on:keydown={(e) => {
+										if (e.key === 'Enter')
+											dispatch('externalAction', { type: 'email', context: item });
 									}}
 								>
 									click here
@@ -423,13 +423,14 @@
 							on:click|stopPropagation={() => {
 								showMenu = !showMenu;
 							}}
-							on:keypress|stopPropagation={(e) => {
+							on:keydown|stopPropagation={(e) => {
 								if (e.key === 'Enter') {
 									showMenu = !showMenu;
 								}
 							}}
 							on:mouseenter={() => (nestedHover = true)}
 							on:mouseleave={() => (nestedHover = false)}
+							on:blur={handleBlur}
 							class="w-[22%] mr-auto self-start max-w-[28px] max-h-fit cursor-context-menu mx-1 hover:scale-125 active:scale-100 ease-in-out duration-150"
 						>
 							<MenuIcon />

@@ -296,7 +296,7 @@
 										handleSubmit(autocomplete);
 										inputField.focus();
 									}}
-									on:keypress|preventDefault|stopPropagation={(e) => {
+									on:keydown|preventDefault|stopPropagation={(e) => {
 										if (e.key === 'Enter') {
 											autocompleted = autocomplete;
 											handleSubmit(autocomplete);

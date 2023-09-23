@@ -118,12 +118,10 @@
 			min-width: 200%;
 			background-color: theme('colors.peacockFeather.500');
 			padding: 0.33em;
-			margin-top: 0.5em;
 			margin-left: -50%;
 			cursor: pointer;
 			transition: ease-in-out 0.2s;
 			&--close {
-				margin-top: 2em;
 				background-color: theme('colors.peacockFeather.600');
 			}
 		}
