@@ -279,57 +279,55 @@
 			: ''} min-w-full min-h-fit overflow-hidden"
 	>
 		{#if sessionStore}
-			<span class="flex max-w-full h-fit items-center relative">
-				<h1
-					aria-label="Subject line"
-					aria-describedby={item.subject}
-					title={scrollPosition.header.x > 0 ? item.subject : null}
-					bind:this={header}
-					on:wheel={(e) => {
-						if (scrollPosition.header.remainingWidth > 0) {
-							e.stopPropagation();
-							e.preventDefault();
-							header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-							scrollPosition.header.x = header.scrollLeft;
-						}
-					}}
-					on:touchstart={(e) => {
-						if (scrollPosition.header.remainingWidth > 0) {
-							scrollPosition.header.startX = e.touches[0].pageX;
-							scrollPosition.header.startScrollLeft = header.scrollLeft;
-						}
-					}}
-					on:touchmove={(e) => {
-						if (scrollPosition.header.remainingWidth > 0) {
-							e.stopPropagation();
-							e.preventDefault();
-							const x = e.touches[0].pageX;
-							const walk = (x - scrollPosition.header.startX) * 2;
-							header.scrollLeft = scrollPosition.header.startScrollLeft - walk;
-							scrollPosition.header.x = header.scrollLeft;
-						}
-					}}
-					on:touchend={() => {
-						if (scrollPosition.header.remainingWidth > 0) {
-							scrollPosition.header.startX = 0;
-							scrollPosition.header.startScrollLeft = 0;
-						}
-					}}
-					class:scrollable={scrollPosition.header.remainingWidth > 0}
-					class:scrolled={scrollPosition.header.x > 1}
-					class:scrolled__max={scrollPosition.header.remainingWidth - scrollPosition.header.x < 1}
-					class="inline-block mr-1 w-full text-left"
-				>
-					{item.subject}
-				</h1>
-			</span>
-			<article
-				class="flex grow justify-between min-w-full h-full flex-col"
-				class:md:flex-row={!expand}
-			>
-				<div class="flex flex-col min-h-full" class:md:max-w-[50%]={!expand}>
-					<div class="stats p-1 flex flex-row gap-x-5">
-						<span title="Read count" aria-label="Number of reads" class="flex items-center">
+			<span class="flex max-w-full h-fit items-start relative">
+				<span class="min-w-[0] relative">
+					<h1
+						aria-label="Subject line"
+						aria-describedby={item.subject}
+						title={scrollPosition.header.x > 0 ? item.subject : null}
+						bind:this={header}
+						on:wheel={(e) => {
+							if (scrollPosition.header.remainingWidth > 0) {
+								e.stopPropagation();
+								e.preventDefault();
+								header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
+								scrollPosition.header.x = header.scrollLeft;
+							}
+						}}
+						on:touchstart={(e) => {
+							if (scrollPosition.header.remainingWidth > 0) {
+								scrollPosition.header.startX = e.touches[0].pageX;
+								scrollPosition.header.startScrollLeft = header.scrollLeft;
+							}
+						}}
+						on:touchmove={(e) => {
+							if (scrollPosition.header.remainingWidth > 0) {
+								e.stopPropagation();
+								e.preventDefault();
+								const x = e.touches[0].pageX;
+								const walk = (x - scrollPosition.header.startX) * 2;
+								header.scrollLeft = scrollPosition.header.startScrollLeft - walk;
+								scrollPosition.header.x = header.scrollLeft;
+							}
+						}}
+						on:touchend={() => {
+							if (scrollPosition.header.remainingWidth > 0) {
+								scrollPosition.header.startX = 0;
+								scrollPosition.header.startScrollLeft = 0;
+							}
+						}}
+						class:scrollable={scrollPosition.header.remainingWidth > 0}
+						class:scrolled={scrollPosition.header.x > 1}
+						class:scrolled__max={scrollPosition.header.remainingWidth - scrollPosition.header.x < 1}
+						class="inline-block mr-1 w-full text-left"
+					>
+						{item.subject}
+					</h1>
+				</span>
+
+				<div class="stats ml-auto flex shrink-0 pl-2 -mt-1 flex-row gap-x-5">
+					<!-- show read count only for emails on blockchain -->
+					<!-- <span title="Read count" aria-label="Number of reads" class="flex items-center">
 							<icon
 								title="Recipient"
 								class="max-w-[36px]"
@@ -338,25 +336,26 @@
 								<RecipientIcon color="#94D2BD" />
 							</icon>
 							{item.open_count != BigInt(0) ? item.open_count : '?'}
-						</span>
-						<span
-							title="Send count"
-							aria-label="Number of sends"
-							class="flex items-center gap-x-1.5"
+						</span> -->
+					<span title="Send count" aria-label="Number of sends" class="flex items-center gap-x-1.5">
+						<icon
+							title="Envelope"
+							class="max-w-[36px]"
+							style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
 						>
-							<icon
-								title="Envelope"
-								class="max-w-[36px]"
-								style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
-							>
-								<SentIcon color="#94D2BD" />
-							</icon>
-							{item.send_count != BigInt(0) ? item.send_count : '?'}
-						</span>
-					</div>
-
+							<SentIcon color="#94D2BD" />
+						</icon>
+						{item.send_count != BigInt(0) ? item.send_count : '?'}
+					</span>
+				</div>
+			</span>
+			<article
+				class="flex grow justify-between min-w-full h-full flex-col"
+				class:md:flex-row={!expand}
+			>
+				<div class="flex flex-col min-h-full" class:md:max-w-[50%]={!expand}>
 					<div
-						class="tags max-w-[full] h-full justify-between"
+						class="tags max-w-[full] h-full"
 						aria-label="Topic and recepient lists"
 						style="max-width: {!expand ? '35rem' : '100%'};"
 					>
