@@ -29,10 +29,13 @@ type MenuItem = {
 	class: string;
 	show: boolean;
 	actionToggled: boolean;
-	actionComponent: SvelteComponent;
+	actionComponent: { component: SvelteComponent; props: Props };
 	onClick: (MenuItemClickArgs?) => void;
 };
 
+interface SettablePages {
+	[key: number]: Settable[];
+}
 interface Settable {
 	name: string;
 	description: string;

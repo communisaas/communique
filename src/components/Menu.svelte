@@ -75,8 +75,12 @@
 			class="flex flex-col gap-y-2"
 		>
 			{#each items.filter((item) => item.show) as item, index (item.key)}
-				<button
-					class={item.class}
+				<div
+					tabindex="0"
+					role="menuitem"
+					class="flex justify-center items-center cursor-pointer {item.class}"
+					style="flex-direction: {item.actionToggled ? 'column' : 'row'}"
+					class:cursor-default={item.actionToggled}
 					id={item.key}
 					animate:flip={{ delay: 0, duration: 250, easing: quintOut }}
 					out:fly={{
@@ -96,13 +100,19 @@
 					}}
 					on:blur
 				>
-					<span transition:scale={{ delay: 50, duration: 250, easing: expoIn }}>
+					<span
+						transition:scale={{ delay: 50, duration: 250, easing: expoIn }}
+						class:cursor-default={item.actionToggled}
+					>
 						{item.name}
 					</span>
 					{#if item.actionToggled && item.actionComponent !== undefined}
-						<svelte:component this={item.actionComponent} />
+						<svelte:component
+							this={item.actionComponent.component}
+							{...item.actionComponent.props}
+						/>
 					{/if}
-				</button>
+				</div>
 			{/each}
 		</div>
 	</section>
@@ -119,8 +129,8 @@
 			background-color: theme('colors.peacockFeather.500');
 			padding: 0.33em;
 			margin-left: -50%;
-			cursor: pointer;
 			transition: ease-in-out 0.2s;
+
 			&--close {
 				background-color: theme('colors.peacockFeather.600');
 			}

@@ -87,15 +87,53 @@
 			key: 'moderation',
 			class: 'menu__item mt-2',
 			show: true,
-			actionToggled: true,
-			actionComponent: undefined,
+			actionToggled: false,
+			actionComponent: {
+				component: Preferences,
+				props: {
+					flow: {
+						1: [
+							{
+								inputType: 'radio',
+								name: 'type',
+								onUpdate: () => {},
+								label: 'Spam',
+								class: 'option'
+							},
+							{
+								inputType: 'radio',
+								name: 'type',
+								onUpdate: () => {},
+								label: 'Harassment',
+								class: 'option'
+							},
+							{
+								inputType: 'radio',
+								name: 'type',
+								onUpdate: () => {},
+								label: 'Other',
+								class: 'option'
+							},
+							{
+								inputType: 'submit',
+								name: 'next',
+								onUpdate: () => {},
+								label: 'Next',
+								class: 'justify-center block'
+							}
+						]
+					}
+				}
+			},
 
 			onClick: () => {
 				menuItems = menuItems.map((item) => {
 					if (item.key !== 'moderation' && item.key !== 'back') {
 						item.show = false;
+						item.actionToggled = false;
 					} else {
 						item.show = true;
+						item.actionToggled = true;
 					}
 					return item;
 				});
@@ -133,6 +171,7 @@
 				menuItems = menuItems.map((item) => {
 					if (item.key !== 'back') {
 						item.show = true;
+						item.actionToggled = false;
 					} else {
 						item.show = false;
 					}
@@ -210,9 +249,11 @@
 		}
 		showMenu = false;
 		activationState = null;
+		console.log('blurred');
 		menuItems = menuItems.map((item) => {
 			if (item.key !== 'back') {
 				item.show = true;
+				item.actionToggled = false;
 			} else {
 				item.show = false;
 			}
@@ -280,7 +321,7 @@
 	>
 		{#if sessionStore}
 			<span class="flex max-w-full h-fit items-start relative">
-				<span class="min-w-[0] relative">
+				<span class="min-w-[90%] relative">
 					<h1
 						aria-label="Subject line"
 						aria-describedby={item.subject}
