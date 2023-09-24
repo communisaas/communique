@@ -121,6 +121,7 @@
 							{...item.actionComponent.props}
 							on:blur
 							bind:focusableElements={nestedFocusableElements}
+							bind:firstFocus
 						/>
 					{/if}
 				</div>

@@ -36,6 +36,7 @@ type MenuItem = {
 interface SettablePage {
 	show: boolean;
 	class: string;
+	onSubmit: (e: FormEventHandler<HTMLInputElement>) => Promise<unknown>;
 	items: Settable[];
 }
 interface Settable {
@@ -43,7 +44,9 @@ interface Settable {
 	description: string;
 	label: string;
 	class: string;
-	value?: string;
+	value?: string | boolean | number;
+	placeholder?: string;
+	maxLength?: number;
 	type:
 		| radio
 		| checkbox

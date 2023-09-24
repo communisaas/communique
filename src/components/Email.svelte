@@ -90,7 +90,22 @@
 						{
 							show: true,
 							class:
-								'grid grid-rows-5 grid-flow-col gap-2 mx-auto min-w-full text-xs sm:text-sm md:text-base',
+								'grid md:grid-rows-3 sm:grid-rows-4 xs:grid-rows-5 grid-rows-6 grid-flow-col gap-4 mb-4 mx-auto min-w-full text-xs sm:text-sm md:text-base',
+							onSubmit: async (e: FormDataEvent) => {
+								const formElement = e.target as HTMLFormElement;
+								const typeInput = formElement.querySelector(
+									'input[name="type"]'
+								) as HTMLInputElement;
+								const formData = new FormData(formElement);
+
+								const selectedPreset = formElement.querySelector('input[name="type"]:checked')?.id;
+								const customOption = formData.get('custom');
+								if (!selectedPreset && !customOption) {
+									typeInput?.setCustomValidity('Please set an option');
+									typeInput?.reportValidity();
+									throw new Error('Please set an option');
+								}
+							},
 							items: [
 								{
 									type: 'radio',
@@ -99,7 +114,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Spam',
-									class: 'option'
+									class: 'option py-3 sm:py-2'
 								},
 								{
 									type: 'radio',
@@ -108,7 +123,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Harassment',
-									class: 'option'
+									class: 'option py-3 sm:py-2'
 								},
 								{
 									type: 'radio',
@@ -117,7 +132,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Violence',
-									class: 'option'
+									class: 'option py-3 sm:py-2'
 								},
 								{
 									type: 'radio',
@@ -126,7 +141,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Privacy',
-									class: 'option'
+									class: 'option py-3 sm:py-2'
 								},
 								{
 									type: 'radio',
@@ -135,22 +150,24 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Misleading',
-									class: 'option'
+									class: 'option py-3 sm:py-2'
 								},
 								{
-									type: 'radio',
-									name: 'type',
+									type: 'text',
+									name: 'custom',
 									onUpdate: (e: KeyboardEvent | MouseEvent) => {
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Other',
-									class: 'option'
+									placeholder: '50 characters',
+									maxLength: 50,
+									class:
+										'option my-0 h-6 md:h-10 [&_input]:bg-peacockFeather-600 [&_input]:rounded-r-[10px] [&_input]:px-1 [&_input]:h-6 [&_input]:md:h-10 [&_input]:ml-1 [&_label]:mr-0 [&_input]:w-28'
 								},
 								{
 									type: 'submit',
 									name: 'next',
 									onUpdate: (e: KeyboardEvent | MouseEvent) => {
-										console.log(e);
 										if (e.currentTarget) {
 											(e.currentTarget as HTMLInputElement).click();
 											e.preventDefault();
@@ -158,7 +175,7 @@
 									},
 									label: 'Next',
 									value: 'Next',
-									class: 'submit justify-center block'
+									class: 'submit py-3 sm:py-2 justify-self-end block'
 								}
 							]
 						},
@@ -170,7 +187,6 @@
 									type: 'menuitem',
 									name: 'confirm',
 									onUpdate: (e: KeyboardEvent | MouseEvent) => {
-										console.log(e);
 										if (e.currentTarget) {
 											(e.currentTarget as HTMLInputElement).click();
 											e.preventDefault();
@@ -261,7 +277,7 @@
 		}
 		if (card && header) {
 			scrollableElements = { card, header };
-			updateScrollableElements(scrollableElements);
+			updateScrollableElements(scrollableElements), 100;
 		}
 	});
 
@@ -386,7 +402,7 @@
 		{#if sessionStore}
 			<span class="flex max-w-full h-fit items-start relative">
 				<span
-					class="max-w-[calc(85%-10vw)] xs:max-w-[calc(90%-6vw)] sm:max-w-[88%] md:max-w-[90%] lg:max-w-[95%] relative"
+					class="w-[calc(85%-10vw)] xs:w-[calc(90%-6vw)] sm:w-[88%] md:w-[90%] lg:w-[95%] relative"
 				>
 					<h1
 						aria-label="Subject line"
@@ -537,7 +553,6 @@
 								if (e.key === 'Enter') {
 									e.preventDefault();
 									showMenu = !showMenu;
-									console.log(showMenu);
 								}
 							}}
 							on:mouseenter={() => (nestedHover = true)}
