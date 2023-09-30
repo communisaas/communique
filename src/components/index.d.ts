@@ -29,7 +29,7 @@ type MenuItem = {
 	class: string;
 	show: boolean;
 	actionToggled: boolean;
-	actionComponent: { component: SvelteComponent; props: Props };
+	actionComponent: { component: SvelteComponent; props: props } | undefined;
 	onClick: (MenuItemClickArgs?) => void;
 };
 
@@ -65,6 +65,7 @@ interface Settable {
 		| 'menuitem';
 	key: string;
 	onUpdate: (e: FormEventHandler<HTMLInputElement>) => void;
+	onFocus?: (e: FocusEvent) => void;
 }
 
 interface Props {

@@ -76,7 +76,7 @@
 		}
 	}
 
-	function handleInputFocus(e: FocusEvent, step: Settable) {
+	function focusInput(e: FocusEvent, step: Settable) {
 		if (!e || !e.currentTarget) return;
 		if (step.type === 'text') {
 			const input = (e.currentTarget as HTMLElement).querySelector(`#${step.label}`);
@@ -133,54 +133,55 @@
 							// focus wrapping div to blur input upon click/tab out
 							else if (step.type !== 'submit') e.currentTarget.focus();
 						}}
-						on:focus={(e) => handleInputFocus(e, step)}
+						on:focus={(e) => focusInput(e, step)}
 						on:blur
 					>
-						<span>
-							{#if step.type !== 'menuitem'}
-								<label for={step.label} class="cursor-pointer pointer-events-auto mx-2 py-2">
-									{#if step.type !== 'submit'}{step.label}{/if}
-									<input
-										tabindex="-1"
-										id={step.label}
-										name={step.name}
-										on:input={(e) => handleInput(e, index, step)}
-										type={step.type}
-										value={step.value ?? ''}
-										placeholder={step.placeholder}
-										maxlength={step.maxLength}
-										autocomplete="off"
-										class="cursor-pointer"
-										on:blur={(e) => {
-											if (submitting) {
+						{#if step.type !== 'menuitem'}
+							<label for={step.label} class="cursor-pointer pointer-events-auto mx-2 py-2">
+								{#if step.type !== 'submit'}{step.label}{/if}
+								<input
+									tabindex="-1"
+									id={step.label}
+									name={step.name}
+									on:input={(e) => handleInput(e, index, step)}
+									type={step.type}
+									value={step.value ?? ''}
+									placeholder={step.placeholder}
+									maxlength={step.maxLength}
+									autocomplete="off"
+									class="cursor-pointer"
+									on:focus={(e) => {
+										if ('onFocus' in step && step.onFocus) step.onFocus(e);
+									}}
+									on:blur={(e) => {
+										if (submitting) {
+											e.preventDefault();
+											submitting = false;
+										} else {
+											e?.currentTarget.blur();
+										}
+									}}
+									on:keydown|stopPropagation={(e) => {
+										if (e.key === 'Enter') {
+											step.onUpdate(e);
+										} else if (e.key === 'Tab' && step.type == 'text') {
+											if (e.shiftKey) {
 												e.preventDefault();
-												submitting = false;
-											} else {
-												e?.currentTarget.blur();
+												menus[index]
+													.querySelector(
+														`#${flow[index].items[inputIndex - 1].label}__${
+															flow[index].items[inputIndex - 1].type
+														}`
+													)
+													?.focus();
 											}
-										}}
-										on:keydown|stopPropagation={(e) => {
-											if (e.key === 'Enter') {
-												step.onUpdate(e);
-											} else if (e.key === 'Tab' && step.type == 'text') {
-												if (e.shiftKey) {
-													e.preventDefault();
-													menus[index]
-														.querySelector(
-															`#${flow[index].items[inputIndex - 1].label}__${
-																flow[index].items[inputIndex - 1].type
-															}`
-														)
-														?.focus();
-												}
-											}
-										}}
-									/>
-								</label>
-							{:else}
-								{step.value}
-							{/if}
-						</span>
+										}
+									}}
+								/>
+							</label>
+						{:else}
+							{step.value}
+						{/if}
 					</div>
 				{/each}
 			</form>

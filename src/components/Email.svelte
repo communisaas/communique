@@ -12,6 +12,7 @@
 	import { page } from '$app/stores';
 	import type { Writable } from 'svelte/store';
 	import Preferences from './input/Preferences.svelte';
+	import { goto } from '$app/navigation';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -92,24 +93,27 @@
 							class:
 								'grid md:grid-rows-3 sm:grid-rows-4 xs:grid-rows-5 grid-rows-6 grid-flow-col gap-4 mb-4 mx-auto min-w-full text-xs sm:text-sm md:text-base',
 							onSubmit: async (e: FormDataEvent) => {
+								console.log(e);
 								const formElement = e.target as HTMLFormElement;
-								const typeInput = formElement.querySelector(
-									'input[name="type"]'
+								const firstReportInput = formElement.querySelector(
+									'input[name="reportType"]'
 								) as HTMLInputElement;
 								const formData = new FormData(formElement);
 
 								const selectedPreset = formElement.querySelector('input[name="type"]:checked')?.id;
-								const customOption = formData.get('custom');
+								const customOption = formData.get('customReport');
+								console.log(!selectedPreset && !customOption);
+
 								if (!selectedPreset && !customOption) {
-									typeInput?.setCustomValidity('Please set an option');
-									typeInput?.reportValidity();
+									firstReportInput?.setCustomValidity('Please set an option');
+									firstReportInput?.reportValidity();
 									throw new Error('Please set an option');
 								}
 							},
 							items: [
 								{
 									type: 'radio',
-									name: 'type',
+									name: 'reportType',
 									onUpdate: (e: KeyboardEvent | MouseEvent) => {
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
@@ -118,7 +122,7 @@
 								},
 								{
 									type: 'radio',
-									name: 'type',
+									name: 'reportType',
 									onUpdate: (e: KeyboardEvent | MouseEvent) => {
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
@@ -127,7 +131,7 @@
 								},
 								{
 									type: 'radio',
-									name: 'type',
+									name: 'reportType',
 									onUpdate: (e: KeyboardEvent | MouseEvent) => {
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
@@ -136,7 +140,7 @@
 								},
 								{
 									type: 'radio',
-									name: 'type',
+									name: 'reportType',
 									onUpdate: (e: KeyboardEvent | MouseEvent) => {
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
@@ -145,7 +149,7 @@
 								},
 								{
 									type: 'radio',
-									name: 'type',
+									name: 'reportType',
 									onUpdate: (e: KeyboardEvent | MouseEvent) => {
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
@@ -154,9 +158,17 @@
 								},
 								{
 									type: 'text',
-									name: 'custom',
+									name: 'customReport',
 									onUpdate: (e: KeyboardEvent | MouseEvent) => {
-										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+										console.log(e);
+									},
+									onFocus: (e: FocusEvent) => {
+										const reportRadioButtons = document.querySelectorAll(
+											"input[name='reportType']"
+										);
+										reportRadioButtons.forEach((radio) => {
+											(radio as HTMLInputElement).checked = false;
+										});
 									},
 									label: 'Other',
 									placeholder: '50 characters',
@@ -203,6 +215,11 @@
 			},
 
 			onClick: () => {
+				menuItems[3].name = 'Loading...';
+				if (!$page.data.session) {
+					goto('/sign/in?callbackUrl=/');
+					return;
+				}
 				menuItems = menuItems.map((item) => {
 					if (item.key !== 'moderation' && item.key !== 'back') {
 						item.show = false;
@@ -213,6 +230,7 @@
 					}
 					return item;
 				});
+				menuItems[3].name = 'Report';
 			}
 		},
 		{
