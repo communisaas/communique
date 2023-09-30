@@ -5,7 +5,7 @@
 	import weMakeChangeLogo from '$lib/assets/We Make Change Logo.png';
 	import Navigation from '$components/Navigation.svelte';
 
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 	import { signIn, signOut } from '@auth/sveltekit/client';
 	import type { topic } from '@prisma/client';
 	import Selector from '$components/Selector.svelte';
@@ -14,13 +14,31 @@
 	import type { Writable } from 'svelte/store';
 	import { handleSelect } from '$lib/data/select';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
+	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
 	import { routeModal } from '$lib/ui/hash';
+	import { browser } from '$app/environment';
 
 	export let data: LayoutSchema;
 	const dispatch = createEventDispatcher();
 
 	let sessionStore: Writable<UserState>;
+
+	function handleHashChange(e: HashChangeEvent) {
+		$sessionStore.show = {
+			login: false,
+			share: false,
+			privacyPolicy: false,
+			termsOfUse: false
+		};
+		if (window.location.hash === '#terms-of-use') {
+			$sessionStore.show.termsOfUse = true;
+		} else if (window.location.hash === '#privacy-policy') {
+			$sessionStore.show.privacyPolicy = true;
+		} else {
+			dispatch('popover', false);
+		}
+	}
+
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
 		$sessionStore.topic = $sessionStore.topic || { id: topicNames[0], type: 'topic' };
@@ -40,7 +58,14 @@
 		const hashes = window.location.hash.substring(1).split('#');
 		// TODO use enum
 		$sessionStore = await routeModal(hashes, $page, $sessionStore, dispatch);
+
+		window.addEventListener('hashchange', handleHashChange);
 	});
+
+	onDestroy(() => {
+		if (browser) window.removeEventListener('hashchange', handleHashChange);
+	});
+
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
 </script>
 
@@ -143,14 +168,14 @@
 					<span class="border-l border-gray-600 pl-2 ml-2">
 						<a
 							href="#terms-of-use"
-							on:click={() => ($sessionStore.show.termsOfUse = true)}
+							on:click={() => (window.location.hash = '#terms-of-use')}
 							class="text-teal-400 hover:text-teal-500">Terms of Use</a
 						>
 					</span>
 					<span class="border-l border-gray-600 pl-2 ml-2">
 						<a
 							href="#privacy-policy"
-							on:click={() => ($sessionStore.show.privacyPolicy = true)}
+							on:click={() => (window.location.hash = '#privacy-policy')}
 							class="text-teal-400 hover:text-teal-500">Privacy Policy</a
 						>
 					</span>
