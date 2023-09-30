@@ -72,10 +72,10 @@
 						// 		break;
 						// }
 						$sessionStore.template[index].focus = {
-							type: 'topic',
+							type: e.detail.type,
 							item: e.detail.id,
-							field: 'topic_list',
-							source: 'topic',
+							field: e.detail.type === 'recipient' ? 'recipient_list' : 'topic_list',
+							source: e.detail.type,
 							iterable: true
 						};
 					}}

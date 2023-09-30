@@ -76,7 +76,6 @@
 			}
 			return accumulator;
 		}, {} as Record<string, string[]>);
-
 		// Construct the query string from the grouped object
 		const tagString = Object.entries(grouped)
 			.map(([field, items]) => `${field}=${encodeURIComponent(items.join('␞'))}`)
