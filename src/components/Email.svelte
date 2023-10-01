@@ -163,9 +163,6 @@
 									type: 'text',
 									name: 'customReport',
 									onUpdate: (e: KeyboardEvent | MouseEvent) => {
-										console.log(e);
-									},
-									onFocus: (e: FocusEvent) => {
 										const reportRadioButtons = document.querySelectorAll(
 											"input[name='reportType']"
 										);
