@@ -85,7 +85,11 @@
 	}
 
 	function handleInput(e: Event, index: number, step: Settable) {
-		(menus[index].querySelector('input[name="type"]') as HTMLInputElement)?.setCustomValidity('');
+		(menus[index].querySelectorAll('input') as NodeListOf<HTMLInputElement>)?.forEach(
+			(inputElement) => {
+				inputElement.setCustomValidity('');
+			}
+		);
 		step.onUpdate(e);
 	}
 </script>
