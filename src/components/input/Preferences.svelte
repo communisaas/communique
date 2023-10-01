@@ -140,12 +140,13 @@
 							}
 							// focus wrapping div to blur input upon click/tab out
 							else if (step.type !== 'submit') e.currentTarget.focus();
+							else if (step.type === 'submit') e.currentTarget.click();
 						}}
 						on:focus={(e) => focusInput(e, step)}
 						on:blur
 					>
 						{#if step.type !== 'menuitem'}
-							<label for={step.label} class="cursor-pointer pointer-events-auto mx-2 py-2">
+							<label for={step.label} class="cursor-pointer pointer-events-auto px-2 py-2">
 								{#if step.type !== 'submit'}{step.label}{/if}
 								<input
 									tabindex="-1"

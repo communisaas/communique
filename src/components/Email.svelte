@@ -177,7 +177,7 @@
 									placeholder: '50 characters',
 									maxLength: 50,
 									class:
-										'option my-0 h-6 md:h-10 [&_input]:bg-peacockFeather-600 [&_input]:rounded-r-[10px] [&_input]:px-1 [&_input]:h-6 [&_input]:md:h-10 [&_input]:ml-1 [&_label]:mr-0 [&_input]:w-28'
+										'option my-0 h-6 md:h-10 [&_input]:-mr-2 [&_input]:bg-peacockFeather-600 [&_input]:rounded-r-[10px] [&_input]:px-1 [&_input]:h-6 [&_input]:md:h-10 [&_input]:ml-1 [&_label]:mr-0 [&_input]:w-28'
 								},
 								{
 									type: 'submit',
@@ -190,7 +190,7 @@
 									},
 									label: 'Next',
 									value: 'Next',
-									class: 'submit py-3 sm:py-2 justify-self-end block'
+									class: 'submit justify-self-end block'
 								}
 							]
 						},
