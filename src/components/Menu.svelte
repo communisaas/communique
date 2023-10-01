@@ -7,9 +7,9 @@
 	import { fade, fly, scale, slide } from 'svelte/transition';
 
 	export let items: MenuItem[];
+	export let focusableElements = writable<HTMLElement[]>([]);
 
 	let menu: HTMLElement;
-	let focusableElements = writable<HTMLElement[]>([]);
 	let nestedFocusableElements = writable<HTMLElement[]>([]);
 	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let lastFocusableElement = writable<HTMLElement | null>(null);
@@ -53,11 +53,11 @@
 			HTMLElement
 		];
 		focusableElements.set([
+			...$nestedFocusableElements,
 			...focusElems.filter((element) => {
 				const shownItems = items.filter((item) => item.show && item.key).map((item) => item.key);
 				if (shownItems.includes(element.id)) return element;
-			}),
-			...$nestedFocusableElements
+			})
 		]);
 	});
 

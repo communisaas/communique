@@ -109,8 +109,12 @@
 					if (flow[index + 1]) {
 						flow[index + 1].show = true;
 					}
+					if ('onLoad' in flow[index + 1]) {
+						flow[index + 1].onLoad?.();
+					}
 					const [focusElems, firstElem, lastElem] = updateFocusableElements(menus[index + 1]);
 				}}
+				on:blur
 			>
 				{#each page.items as step, inputIndex (step.label)}
 					<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
@@ -151,7 +155,7 @@
 									autocomplete="off"
 									class="cursor-pointer"
 									on:focus={(e) => {
-										if ('onFocus' in step && step.onFocus) step.onFocus(e);
+										if ('onFocus' in step) step.onFocus?.(e);
 									}}
 									on:blur={(e) => {
 										if (submitting) {

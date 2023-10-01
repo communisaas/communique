@@ -10,7 +10,7 @@
 	import Menu from './Menu.svelte';
 	import { handleCopy } from '$lib/data/select';
 	import { page } from '$app/stores';
-	import type { Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import Preferences from './input/Preferences.svelte';
 	import { goto } from '$app/navigation';
 
@@ -27,6 +27,7 @@
 	let header: HTMLHeadingElement;
 	let card: HTMLElement;
 	let menu: HTMLElement;
+	let focusableMenuElements = writable<HTMLElement[]>([]);
 	let scrollableElements: { [key: string]: HTMLElement };
 
 	let resizeObserver: ResizeObserver;
@@ -100,7 +101,9 @@
 								) as HTMLInputElement;
 								const formData = new FormData(formElement);
 
-								const selectedPreset = formElement.querySelector('input[name="type"]:checked')?.id;
+								const selectedPreset = formElement.querySelector(
+									'input[name="reportType"]:checked'
+								)?.id;
 								const customOption = formData.get('customReport');
 								console.log(!selectedPreset && !customOption);
 
@@ -194,6 +197,9 @@
 						{
 							show: false,
 							class: 'mx-auto min-w-full text-xs sm:text-sm md:text-base',
+							onLoad: () => {
+								$focusableMenuElements[$focusableMenuElements.length - 1].focus();
+							},
 							items: [
 								{
 									type: 'menuitem',
@@ -205,7 +211,7 @@
 										}
 									},
 									label: 'confirm',
-									value: 'confirmed',
+									value: 'Confirmed—check your account dashboard for updates.',
 									class: 'inline'
 								}
 							]
@@ -331,9 +337,12 @@
 	}
 
 	function handleBlur(event: FocusEvent) {
+		console.log(event);
 		if (
 			(card && card.contains(event.relatedTarget as Node)) ||
-			(menu && (event.target as HTMLElement).id === 'back') ||
+			(menu &&
+				(event.target as HTMLElement).id === 'back' &&
+				menu.contains(event.relatedTarget as Node)) ||
 			(card.contains(event.relatedTarget as Node) &&
 				(event.relatedTarget as HTMLElement).classList.contains('menu__item')) ||
 			(menu && menu.contains(event.relatedTarget as Node))
@@ -409,7 +418,12 @@
 				}
 			}}
 		>
-			<Menu on:mouseenter={() => (nestedHover = true)} on:blur={handleBlur} items={menuItems} />
+			<Menu
+				on:mouseenter={() => (nestedHover = true)}
+				on:blur={handleBlur}
+				items={menuItems}
+				bind:focusableElements={focusableMenuElements}
+			/>
 		</div>
 	{/if}
 	<section

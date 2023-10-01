@@ -37,6 +37,7 @@ interface SettablePage {
 	show: boolean;
 	class: string;
 	onSubmit: (e: FormEventHandler<HTMLInputElement>) => Promise<unknown>;
+	onLoad?: () => void;
 	items: Settable[];
 }
 interface Settable {
@@ -66,6 +67,7 @@ interface Settable {
 	key: string;
 	onUpdate: (e: FormEventHandler<HTMLInputElement>) => void;
 	onFocus?: (e: FocusEvent) => void;
+	onLoad?: () => void;
 }
 
 interface Props {
