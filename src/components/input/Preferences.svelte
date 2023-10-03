@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, scale, slide } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import { afterUpdate, onDestroy, onMount } from 'svelte';
 	import { trapFocus, updateFocusableElements } from '$lib/ui/ux';
@@ -118,7 +118,6 @@
 					}
 					const [focusElems, firstElem, lastElem] = updateFocusableElements(menus[index + 1]);
 				}}
-				on:blur
 			>
 				{#each page.items as step, inputIndex (step.label)}
 					<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
@@ -132,6 +131,7 @@
 						on:keydown|stopPropagation={(e) => {
 							if (e.key === 'Enter') {
 								handleKeyPress(e, step.label);
+								e.preventDefault();
 							}
 						}}
 						on:click={(e) => {
@@ -162,17 +162,11 @@
 									on:focus={(e) => {
 										if ('onFocus' in step) step.onFocus?.(e);
 									}}
-									on:blur={(e) => {
-										if (submitting) {
-											e.preventDefault();
-											submitting = false;
-										} else {
-											e?.currentTarget.blur();
-										}
-									}}
+									on:blur
 									on:keydown|stopPropagation={(e) => {
 										if (e.key === 'Enter') {
-											step.onUpdate(e);
+											handleInput(e, index, step);
+											e.preventDefault();
 										} else if (e.key === 'Tab' && step.type == 'text') {
 											if (e.shiftKey) {
 												e.preventDefault();

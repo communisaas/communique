@@ -55,6 +55,7 @@
 			privacyPolicy: false,
 			termsOfUse: false
 		};
+		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
 		const hashes = window.location.hash.substring(1).split('#');
 		// TODO use enum
 		$sessionStore = await routeModal(hashes, $page, $sessionStore, dispatch);

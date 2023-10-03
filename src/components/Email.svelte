@@ -76,7 +76,12 @@
 			actionComponent: undefined,
 
 			onClick: () => {
-				// TODO
+				$sessionStore.hiddenEmails.push(item.rowid);
+				if ($page.data.session) {
+					// TODO update hidden emails in db
+				}
+				card.focus();
+				card.blur();
 			}
 		},
 		{
@@ -94,7 +99,6 @@
 							class:
 								'grid md:grid-rows-3 sm:grid-rows-4 xs:grid-rows-5 grid-rows-6 grid-flow-col gap-4 mb-4 mx-auto min-w-full text-xs sm:text-sm md:text-base',
 							onSubmit: async (e: FormDataEvent) => {
-								console.log(e);
 								const formElement = e.target as HTMLFormElement;
 								const firstReportInput = formElement.querySelector(
 									'input[name="reportType"]'
@@ -105,12 +109,17 @@
 									'input[name="reportType"]:checked'
 								)?.id;
 								const customOption = formData.get('customReport');
-								console.log(!selectedPreset && !customOption);
 
 								if (!selectedPreset && !customOption) {
 									firstReportInput?.setCustomValidity('Please set an option');
 									firstReportInput?.reportValidity();
+									e.preventDefault();
 									throw new Error('Please set an option');
+								}
+
+								$sessionStore.hiddenEmails.push(item.rowid);
+								if ($page.data.session) {
+									// TODO update hidden emails in db
 								}
 							},
 							items: [
@@ -220,7 +229,7 @@
 			onClick: () => {
 				menuItems[3].name = 'Loading...';
 				if (!$page.data.session) {
-					goto('/sign/in?callbackUrl=/');
+					goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
 					return;
 				}
 				menuItems = menuItems.map((item) => {
@@ -289,7 +298,7 @@
 	});
 
 	afterUpdate(() => {
-		if (scrollToCard) {
+		if (scrollToCard && !$sessionStore.hiddenEmails.includes(item.rowid)) {
 			// TODO more contextual fix for resolving pending events after DOM update
 			setTimeout(() => {
 				card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
@@ -334,7 +343,6 @@
 	}
 
 	function handleBlur(event: FocusEvent) {
-		console.log(event);
 		if (
 			(card && card.contains(event.relatedTarget as Node)) ||
 			(menu &&
@@ -567,8 +575,8 @@
 											dispatch('externalAction', { type: 'email', context: item });
 									}}
 								>
-									click here
-								</span> to send...
+									send...
+								</span>
 							</i>
 						</p>
 						<div

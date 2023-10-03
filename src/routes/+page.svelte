@@ -12,6 +12,7 @@
 	import Login from '$components/Login.svelte';
 	import { page } from '$app/stores';
 	import Reader from '$components/Reader.svelte';
+	import type { email } from '@prisma/client';
 
 	export let data;
 
@@ -34,6 +35,13 @@
 			props: () => ({ item: $page.data.termsOfUse, inModal: true })
 		}
 	};
+
+	$: if ($sessionStore && $sessionStore.template && $sessionStore.hiddenEmails) {
+		for (const templateName in $sessionStore.template)
+			$sessionStore.template[templateName].cardList = $sessionStore.template[
+				templateName
+			].cardList.filter((card: email) => !$sessionStore.hiddenEmails.includes(card.rowid));
+	}
 
 	// TODO loading placeholders
 </script>
