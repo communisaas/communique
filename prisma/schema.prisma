@@ -7,19 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model author {
-  profile          Json
   read_email_count BigInt
   sent_email_count BigInt
   open_email_count BigInt
-  is_registered    Boolean
   rowid            String      @id(map: "author___pkey")
+  last_updated     DateTime?   @default(now()) @db.Timestamp(6)
+  issue_list       String[]
+  add_date         DateTime?   @default(now()) @db.Timestamp(6)
+  user             user        @relation(fields: [rowid], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "author_user_rowid_fk")
   email            email[]
   issue            issue[]
   recipient        recipient[]
   topic            topic[]
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model email {
   subject         String
   body            String
@@ -29,41 +33,65 @@ model email {
   send_count      BigInt
   read_count      BigInt
   recipient_list  String[]
-  rowid           String   @id(map: "email___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rowid           String    @id(map: "email___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   added_by        String
-  shortid         String   @unique(map: "shortid__key")
-  author          author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
+  shortid         String?   @unique(map: "shortid__key")
+  title           String?
+  add_date        DateTime? @default(now()) @db.Timestamp(6)
+  issue_list      String[]
+  author          author    @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
   issue           issue[]
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model issue {
   type        String
   description String
-  rowid       String @id(map: "issue___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email_id    String @db.Uuid
+  rowid       String    @id(map: "issue___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email_id    String    @db.Uuid
   added_by    String
-  author      author @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
-  email       email  @relation(fields: [email_id], references: [rowid], onDelete: NoAction, map: "email_id___fkey")
+  add_date    DateTime? @default(now()) @db.Timestamp(6)
+  author      author    @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
+  email       email     @relation(fields: [email_id], references: [rowid], onDelete: NoAction, map: "email_id___fkey")
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model recipient {
-  address          String   @id(map: "recipient___pkey")
+  address          String    @id(map: "recipient___pkey")
   email_open_count BigInt
   email_read_count BigInt
   email_sent_count BigInt
   added_by         String
   email_count      BigInt
-  last_updated     DateTime @db.Timestamp(6)
-  author           author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
+  last_updated     DateTime  @default(now()) @db.Timestamp(6)
+  add_date         DateTime? @default(now()) @db.Timestamp(6)
+  author           author    @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model topic {
-  name             String   @id(map: "topic___pkey")
+  name             String    @id(map: "topic___pkey")
   email_count      BigInt
-  last_updated     DateTime @db.Timestamp(6)
+  last_updated     DateTime  @default(now()) @db.Timestamp(6)
   email_open_count BigInt
   email_read_count BigInt
   email_sent_count BigInt
   added_by         String
-  author           author   @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
+  add_date         DateTime? @default(now()) @db.Timestamp(6)
+  author           author    @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model user {
+  email              String    @id(map: "user__pkey")
+  fingerprint        Json?
+  ignored_email_list String[]
+  address            String?
+  signup_date        DateTime  @default(now()) @db.Timestamp(6)
+  phone              String?
+  privilege          String?
+  rowid              String    @unique(map: "user__key")
+  auth_provider      String?
+  last_login         DateTime? @default(now()) @db.Timestamp(6)
+  author             author?
 }
