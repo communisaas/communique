@@ -93,5 +93,6 @@ model user {
   rowid              String    @unique(map: "user__key")
   auth_provider      String?
   last_login         DateTime? @default(now()) @db.Timestamp(6)
+  sent_email_list    String[]
   author             author?
 }

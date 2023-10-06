@@ -11,6 +11,7 @@
 
 	import { handleMailto } from '$lib/data/email';
 	import { handleCopy } from '$lib/data/select';
+	import { goto } from '$app/navigation';
 
 	export let item: email;
 
@@ -115,7 +116,24 @@
 			</span>
 		</div>
 	</div>
-	<button class="w-full h-10" on:click={() => setPopover(false)}>
+	<button
+		class="w-full h-10"
+		on:click={() => {
+			if (!$page.data.session && sent) {
+				goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
+				return;
+			} else if (sent && $page.data.session?.user?.email) {
+				fetch('/data/email/' + item.shortid, {
+					method: 'POST',
+					headers: {
+						'Increment-Send': 'true',
+						'Sender-Email': $page.data.session?.user?.email
+					}
+				});
+			}
+			setPopover(false);
+		}}
+	>
 		{sent ? 'Confirm' : 'Close'}
 	</button>
 </article>
