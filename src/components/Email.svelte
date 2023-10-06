@@ -12,7 +12,6 @@
 	import { page } from '$app/stores';
 	import { writable, type Writable } from 'svelte/store';
 	import Preferences from './input/Preferences.svelte';
-	import { goto } from '$app/navigation';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -38,6 +37,18 @@
 	let nestedHover = false;
 	let activationState: 'click' | 'focus' | null = null;
 	let showMenu = false;
+	let remove = false;
+
+	function handleRemove() {
+		remove = false;
+		$sessionStore.hiddenEmails.push(item.rowid);
+		if ($page.data.session) {
+			// TODO update hidden emails in db
+		}
+		card.focus();
+		card.blur();
+	}
+
 	let menuItems = [
 		{
 			name: 'Get link',
@@ -76,12 +87,7 @@
 			actionComponent: undefined,
 
 			onClick: () => {
-				$sessionStore.hiddenEmails.push(item.rowid);
-				if ($page.data.session) {
-					// TODO update hidden emails in db
-				}
-				card.focus();
-				card.blur();
+				handleRemove();
 			}
 		},
 		{
@@ -117,7 +123,7 @@
 									throw new Error('Please set an option');
 								}
 
-								$sessionStore.hiddenEmails.push(item.rowid);
+								remove = true;
 								if ($page.data.session) {
 									// TODO update hidden emails in db
 								}
@@ -206,6 +212,7 @@
 							onLoad: () => {
 								$focusableMenuElements[$focusableMenuElements.length - 1].focus();
 							},
+
 							items: [
 								{
 									type: 'menuitem',
@@ -228,10 +235,10 @@
 
 			onClick: () => {
 				menuItems[3].name = 'Loading...';
-				if (!$page.data.session) {
-					goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
-					return;
-				}
+				// if (!$page.data.session) {
+				// 	goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
+				// 	return;
+				// }
 				menuItems = menuItems.map((item) => {
 					if (item.key !== 'moderation' && item.key !== 'back') {
 						item.show = false;
@@ -283,7 +290,13 @@
 					}
 					return item;
 				});
-				if (focusableElements) focusableElements[0].focus();
+				if (focusableElements) {
+					console.log(menu.firstChild);
+					(menu.querySelector("div[role='menuitem']") as HTMLElement)?.focus();
+				}
+				if (remove) {
+					handleRemove();
+				}
 			}
 		}
 	];
@@ -298,7 +311,7 @@
 	});
 
 	afterUpdate(() => {
-		if (scrollToCard && !$sessionStore.hiddenEmails.includes(item.rowid)) {
+		if (scrollToCard && !$sessionStore.hiddenEmails.includes(item.rowid) && !showMenu && !remove) {
 			// TODO more contextual fix for resolving pending events after DOM update
 			setTimeout(() => {
 				card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
@@ -343,11 +356,12 @@
 	}
 
 	function handleBlur(event: FocusEvent) {
+		console.log(event);
 		if (
 			(card && card.contains(event.relatedTarget as Node)) ||
-			(menu &&
-				(event.target as HTMLElement).id === 'back' &&
-				menu.contains(event.relatedTarget as Node)) ||
+			((event.target as HTMLElement).id === 'back' &&
+				menu.contains(event.relatedTarget as Node) &&
+				!remove) ||
 			(card.contains(event.relatedTarget as Node) &&
 				(event.relatedTarget as HTMLElement).classList.contains('menu__item')) ||
 			(menu && menu.contains(event.relatedTarget as Node))
@@ -371,6 +385,9 @@
 			}
 			return item;
 		});
+		if (remove) {
+			handleRemove();
+		}
 	}
 </script>
 
@@ -391,12 +408,15 @@
 	on:keydown={(e) => {
 		if (e.key === 'Enter') {
 			handleSelect();
+		} else if (e.key === 'Escape') {
+			setExpand(false);
+			showMenu = false;
 		}
 	}}
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
 	class="card flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
-		justify-center w-48 {style}"
+		justify-center w-[80vw] {style}"
 	class:cursor-default={expand}
 	class:clickable={!nestedHover}
 	style="min-width: {expand ? '99%' : '95%'};"
@@ -425,7 +445,17 @@
 		>
 			<Menu
 				on:mouseenter={() => (nestedHover = true)}
-				on:blur={handleBlur}
+				on:blur={(e) => {
+					if (e.target.id === 'back' && !remove) {
+						e.preventDefault();
+						return;
+					}
+					if (remove && e.target.id === 'confirm__menuitem') {
+						handleRemove();
+						return;
+					}
+					handleBlur(e);
+				}}
 				items={menuItems}
 				bind:focusableElements={focusableMenuElements}
 			/>
@@ -610,13 +640,10 @@
 						tabindex="-1"
 						aria-expanded={expand}
 						aria-label="Email body"
-						class="cursor-alias"
 						class:mt-6={expand}
 						on:click={(e) => {
 							if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 								e.stopPropagation();
-							} else {
-								dispatch('externalAction', { type: 'email', context: item });
 							}
 						}}
 						on:keypress={(e) => {

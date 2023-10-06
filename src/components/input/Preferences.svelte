@@ -13,8 +13,6 @@
 	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let lastFocusableElement = writable<HTMLElement | null>(null);
 
-	let submitting = false;
-
 	let focusHandler: (e: KeyboardEvent) => void;
 	onMount(() => {
 		const [focusElems, firstElem, lastElem] = updateFocusableElements(menus[0]) as [
@@ -33,7 +31,7 @@
 
 		firstFocusableElement.update((first) => {
 			if (first && $focusableElements) {
-				lastElem.focus();
+				firstElem.focus();
 				firstFocus = false;
 				return null;
 			}
@@ -77,7 +75,6 @@
 	}
 
 	function focusInput(e: FocusEvent, step: Settable) {
-		if (!e || !e.currentTarget) return;
 		if (step.type === 'text') {
 			const input = (e.currentTarget as HTMLElement).querySelector(`#${step.label}`);
 			if (input) (input as HTMLInputElement).focus();
@@ -102,7 +99,6 @@
 				class:hidden={!page.show}
 				bind:this={menus[index]}
 				on:submit|preventDefault={async (e) => {
-					submitting = true;
 					try {
 						await page.onSubmit(e);
 					} catch (error) {

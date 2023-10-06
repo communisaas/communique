@@ -16,6 +16,7 @@ interface Selectable {
 	target?: SelectableKey;
 	index?: number;
 	content?: email;
+	[key: string];
 }
 
 interface MenuItemClickArgs {
