@@ -123,7 +123,7 @@
 									throw new Error('Please set an option');
 								}
 
-								remove = true;
+								setTimeout(() => (remove = true)); // set remove flag after form update
 								if ($page.data.session) {
 									// TODO update hidden emails in db
 								}
@@ -357,14 +357,16 @@
 
 	function handleBlur(event: FocusEvent) {
 		console.log(event);
+
 		if (
-			(card && card.contains(event.relatedTarget as Node)) ||
+			(card && card.contains(event.relatedTarget as Node) && !remove) ||
 			((event.target as HTMLElement).id === 'back' &&
 				menu.contains(event.relatedTarget as Node) &&
 				!remove) ||
 			(card.contains(event.relatedTarget as Node) &&
-				(event.relatedTarget as HTMLElement).classList.contains('menu__item')) ||
-			(menu && menu.contains(event.relatedTarget as Node))
+				(event.relatedTarget as HTMLElement).classList.contains('menu__item') &&
+				!remove) ||
+			(menu && menu.contains(event.relatedTarget as Node) && !remove)
 		)
 			return; // keep expanded if focus is on the card
 		setExpand(false);
@@ -385,7 +387,9 @@
 			}
 			return item;
 		});
+		console.log('reached once');
 		if (remove) {
+			console.log('reached');
 			handleRemove();
 		}
 	}
@@ -529,7 +533,7 @@
 						</span> -->
 					<span title="Send count" aria-label="Number of sends" class="flex items-center gap-x-1.5">
 						<icon
-							title="Envelope"
+							aria-label="Envelope"
 							class="max-w-[36px]"
 							style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
 						>
