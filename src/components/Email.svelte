@@ -87,6 +87,7 @@
 			actionComponent: undefined,
 
 			onClick: () => {
+				remove = true;
 				handleRemove();
 			}
 		},
@@ -291,7 +292,6 @@
 					return item;
 				});
 				if (focusableElements) {
-					console.log(menu.firstChild);
 					(menu.querySelector("div[role='menuitem']") as HTMLElement)?.focus();
 				}
 				if (remove) {
@@ -356,8 +356,6 @@
 	}
 
 	function handleBlur(event: FocusEvent) {
-		console.log(event);
-
 		if (
 			(card && card.contains(event.relatedTarget as Node) && !remove) ||
 			((event.target as HTMLElement).id === 'back' &&
@@ -387,9 +385,7 @@
 			}
 			return item;
 		});
-		console.log('reached once');
 		if (remove) {
-			console.log('reached');
 			handleRemove();
 		}
 	}
