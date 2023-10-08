@@ -9,6 +9,7 @@ interface UserState {
 	hiddenEmails: string[];
 	hiddenTopics: string[];
 	loginCallbackURL?: `/${string}`;
+	profile: unknown;
 	show: ModalState;
 	[key: string];
 }

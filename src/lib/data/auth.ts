@@ -8,6 +8,7 @@ import Twitter from '@auth/core/providers/twitter';
 
 import type { Provider } from '@auth/core/providers';
 import { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, AUTH_SECRET } from '$env/static/private';
+import { upsert } from './database';
 
 export const providers: Provider[] = [
 	Facebook({}) as Provider,
@@ -32,7 +33,20 @@ const config: SvelteKitAuthConfig = {
 		// verifyRequest: '/auth/verify-request', // (used for check email message)
 		// newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
 	},
-	debug: true,
+	callbacks: {
+		async signIn({ account, profile }) {
+			if (!profile?.email) throw new Error('No email found');
+			return await upsert('user', {
+				where: { email: profile?.email },
+				update: { auth_provider: account?.provider, last_login: new Date() },
+				create: {
+					email: profile?.email,
+					auth_provider: account?.provider
+				}
+			});
+		}
+	},
+	debug: false,
 	secret: process.env.AUTH_SECRET || AUTH_SECRET,
 	trustHost: true,
 	session: {

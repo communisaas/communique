@@ -15,16 +15,11 @@ export function find(table: string, options: Clause, scope: 'unique' | 'many' = 
 	}
 }
 
-export function update(table: string, options: Clause, scope: 'unique' | 'many' = 'many') {
+export function upsert(table: string, options: Clause) {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore indexing type error
 	const currentTable = objectMapper[table];
-	switch (scope) {
-		case 'unique':
-			return currentTable.update({ ...options });
-		case 'many':
-			return currentTable.updateMany({ ...options });
-	}
+	return currentTable.upsert({ ...options });
 }
 
 export async function rawSqlQuery(query: Sql, params: unknown[] = []) {

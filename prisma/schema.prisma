@@ -12,11 +12,12 @@ model author {
   read_email_count BigInt
   sent_email_count BigInt
   open_email_count BigInt
-  rowid            String      @id(map: "author___pkey")
+  email_address    String      @id(map: "author___pkey")
   last_updated     DateTime?   @default(now()) @db.Timestamp(6)
   issue_list       String[]
   add_date         DateTime?   @default(now()) @db.Timestamp(6)
-  user             user        @relation(fields: [rowid], references: [rowid], onDelete: NoAction, onUpdate: NoAction, map: "author_user_rowid_fk")
+  email_id_list    String[]
+  user             user        @relation(fields: [email_address], references: [email], onDelete: NoAction, onUpdate: NoAction, map: "author___fkey")
   email            email[]
   issue            issue[]
   recipient        recipient[]
@@ -39,7 +40,7 @@ model email {
   title           String?
   add_date        DateTime? @default(now()) @db.Timestamp(6)
   issue_list      String[]
-  author          author    @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
+  author          author    @relation(fields: [added_by], references: [email_address], onDelete: NoAction, map: "added_by___fkey")
   issue           issue[]
 }
 
@@ -51,7 +52,7 @@ model issue {
   email_id    String    @db.Uuid
   added_by    String
   add_date    DateTime? @default(now()) @db.Timestamp(6)
-  author      author    @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
+  author      author    @relation(fields: [added_by], references: [email_address], onDelete: NoAction, map: "added_by___fkey")
   email       email     @relation(fields: [email_id], references: [rowid], onDelete: NoAction, map: "email_id___fkey")
 }
 
@@ -65,7 +66,7 @@ model recipient {
   email_count      BigInt
   last_updated     DateTime  @default(now()) @db.Timestamp(6)
   add_date         DateTime? @default(now()) @db.Timestamp(6)
-  author           author    @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
+  author           author    @relation(fields: [added_by], references: [email_address], onDelete: NoAction, map: "added_by___fkey")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -78,7 +79,7 @@ model topic {
   email_sent_count BigInt
   added_by         String
   add_date         DateTime? @default(now()) @db.Timestamp(6)
-  author           author    @relation(fields: [added_by], references: [rowid], onDelete: NoAction, map: "added_by___fkey")
+  author           author    @relation(fields: [added_by], references: [email_address], onDelete: NoAction, map: "added_by___fkey")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -89,10 +90,9 @@ model user {
   address            String?
   signup_date        DateTime  @default(now()) @db.Timestamp(6)
   phone              String?
-  privilege          String?
-  rowid              String    @unique(map: "user__key")
   auth_provider      String?
   last_login         DateTime? @default(now()) @db.Timestamp(6)
   sent_email_list    String[]
+  privilege          BigInt?   @default(0)
   author             author?
 }
