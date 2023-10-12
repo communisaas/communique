@@ -79,7 +79,6 @@ export async function POST({ params, request, cookies, url }) {
 		userOptions.data = { ignored_email_list: { push: params.slug } }; // push shortid
 
 		await objectMapper.user.update({ ...userOptions });
-		console.log('removed');
 	}
 	return new Response('ok');
 }
