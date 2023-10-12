@@ -40,7 +40,7 @@
 		for (const templateName in $sessionStore.template)
 			$sessionStore.template[templateName].cardList = $sessionStore.template[
 				templateName
-			].cardList.filter((card: email) => !$sessionStore.hiddenEmails.includes(card.rowid));
+			].cardList.filter((card: email) => !$sessionStore.hiddenEmails.includes(card.shortid));
 	}
 
 	// TODO loading placeholders

@@ -2,9 +2,48 @@ import { redirect, type Handle } from '@sveltejs/kit';
 import prepAuth from '$lib/data/auth';
 
 import { sequence } from '@sveltejs/kit/hooks';
+import { decode } from '@auth/core/jwt';
+import { AUTH_SECRET } from '$env/static/private';
+
+async function enforcePostSecurity({ event, resolve }) {
+	// Check for POST method and if it's a /data endpoint
+	if (
+		(event.request.method === 'POST' && event.url.pathname.startsWith('/data')) ||
+		event.url.pathname.startsWith('/data/user')
+	) {
+		// Extract the JWT token and decode it
+		const authCookieName =
+			event.url.protocol === 'https:'
+				? '__Secure-next-auth.session-token'
+				: 'next-auth.session-token';
+		const jwt = await decode({ token: event.cookies.get(authCookieName), secret: AUTH_SECRET });
+
+		if (!jwt) {
+			throw new Error('Invalid token');
+		}
+
+		// Check JWT expiration
+		const currentTime = Date.now() / 1000; // to get in seconds;
+		if (jwt.exp && Number(jwt.exp) < currentTime) {
+			throw new Error('Token expired');
+		}
+
+		// CSRF Token Verification
+		const csrfTokenCookie = event.cookies.get('next-auth.csrf-token').split('|')[0];
+		if (!csrfTokenCookie || csrfTokenCookie !== event.request.headers.get('csrf-token')) {
+			throw new Error('CSRF token mismatch');
+		}
+	}
+
+	return resolve(event);
+}
 
 async function authorize({ event, resolve }) {
 	// TODO structure auth requirements, verify session
+	const token = event.cookies.get('next-auth.session-token');
+
+	if (token) event.locals.tokenData = await decode({ token, secret: AUTH_SECRET });
+
 	const session = await event.locals.getSession();
 
 	if (event.url && event.url.pathname.startsWith('/compose')) {
@@ -20,4 +59,4 @@ async function authorize({ event, resolve }) {
 	return resolve(event);
 }
 
-export const handle = sequence(prepAuth, authorize) satisfies Handle;
+export const handle = sequence(prepAuth, authorize, enforcePostSecurity) satisfies Handle;

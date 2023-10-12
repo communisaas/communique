@@ -56,10 +56,22 @@
 			termsOfUse: false
 		};
 		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
+		$sessionStore.csrfToken =
+			($sessionStore.csrfToken || (await (await fetch('/auth/csrf')).json()).csrfToken) ?? '';
 		const hashes = window.location.hash.substring(1).split('#');
 		// TODO use enum
 		$sessionStore = await routeModal(hashes, $page, $sessionStore, dispatch);
 
+		if ($page.data.session && $page.data.session?.user?.email) {
+			const ignoredEmails = await fetch('/', {
+				method: 'GET',
+				headers: {
+					'User-Email': $page.data.session.user?.email,
+					'CSRF-Token': $sessionStore.csrfToken
+				}
+			}).then((res) => res.json());
+			$sessionStore.hiddenEmails = [];
+		}
 		window.addEventListener('hashchange', handleHashChange);
 	});
 

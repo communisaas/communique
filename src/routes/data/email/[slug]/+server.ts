@@ -1,4 +1,6 @@
-import { find, objectMapper, update } from '$lib/data/database';
+import { AUTH_SECRET } from '$env/static/private';
+import { find, objectMapper } from '$lib/data/database';
+import { decode, getToken } from '@auth/core/jwt';
 import { error } from '@sveltejs/kit';
 
 function isUUID(s: string) {
@@ -23,7 +25,22 @@ export async function GET({ params, url }) {
 }
 
 /** @type {import('./$types').RequestHandler} */
-export async function POST({ params, request }) {
+export async function POST({ params, request, cookies, url }) {
+	// HTTPS-only should be enforced on host, this is a developer convenience
+	const authCookieName =
+		url.protocol === 'https:' ? '__Secure-next-auth.session-token' : 'next-auth.session-token';
+	const jwt = await decode({ token: cookies.get(authCookieName), secret: AUTH_SECRET });
+
+	if (!jwt) {
+		return new Response('Invalid token', { status: 401 });
+	}
+	if (
+		jwt.email !== request.headers.get('sender-email') &&
+		jwt.email !== request.headers.get('user-email')
+	) {
+		return new Response('Email address mismatch', { status: 403 });
+	}
+
 	const whereCriteria: Criteria = {};
 	whereCriteria.shortid = params.slug;
 
@@ -35,25 +52,34 @@ export async function POST({ params, request }) {
 			where: { email: senderEmail }
 		};
 
-		emailOptions.data = {
-			send_count: { increment: 1 }
+		const sentEmailList = await objectMapper.user.findMany({
+			where: { email: senderEmail, sent_email_list: { has: params.slug } }
+		});
+
+		if (sentEmailList.length <= 0) {
+			emailOptions.data = {
+				send_count: { increment: 1 }
+			};
+			userOptions.data = { sent_email_list: { push: params.slug } }; // push shortid
+			// TODO merge into single query once cockroachdb supports record types https://github.com/cockroachdb/cockroach/issues/70099?version=v23.1
+			await objectMapper.$transaction([
+				objectMapper.email.update({ ...emailOptions }),
+				objectMapper.user.update({ ...userOptions })
+			]);
+			return new Response('incremented');
+		}
+	} else if (
+		request.headers.get('remove-email-content') === 'true' &&
+		request.headers.get('user-email')
+	) {
+		const userEmail = request.headers.get('user-email') as string;
+		const userOptions: Clause = {
+			where: { email: userEmail }
 		};
-		userOptions.data = { sent_email_list: { push: params.slug } }; // push shortid
-		// TODO merge into single query once cockroachdb supports record types https://github.com/cockroachdb/cockroach/issues/70099?version=v23.1
-		const result = await objectMapper.$transaction([
-			objectMapper.email.update({ ...emailOptions }),
-			objectMapper.user.update({ ...userOptions })
-		]);
+		userOptions.data = { ignored_email_list: { push: params.slug } }; // push shortid
 
-		// options.data = {
-		// 	send_count: { increment: 1 },
-		// 	user: {
-		// 		where: { email: senderEmail },
-		// 		data: { sent_email_list: { push: whereCriteria.rowid } }
-		// 	}
-		// };
-
-		// console.log(await update('email', emailOptions, 'unique'));
+		await objectMapper.user.update({ ...userOptions });
+		console.log('removed');
 	}
 	return new Response('ok');
 }

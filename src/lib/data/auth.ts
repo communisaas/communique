@@ -44,13 +44,16 @@ const config: SvelteKitAuthConfig = {
 					auth_provider: account?.provider
 				}
 			});
+		},
+		async jwt(args) {
+			return args.token;
 		}
 	},
 	debug: false,
 	secret: process.env.AUTH_SECRET || AUTH_SECRET,
 	trustHost: true,
 	session: {
-		maxAge: 1800 // 30 mins
+		strategy: 'jwt'
 	}
 };
 

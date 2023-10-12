@@ -39,11 +39,19 @@
 	let showMenu = false;
 	let remove = false;
 
-	function handleRemove() {
+	async function handleRemove() {
 		remove = false;
-		$sessionStore.hiddenEmails.push(item.rowid);
-		if ($page.data.session) {
-			// TODO update hidden emails in db
+		$sessionStore.hiddenEmails.push(item.shortid);
+		if ($page.data.session && $page.data.session?.user?.email) {
+			const response = fetch('/data/email/' + item.shortid, {
+				method: 'POST',
+				headers: {
+					'Remove-Email-Content': 'true',
+					'User-Email': $page.data.session?.user?.email,
+					'CSRF-Token': $sessionStore.csrfToken
+				}
+			});
+			// TODO handle error response
 		}
 		card.focus();
 		card.blur();
@@ -311,7 +319,12 @@
 	});
 
 	afterUpdate(() => {
-		if (scrollToCard && !$sessionStore.hiddenEmails.includes(item.rowid) && !showMenu && !remove) {
+		if (
+			scrollToCard &&
+			!$sessionStore.hiddenEmails.includes(item.shortid) &&
+			!showMenu &&
+			!remove
+		) {
 			// TODO more contextual fix for resolving pending events after DOM update
 			setTimeout(() => {
 				card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
@@ -365,8 +378,9 @@
 				(event.relatedTarget as HTMLElement).classList.contains('menu__item') &&
 				!remove) ||
 			(menu && menu.contains(event.relatedTarget as Node) && !remove)
-		)
-			return; // keep expanded if focus is on the card
+		) {
+			return;
+		} // keep expanded if focus is on the card
 		setExpand(false);
 		if (!expand) {
 			header.scrollLeft = 0;
@@ -469,7 +483,7 @@
 		{#if sessionStore}
 			<span class="flex max-w-full h-fit items-start relative">
 				<span
-					class="w-[calc(85%-10vw)] xs:w-[calc(90%-6vw)] sm:w-[88%] md:w-[90%] lg:w-[95%] relative"
+					class="w-[calc(85%-10vw)] xs:w-[calc(90%-6vw)] sm:w-[88%] md:w-[90%] lg:w-[calc(95%-2.5vw)] relative"
 				>
 					<h1
 						aria-label="Subject line"

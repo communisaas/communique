@@ -36,7 +36,7 @@ model email {
   recipient_list  String[]
   rowid           String    @id(map: "email___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   added_by        String
-  shortid         String?   @unique(map: "shortid__key")
+  shortid         String    @unique(map: "shortid__key")
   title           String?
   add_date        DateTime? @default(now()) @db.Timestamp(6)
   issue_list      String[]
