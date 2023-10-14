@@ -141,8 +141,10 @@
 	<button
 		class="w-full h-10"
 		on:click={async () => {
+			setPopover(false);
 			if (!$page.data.session && sent) {
 				goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
+				setPopover(true);
 				return;
 			} else if (sent && $page.data.session?.user?.email) {
 				closeButtonText = 'Confirming...';
@@ -167,7 +169,6 @@
 					closeButtonText = 'Confirm';
 				}
 			}
-			setPopover(false);
 		}}
 	>
 		{closeButtonText}

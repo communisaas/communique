@@ -12,6 +12,7 @@
 	import { page } from '$app/stores';
 	import { writable, type Writable } from 'svelte/store';
 	import Preferences from './input/Preferences.svelte';
+	import { goto } from '$app/navigation';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -39,7 +40,7 @@
 	let showMenu = false;
 	let remove = false;
 
-	async function handleRemove() {
+	async function handleRemove({ background = false }) {
 		remove = false;
 		$sessionStore.hiddenEmails.push(item.shortid);
 		if ($page.data.session && $page.data.session?.user?.email) {
@@ -53,6 +54,7 @@
 			});
 			// TODO handle error response
 		}
+		if (background) return;
 		card.focus();
 		card.blur();
 	}
@@ -96,7 +98,7 @@
 
 			onClick: () => {
 				remove = true;
-				handleRemove();
+				handleRemove({ background: false });
 			}
 		},
 		{
@@ -133,9 +135,7 @@
 								}
 
 								setTimeout(() => (remove = true)); // set remove flag after form update
-								if ($page.data.session) {
-									// TODO update hidden emails in db
-								}
+								handleRemove({ background: true });
 							},
 							items: [
 								{
@@ -244,10 +244,10 @@
 
 			onClick: () => {
 				menuItems[3].name = 'Loading...';
-				// if (!$page.data.session) {
-				// 	goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
-				// 	return;
-				// }
+				if (!$page.data.session) {
+					goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
+					return;
+				}
 				menuItems = menuItems.map((item) => {
 					if (item.key !== 'moderation' && item.key !== 'back') {
 						item.show = false;
@@ -303,7 +303,8 @@
 					(menu.querySelector("div[role='menuitem']") as HTMLElement)?.focus();
 				}
 				if (remove) {
-					handleRemove();
+					card.focus();
+					card.blur();
 				}
 			}
 		}
@@ -399,9 +400,6 @@
 			}
 			return item;
 		});
-		if (remove) {
-			handleRemove();
-		}
 	}
 </script>
 
@@ -465,7 +463,8 @@
 						return;
 					}
 					if (remove && e.target.id === 'confirm__menuitem') {
-						handleRemove();
+						card.blur();
+						card.focus();
 						return;
 					}
 					handleBlur(e);
