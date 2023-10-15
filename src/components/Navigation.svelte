@@ -69,7 +69,7 @@
 				</div>
 			{:else}
 				<div
-					class="m-auto sm:m-0 sm:w-16 md:w-20 w-14"
+					class="m-auto w-full"
 					transition:slide={{ duration: 500, easing: quintOut, axis: 'x' }}
 				>
 					{#each Object.entries(navLinks) as [route, link]}

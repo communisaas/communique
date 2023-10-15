@@ -14,7 +14,7 @@
 	import type { Writable } from 'svelte/store';
 	import { handleSelect } from '$lib/data/select';
 	import { page } from '$app/stores';
-	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { routeModal } from '$lib/ui/hash';
 	import { browser } from '$app/environment';
 
@@ -85,12 +85,12 @@
 </script>
 
 <main class="flex">
-	<div class="grow-0 shrink-0 lg:w-20"><Navigation /></div>
-	<div class="w-full relative flex flex-col min-h-full">
+	<div class="grow-0 shrink-0 sm:m-0 w-[7%] min-w-[50px] xl:w-[5rem]"><Navigation /></div>
+	<div class="relative flex flex-col min-h-full w-[calc(100%-50px)] xl:w-full">
 		<section class="min-h-screen mb-3">
 			<header
 				aria-label="Popular topics list"
-				class="flex px-3 md:h-12 h-14 bg-peacockFeather-700 items-center relative align-middle"
+				class="flex pr-3 md:h-12 h-14 bg-peacockFeather-700 items-center relative align-middle w-full"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
@@ -146,7 +146,7 @@
 			<slot />
 		</section>
 		<!-- TODO aria labels for footer -->
-		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full z-10">
+		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full xl:w-full z-10">
 			<div class="container mx-auto flex flex-wrap items-center justify-center px-4">
 				<div class="mb-4 md:mb-0">
 					<div class="flex justify-center md:justify-start">

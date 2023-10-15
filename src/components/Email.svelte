@@ -134,6 +134,18 @@
 									throw new Error('Please set an option');
 								}
 
+								if ($page.data.session && $page.data.session?.user?.email)
+									// TODO handle error response
+									await fetch('/data/email/' + item.shortid, {
+										method: 'POST',
+										headers: {
+											'Report-Email-Content': 'true',
+											'User-Email': $page.data.session?.user?.email,
+											'CSRF-Token': $sessionStore.csrfToken
+										},
+										body: formData
+									});
+
 								setTimeout(() => (remove = true)); // set remove flag after form update
 								handleRemove({ background: true });
 							},
@@ -400,6 +412,10 @@
 			}
 			return item;
 		});
+		if (remove) {
+			card.focus();
+			card.blur();
+		}
 	}
 </script>
 
