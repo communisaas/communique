@@ -93,13 +93,13 @@
 		<Navigation bind:collapsed={navCollapsed} />
 	</div>
 	<div
-		class="relative flex flex-col min-h-full w-[calc(100%-50px)] xl:w-full"
+		class="relative flex flex-col min-h-full w-[calc(100%-50px)] xl:w-full overflow-hidden"
 		class:min-w-full={navCollapsed}
 	>
 		<section class="min-h-screen mb-3">
 			<header
 				aria-label="Popular topics list"
-				class="flex pr-3 md:h-12 h-14 bg-peacockFeather-700 items-center relative align-middle w-full"
+				class="flex md:h-12 h-14 bg-peacockFeather-700 items-center relative align-middle w-full"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
