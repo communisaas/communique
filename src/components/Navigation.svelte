@@ -59,7 +59,7 @@
 					<button
 						on:click={() => (collapsed = !collapsed)}
 						on:touchstart|preventDefault={() => (collapsed = !collapsed)}
-						class="flex flex-col gap-3 items-center justify-center relative border-r-2 border-y-2 rounded-r-md h-20 p-2 w-1.5 mr-4 my-4 top-0 border-paper-800 cursor-pointer"
+						class="flex flex-col gap-3 items-center justify-center relative border-x-2 border-y-2 rounded-md h-20 p-2 w-1.5 mr-4 ml-[4px] my-4 top-0 border-paper-800 cursor-pointer"
 						in:fade={{ delay: 350, duration: 2000, easing: quintOut }}
 					>
 						<div class="w-2 h-2 rounded-full bg-paper-600" />

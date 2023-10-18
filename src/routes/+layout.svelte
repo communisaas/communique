@@ -21,7 +21,8 @@
 	export let data: LayoutSchema;
 	const dispatch = createEventDispatcher();
 
-	let sessionStore: Writable<UserState>;
+	let sessionStore: Writable<UserState>,
+		navCollapsed = false;
 
 	function handleHashChange(e: HashChangeEvent) {
 		$sessionStore.show = {
@@ -85,8 +86,16 @@
 </script>
 
 <main class="flex">
-	<div class="grow-0 shrink-0 sm:m-0 w-[7%] min-w-[50px] xl:w-[5rem]"><Navigation /></div>
-	<div class="relative flex flex-col min-h-full w-[calc(100%-50px)] xl:w-full">
+	<div
+		class="grow-0 shrink-0 sm:m-0 w-[7%] xl:w-[5rem]"
+		style={navCollapsed ? 'max-width: 0' : 'min-width: 50px;'}
+	>
+		<Navigation bind:collapsed={navCollapsed} />
+	</div>
+	<div
+		class="relative flex flex-col min-h-full w-[calc(100%-50px)] xl:w-full"
+		class:min-w-full={navCollapsed}
+	>
 		<section class="min-h-screen mb-3">
 			<header
 				aria-label="Popular topics list"
