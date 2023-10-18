@@ -115,12 +115,20 @@
 							show: true,
 							class:
 								'grid md:grid-rows-3 sm:grid-rows-4 xs:grid-rows-5 grid-rows-6 grid-flow-col gap-4 mb-4 mx-auto min-w-full text-xs sm:text-sm md:text-base',
-							onSubmit: async (e: Event) => {
+							onSubmit: async (e: SubmitEvent) => {
 								const formElement = e.target as HTMLFormElement;
 								const firstReportInput = formElement.querySelector(
 									'input[name="reportType"]'
 								) as HTMLInputElement;
 								const formData = new FormData(formElement);
+
+								const submitterElement = e.submitter as HTMLElement; // Identifying the submitter element
+
+								if (submitterElement) {
+									(submitterElement as HTMLInputElement).value = 'Confirming...'; // Setting the innerHTML to "Confirming..."
+								}
+
+								console.log(e);
 
 								const selectedPreset = formElement.querySelector(
 									'input[name="reportType"]:checked'
