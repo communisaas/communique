@@ -87,7 +87,7 @@
 
 <main class="flex">
 	<div
-		class="grow-0 shrink-0 sm:m-0 w-[7%] xl:w-[5rem]"
+		class="grow-0 shrink-0 sm:m-0 w-[7%] md:w-[4.5rem] xl:w-[5rem]"
 		style={navCollapsed ? 'max-width: 0' : 'min-width: 50px;'}
 	>
 		<Navigation bind:collapsed={navCollapsed} />
@@ -126,7 +126,7 @@
 						}}
 					/>
 				{/if}
-				<span class="ml-auto flex flex-col items-center justify-center h-full text-paper-500">
+				<span class="ml-auto px-2 flex flex-col items-center justify-center h-full text-paper-500">
 					{#if $page.data.session}
 						{#if $page.data.session.user?.image}
 							<img

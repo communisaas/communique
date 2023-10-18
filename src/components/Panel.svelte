@@ -144,7 +144,7 @@
 		{selectable}
 		{items}
 		alignment="center"
-		selectorStyle="flex-col items-center min-h-[13rem] md:max-w-7xl max-w-2xl m-auto"
+		selectorStyle="flex-col px-0.5 items-center min-h-[13rem] md:max-w-7xl max-w-3xl m-auto overflow-visible"
 		overflow="visible"
 		target={selected.type}
 		scrollable={false}

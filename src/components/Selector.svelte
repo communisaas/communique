@@ -148,12 +148,6 @@
 		&::-webkit-scrollbar {
 			display: none;
 		}
-
-		&:hover {
-			overflow: scroll;
-			overflow: overlay; // prevent scrollbar from changing container dimensions in webkit
-		}
-
 		&X {
 			&::before {
 				content: '';

@@ -5,7 +5,7 @@ import { sequence } from '@sveltejs/kit/hooks';
 import { decode } from '@auth/core/jwt';
 import { AUTH_SECRET } from '$env/static/private';
 
-async function enforcePostSecurity({ event, resolve }) {
+async function protectDataEndpoints({ event, resolve }) {
 	// Check for POST method and if it's a /data endpoint
 	if (
 		(event.request.method === 'POST' && event.url.pathname.startsWith('/data')) ||
@@ -16,7 +16,11 @@ async function enforcePostSecurity({ event, resolve }) {
 			event.url.protocol === 'https:'
 				? '__Secure-next-auth.session-token'
 				: 'next-auth.session-token';
-		const jwt = await decode({ token: event.cookies.get(authCookieName), secret: AUTH_SECRET });
+
+		const jwt = await decode({
+			token: event.cookies.get(authCookieName),
+			secret: process.env.AUTH_SECRET || AUTH_SECRET
+		});
 
 		if (!jwt) {
 			throw new Error('Invalid token');
@@ -29,8 +33,8 @@ async function enforcePostSecurity({ event, resolve }) {
 		}
 
 		// CSRF Token Verification
-		const csrfTokenCookie = event.cookies.get('next-auth.csrf-token').split('|')[0];
-		if (!csrfTokenCookie || csrfTokenCookie !== event.request.headers.get('csrf-token')) {
+		const csrfToken = (await (await event.fetch('/auth/csrf')).json()).csrfToken.split('|')[0];
+		if (!csrfToken || csrfToken !== event.request.headers.get('csrf-token')) {
 			throw new Error('CSRF token mismatch');
 		}
 	}
@@ -59,4 +63,4 @@ async function authorize({ event, resolve }) {
 	return resolve(event);
 }
 
-export const handle = sequence(prepAuth, authorize, enforcePostSecurity) satisfies Handle;
+export const handle = sequence(prepAuth, authorize, protectDataEndpoints) satisfies Handle;

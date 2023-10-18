@@ -115,7 +115,7 @@
 							show: true,
 							class:
 								'grid md:grid-rows-3 sm:grid-rows-4 xs:grid-rows-5 grid-rows-6 grid-flow-col gap-4 mb-4 mx-auto min-w-full text-xs sm:text-sm md:text-base',
-							onSubmit: async (e: FormDataEvent) => {
+							onSubmit: async (e: Event) => {
 								const formElement = e.target as HTMLFormElement;
 								const firstReportInput = formElement.querySelector(
 									'input[name="reportType"]'
@@ -136,6 +136,7 @@
 
 								if ($page.data.session && $page.data.session?.user?.email)
 									// TODO handle error response
+									// Display the key/value pairs
 									await fetch('/data/email/' + item.shortid, {
 										method: 'POST',
 										headers: {
@@ -143,7 +144,7 @@
 											'User-Email': $page.data.session?.user?.email,
 											'CSRF-Token': $sessionStore.csrfToken
 										},
-										body: formData
+										body: JSON.stringify(Object.fromEntries(formData))
 									});
 
 								setTimeout(() => (remove = true)); // set remove flag after form update
@@ -157,6 +158,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Spam',
+									value: 'Spam',
 									class: 'option py-3 sm:py-2'
 								},
 								{
@@ -166,6 +168,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Harassment',
+									value: 'Harassment',
 									class: 'option py-3 sm:py-2'
 								},
 								{
@@ -175,6 +178,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Violence',
+									value: 'Violence',
 									class: 'option py-3 sm:py-2'
 								},
 								{
@@ -184,6 +188,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Privacy',
+									value: 'Privacy',
 									class: 'option py-3 sm:py-2'
 								},
 								{
@@ -193,6 +198,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Misleading',
+									value: 'Misleading',
 									class: 'option py-3 sm:py-2'
 								},
 								{
@@ -315,8 +321,7 @@
 					(menu.querySelector("div[role='menuitem']") as HTMLElement)?.focus();
 				}
 				if (remove) {
-					card.focus();
-					card.blur();
+					handleRemove({ background: false });
 				}
 			}
 		}
@@ -413,8 +418,7 @@
 			return item;
 		});
 		if (remove) {
-			card.focus();
-			card.blur();
+			handleRemove({ background: false });
 		}
 	}
 </script>
@@ -444,7 +448,7 @@
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
 	class="card flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
-		justify-center w-[80vw] {style}"
+		justify-center w-[80vw] max-w-full {style}"
 	class:cursor-default={expand}
 	class:clickable={!nestedHover}
 	style="min-width: {expand ? '99%' : '95%'};"
@@ -476,11 +480,6 @@
 				on:blur={(e) => {
 					if (e.target.id === 'back' && !remove) {
 						e.preventDefault();
-						return;
-					}
-					if (remove && e.target.id === 'confirm__menuitem') {
-						card.blur();
-						card.focus();
 						return;
 					}
 					handleBlur(e);

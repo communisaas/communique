@@ -6,6 +6,19 @@ import termsOfUseMarkdown from '$lib/policies/serviceTerms.md?raw';
 import privacyPolicyMarkdown from '$lib/policies/privacyPolicy.md?raw';
 import type { Provider } from '@auth/core/providers';
 
+import * as Sentry from '@sentry/node';
+import { ProfilingIntegration } from '@sentry/profiling-node';
+
+// TODO paramaterize dsn between staging / prod
+Sentry.init({
+	dsn: 'https://d90804840dbbba5c61d35f920a6f5dd9@o4506069115273216.ingest.sentry.io/4506069115404288',
+	integrations: [new ProfilingIntegration()],
+	// Performance Monitoring
+	tracesSampleRate: 1.0,
+	// Set sampling rate for profiling - this is relative to tracesSampleRate
+	profilesSampleRate: 1.0
+});
+
 type DescribedProvider = Provider & {
 	id: string;
 	style: ProviderStyle;

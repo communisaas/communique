@@ -2,6 +2,7 @@ import { AUTH_SECRET } from '$env/static/private';
 import { find, objectMapper } from '$lib/data/database';
 import { decode, getToken } from '@auth/core/jwt';
 import { error } from '@sveltejs/kit';
+import { captureException, startTransaction } from '@sentry/node';
 
 function isUUID(s: string) {
 	return new RegExp(
@@ -29,7 +30,10 @@ export async function POST({ params, request, cookies, url }) {
 	// HTTPS-only should be enforced on host, this is a developer convenience
 	const authCookieName =
 		url.protocol === 'https:' ? '__Secure-next-auth.session-token' : 'next-auth.session-token';
-	const jwt = await decode({ token: cookies.get(authCookieName), secret: AUTH_SECRET });
+	const jwt = await decode({
+		token: cookies.get(authCookieName),
+		secret: process.env.AUTH_SECRET || AUTH_SECRET
+	});
 
 	if (!jwt) {
 		return new Response('Invalid token', { status: 401 });
@@ -43,42 +47,67 @@ export async function POST({ params, request, cookies, url }) {
 
 	const whereCriteria: Criteria = {};
 	whereCriteria.shortid = params.slug;
+	try {
+		if (request.headers.get('increment-send') === 'true' && request.headers.get('sender-email')) {
+			const senderEmail = request.headers.get('sender-email') as string;
 
-	if (request.headers.get('increment-send') === 'true' && request.headers.get('sender-email')) {
-		const senderEmail = request.headers.get('sender-email') as string;
-
-		const emailOptions: Clause = { where: whereCriteria };
-		const userOptions: Clause = {
-			where: { email: senderEmail }
-		};
-
-		const sentEmailList = await objectMapper.user.findMany({
-			where: { email: senderEmail, sent_email_list: { has: params.slug } }
-		});
-
-		if (sentEmailList.length <= 0) {
-			emailOptions.data = {
-				send_count: { increment: 1 }
+			const emailOptions: Clause = { where: whereCriteria };
+			const userOptions: Clause = {
+				where: { email: senderEmail }
 			};
-			userOptions.data = { sent_email_list: { push: params.slug } }; // push shortid
-			// TODO merge into single query once cockroachdb supports record types https://github.com/cockroachdb/cockroach/issues/70099?version=v23.1
-			await objectMapper.$transaction([
-				objectMapper.email.update({ ...emailOptions }),
-				objectMapper.user.update({ ...userOptions })
-			]);
-			return new Response('incremented');
-		}
-	} else if (
-		request.headers.get('remove-email-content') === 'true' &&
-		request.headers.get('user-email')
-	) {
-		const userEmail = request.headers.get('user-email') as string;
-		const userOptions: Clause = {
-			where: { email: userEmail }
-		};
-		userOptions.data = { ignored_email_list: { push: params.slug } }; // push shortid
 
-		await objectMapper.user.update({ ...userOptions });
+			const sentEmailList = await objectMapper.user.findMany({
+				where: { email: senderEmail, sent_email_list: { has: params.slug } }
+			});
+
+			if (sentEmailList.length <= 0) {
+				emailOptions.data = {
+					send_count: { increment: 1 }
+				};
+				userOptions.data = { sent_email_list: { push: params.slug } }; // push shortid
+				// TODO merge into single query once cockroachdb supports record types https://github.com/cockroachdb/cockroach/issues/70099?version=v23.1
+				await objectMapper.$transaction([
+					objectMapper.email.update({ ...emailOptions }),
+					objectMapper.user.update({ ...userOptions })
+				]);
+				return new Response('incremented');
+			}
+		} else if (
+			request.headers.get('remove-email-content') === 'true' &&
+			request.headers.get('user-email')
+		) {
+			const userEmail = request.headers.get('user-email') as string;
+			const userOptions: Clause = {
+				where: { email: userEmail }
+			};
+			userOptions.data = { ignored_email_list: { push: params.slug } }; // push shortid
+
+			await objectMapper.user.update({ ...userOptions });
+		} else if (
+			request.headers.get('report-email-content') === 'true' &&
+			request.headers.get('user-email') &&
+			request.body
+		) {
+			const userEmail = request.headers.get('user-email') as string;
+			const issueOptions: Clause = {
+				where: { email: userEmail }
+			};
+			const formData = await request.json();
+
+			// If no record was found, proceed with creating the issue and updating the user
+			for (const [key, value] of Object.entries(formData)) {
+				if (key === 'reportType' && value) {
+					issueOptions.data = { email_id: params.slug, added_by: userEmail, type: value };
+				} else if (key === 'customReport' && value) {
+					issueOptions.data = { email_id: params.slug, added_by: userEmail, description: value };
+				}
+			}
+			await objectMapper.$transaction([objectMapper.issue.create({ ...issueOptions })]);
+		}
+	} catch (e) {
+		const errorTransaction = startTransaction({ op: 'error', name: 'email' });
+		captureException(e);
+		errorTransaction.finish();
 	}
 	return new Response('ok');
 }
