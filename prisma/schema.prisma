@@ -17,9 +17,8 @@ model author {
   issue_list       String[]
   add_date         DateTime?   @default(now()) @db.Timestamp(6)
   email_id_list    String[]
-  user             user        @relation(fields: [email_address], references: [email], onDelete: NoAction, onUpdate: NoAction, map: "author___fkey")
+  user             user        @relation(fields: [email_address], references: [email], onDelete: NoAction, map: "author___fkey")
   email            email[]
-  issue            issue[]
   recipient        recipient[]
   topic            topic[]
 }
@@ -46,14 +45,16 @@ model email {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model issue {
-  type        String
-  description String
+  type        String?
+  description String?
   rowid       String    @id(map: "issue___pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email_id    String    @db.Uuid
   added_by    String
   add_date    DateTime? @default(now()) @db.Timestamp(6)
-  author      author    @relation(fields: [added_by], references: [email_address], onDelete: NoAction, map: "added_by___fkey")
-  email       email     @relation(fields: [email_id], references: [rowid], onDelete: NoAction, map: "email_id___fkey")
+  email_id    String
+  user        user      @relation(fields: [added_by], references: [email], onDelete: NoAction, onUpdate: NoAction, map: "added_by___fk")
+  email       email     @relation(fields: [email_id], references: [shortid], onDelete: NoAction, map: "email_id___fk")
+
+  @@unique([added_by, email_id], map: "added_by_email_id___ckey")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -95,4 +96,5 @@ model user {
   sent_email_list    String[]
   privilege          BigInt?   @default(0)
   author             author?
+  issue              issue[]
 }

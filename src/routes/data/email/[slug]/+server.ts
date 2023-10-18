@@ -90,23 +90,40 @@ export async function POST({ params, request, cookies, url }) {
 		) {
 			const userEmail = request.headers.get('user-email') as string;
 			const issueOptions: Clause = {
-				where: { email: userEmail }
+				where: { added_by_email_id: { added_by: userEmail, email_id: params.slug } }
 			};
 			const formData = await request.json();
 
-			// If no record was found, proceed with creating the issue and updating the user
+			let upsertable;
 			for (const [key, value] of Object.entries(formData)) {
 				if (key === 'reportType' && value) {
-					issueOptions.data = { email_id: params.slug, added_by: userEmail, type: value };
+					upsertable = {
+						type: value
+					};
 				} else if (key === 'customReport' && value) {
-					issueOptions.data = { email_id: params.slug, added_by: userEmail, description: value };
+					upsertable = {
+						email_id: params.slug,
+						added_by: userEmail,
+						description: value
+					};
 				}
 			}
-			await objectMapper.$transaction([objectMapper.issue.create({ ...issueOptions })]);
+			issueOptions.create = {
+				user: {
+					connect: { email: userEmail }
+				},
+				email: {
+					connect: { shortid: params.slug }
+				},
+				...upsertable
+			};
+			issueOptions.update = upsertable;
+			await objectMapper.issue.upsert({ ...issueOptions });
 		}
 	} catch (e) {
 		const errorTransaction = startTransaction({ op: 'error', name: 'email' });
 		captureException(e);
+		console.error(e);
 		errorTransaction.finish();
 	}
 	return new Response('ok');
