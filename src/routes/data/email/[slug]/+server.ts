@@ -2,7 +2,6 @@ import { AUTH_SECRET } from '$env/static/private';
 import { find, objectMapper } from '$lib/data/database';
 import { decode, getToken } from '@auth/core/jwt';
 import { error } from '@sveltejs/kit';
-import { captureException, startTransaction } from '@sentry/node';
 
 function isUUID(s: string) {
 	return new RegExp(
@@ -121,10 +120,8 @@ export async function POST({ params, request, cookies, url }) {
 			await objectMapper.issue.upsert({ ...issueOptions });
 		}
 	} catch (e) {
-		const errorTransaction = startTransaction({ op: 'error', name: 'email' });
-		captureException(e);
+		// TODO error monitoring
 		console.error(e);
-		errorTransaction.finish();
 	}
 	return new Response('ok');
 }
