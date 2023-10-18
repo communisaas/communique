@@ -10,9 +10,9 @@
 	import Menu from './Menu.svelte';
 	import { handleCopy } from '$lib/data/select';
 	import { page } from '$app/stores';
-	import type { Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import Preferences from './input/Preferences.svelte';
-	import { fade, scale } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -27,7 +27,10 @@
 	let header: HTMLHeadingElement;
 	let card: HTMLElement;
 	let menu: HTMLElement;
+	let focusableMenuElements = writable<HTMLElement[]>([]);
 	let scrollableElements: { [key: string]: HTMLElement };
+
+	let resizeObserver: ResizeObserver;
 
 	// state
 	let scrollToCard = false;
@@ -35,11 +38,32 @@
 	let nestedHover = false;
 	let activationState: 'click' | 'focus' | null = null;
 	let showMenu = false;
+	let remove = false;
+
+	async function handleRemove({ background = false }) {
+		remove = false;
+		$sessionStore.hiddenEmails.push(item.shortid);
+		if ($page.data.session && $page.data.session?.user?.email) {
+			const response = fetch('/data/email/' + item.shortid, {
+				method: 'POST',
+				headers: {
+					'Remove-Email-Content': 'true',
+					'User-Email': $page.data.session?.user?.email,
+					'CSRF-Token': $sessionStore.csrfToken
+				}
+			});
+			// TODO handle error response
+		}
+		if (background) return;
+		card.focus();
+		card.blur();
+	}
+
 	let menuItems = [
 		{
 			name: 'Get link',
 			key: 'copy',
-			class: 'menu__item',
+			class: 'menu__item mb-4 hover:scale-105 active:scale-100',
 			show: true,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -55,7 +79,7 @@
 		{
 			name: 'Open',
 			key: 'open',
-			class: 'menu__item',
+			class: 'menu__item hover:scale-105 active:scale-100',
 			show: true,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -67,45 +91,206 @@
 		{
 			name: 'Not interested...',
 			key: 'interest',
-			class: 'menu__item',
+			class: 'menu__item mt-2 hover:scale-105 active:scale-100',
 			show: true,
 			actionToggled: false,
-			actionComponent: Preferences,
+			actionComponent: undefined,
 
 			onClick: () => {
-				menuItems = menuItems.map((item) => {
-					if (item.key !== 'interest' && item.key !== 'back') {
-						item.show = false;
-					} else {
-						item.show = true;
-					}
-					return item;
-				});
+				remove = true;
+				handleRemove({ background: false });
 			}
 		},
 		{
 			name: 'Report',
 			key: 'moderation',
-			class: 'menu__item',
+			class: 'menu__item mt-2 hover:scale-105 active:scale-100',
 			show: true,
-			actionToggled: true,
-			actionComponent: undefined,
+			actionToggled: false,
+			actionComponent: {
+				component: Preferences,
+				props: {
+					flow: [
+						{
+							show: true,
+							class:
+								'grid md:grid-rows-3 sm:grid-rows-4 xs:grid-rows-5 grid-rows-6 grid-flow-col gap-4 mb-4 mx-auto min-w-full text-xs sm:text-sm md:text-base',
+							onSubmit: async (e: SubmitEvent) => {
+								const formElement = e.target as HTMLFormElement;
+								const firstReportInput = formElement.querySelector(
+									'input[name="reportType"]'
+								) as HTMLInputElement;
+								const formData = new FormData(formElement);
+
+								const submitterElement = e.submitter as HTMLElement; // Identifying the submitter element
+
+								if (submitterElement) {
+									(submitterElement as HTMLInputElement).value = 'Confirming...'; // Setting the innerHTML to "Confirming..."
+								}
+
+								console.log(e);
+
+								const selectedPreset = formElement.querySelector(
+									'input[name="reportType"]:checked'
+								)?.id;
+								const customOption = formData.get('customReport');
+
+								if (!selectedPreset && !customOption) {
+									firstReportInput?.setCustomValidity('Please set an option');
+									firstReportInput?.reportValidity();
+									e.preventDefault();
+									throw new Error('Please set an option');
+								}
+
+								if ($page.data.session && $page.data.session?.user?.email)
+									// TODO handle error response
+									// Display the key/value pairs
+									await fetch('/data/email/' + item.shortid, {
+										method: 'POST',
+										headers: {
+											'Report-Email-Content': 'true',
+											'User-Email': $page.data.session?.user?.email,
+											'CSRF-Token': $sessionStore.csrfToken
+										},
+										body: JSON.stringify(Object.fromEntries(formData))
+									});
+
+								setTimeout(() => (remove = true)); // set remove flag after form update
+								handleRemove({ background: true });
+							},
+							items: [
+								{
+									type: 'radio',
+									name: 'reportType',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Spam',
+									value: 'Spam',
+									class: 'option py-3 sm:py-2'
+								},
+								{
+									type: 'radio',
+									name: 'reportType',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Harassment',
+									value: 'Harassment',
+									class: 'option py-3 sm:py-2'
+								},
+								{
+									type: 'radio',
+									name: 'reportType',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Violence',
+									value: 'Violence',
+									class: 'option py-3 sm:py-2'
+								},
+								{
+									type: 'radio',
+									name: 'reportType',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Privacy',
+									value: 'Privacy',
+									class: 'option py-3 sm:py-2'
+								},
+								{
+									type: 'radio',
+									name: 'reportType',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
+									},
+									label: 'Misleading',
+									value: 'Misleading',
+									class: 'option py-3 sm:py-2'
+								},
+								{
+									type: 'text',
+									name: 'customReport',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										const reportRadioButtons = document.querySelectorAll(
+											"input[name='reportType']"
+										);
+										reportRadioButtons.forEach((radio) => {
+											(radio as HTMLInputElement).checked = false;
+										});
+									},
+									label: 'Other',
+									placeholder: '50 characters',
+									maxLength: 50,
+									class:
+										'option my-0 h-6 md:h-10 [&_input]:-mr-2 [&_input]:bg-peacockFeather-600 [&_input]:rounded-r-[10px] [&_input]:px-1 [&_input]:h-6 [&_input]:md:h-10 [&_input]:ml-1 [&_label]:mr-0 [&_input]:w-28'
+								},
+								{
+									type: 'submit',
+									name: 'next',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) {
+											(e.currentTarget as HTMLInputElement).click();
+											e.preventDefault();
+										}
+									},
+									label: 'Next',
+									value: 'Next',
+									class: 'submit justify-self-end block'
+								}
+							]
+						},
+						{
+							show: false,
+							class: 'mx-auto min-w-full text-xs sm:text-sm md:text-base',
+							onLoad: () => {
+								$focusableMenuElements[$focusableMenuElements.length - 1].focus();
+							},
+
+							items: [
+								{
+									type: 'menuitem',
+									name: 'confirm',
+									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+										if (e.currentTarget) {
+											(e.currentTarget as HTMLInputElement).click();
+											e.preventDefault();
+										}
+									},
+									label: 'confirm',
+									value: 'Confirmed—check your account dashboard for updates.',
+									class: 'inline'
+								}
+							]
+						}
+					]
+				}
+			},
 
 			onClick: () => {
+				menuItems[3].name = 'Loading...';
+				if (!$page.data.session) {
+					goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
+					return;
+				}
 				menuItems = menuItems.map((item) => {
 					if (item.key !== 'moderation' && item.key !== 'back') {
 						item.show = false;
+						item.actionToggled = false;
 					} else {
 						item.show = true;
+						if (item.key === 'moderation') item.actionToggled = true;
 					}
 					return item;
 				});
+				menuItems[3].name = 'Report';
 			}
 		},
 		{
 			name: 'Close',
 			key: 'close',
-			class: 'menu__item menu__item--close',
+			class: 'menu__item menu__item--close mt-4 hover:scale-105 active:scale-100',
 			show: true,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -126,7 +311,7 @@
 		{
 			name: 'Back',
 			key: 'back',
-			class: 'menu__item menu__item--close',
+			class: 'menu__item menu__item--close mt-4 hover:scale-105 active:scale-100',
 			show: false,
 			actionToggled: false,
 			actionComponent: undefined,
@@ -134,22 +319,38 @@
 				menuItems = menuItems.map((item) => {
 					if (item.key !== 'back') {
 						item.show = true;
+						item.actionToggled = false;
 					} else {
 						item.show = false;
 					}
 					return item;
 				});
-				if (focusableElements) focusableElements[0].focus();
+				if (focusableElements) {
+					(menu.querySelector("div[role='menuitem']") as HTMLElement)?.focus();
+				}
+				if (remove) {
+					handleRemove({ background: false });
+				}
 			}
 		}
 	];
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
+		resizeObserver = new ResizeObserver(() => {
+			updateScrollableElements(scrollableElements);
+		});
+
+		resizeObserver.observe(card);
 	});
 
 	afterUpdate(() => {
-		if (scrollToCard) {
+		if (
+			scrollToCard &&
+			!$sessionStore.hiddenEmails.includes(item.shortid) &&
+			!showMenu &&
+			!remove
+		) {
 			// TODO more contextual fix for resolving pending events after DOM update
 			setTimeout(() => {
 				card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
@@ -158,7 +359,7 @@
 		}
 		if (card && header) {
 			scrollableElements = { card, header };
-			updateScrollableElements(scrollableElements);
+			updateScrollableElements(scrollableElements), 100;
 		}
 	});
 
@@ -195,13 +396,17 @@
 
 	function handleBlur(event: FocusEvent) {
 		if (
-			(card && card.contains(event.relatedTarget as Node)) ||
-			(menu && (event.target as HTMLElement).id === 'back') ||
+			(card && card.contains(event.relatedTarget as Node) && !remove) ||
+			((event.target as HTMLElement).id === 'back' &&
+				menu.contains(event.relatedTarget as Node) &&
+				!remove) ||
 			(card.contains(event.relatedTarget as Node) &&
-				(event.relatedTarget as HTMLElement).classList.contains('menu__item')) ||
-			(menu && menu.contains(event.relatedTarget as Node))
-		)
-			return; // keep expanded if focus is on the card
+				(event.relatedTarget as HTMLElement).classList.contains('menu__item') &&
+				!remove) ||
+			(menu && menu.contains(event.relatedTarget as Node) && !remove)
+		) {
+			return;
+		} // keep expanded if focus is on the card
 		setExpand(false);
 		if (!expand) {
 			header.scrollLeft = 0;
@@ -214,11 +419,15 @@
 		menuItems = menuItems.map((item) => {
 			if (item.key !== 'back') {
 				item.show = true;
+				item.actionToggled = false;
 			} else {
 				item.show = false;
 			}
 			return item;
 		});
+		if (remove) {
+			handleRemove({ background: false });
+		}
 	}
 </script>
 
@@ -239,12 +448,15 @@
 	on:keydown={(e) => {
 		if (e.key === 'Enter') {
 			handleSelect();
+		} else if (e.key === 'Escape') {
+			setExpand(false);
+			showMenu = false;
 		}
 	}}
 	on:blur={handleBlur}
 	aria-label="Email with a subject: {item.subject}"
 	class="card flex p-2 m-1 rounded bg-artistBlue-600 items-center relative
-		justify-center w-48 {style}"
+		justify-center w-[80vw] max-w-full {style}"
 	class:cursor-default={expand}
 	class:clickable={!nestedHover}
 	style="min-width: {expand ? '99%' : '95%'};"
@@ -270,8 +482,20 @@
 					}
 				}
 			}}
+			class="absolute top-0 left-0 right-0 bottom-0 max-w-full"
 		>
-			<Menu on:mouseenter={() => (nestedHover = true)} on:blur={handleBlur} items={menuItems} />
+			<Menu
+				on:mouseenter={() => (nestedHover = true)}
+				on:blur={(e) => {
+					if (e.target.id === 'back' && !remove) {
+						e.preventDefault();
+						return;
+					}
+					handleBlur(e);
+				}}
+				items={menuItems}
+				bind:focusableElements={focusableMenuElements}
+			/>
 		</div>
 	{/if}
 	<section
@@ -280,57 +504,57 @@
 			: ''} min-w-full min-h-fit overflow-hidden"
 	>
 		{#if sessionStore}
-			<span class="flex max-w-full h-fit items-center relative">
-				<h1
-					aria-label="Subject line"
-					aria-describedby={item.subject}
-					title={scrollPosition.header.x > 0 ? item.subject : null}
-					bind:this={header}
-					on:wheel={(e) => {
-						if (scrollPosition.header.remainingWidth > 0) {
-							e.stopPropagation();
-							e.preventDefault();
-							header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
-							scrollPosition.header.x = header.scrollLeft;
-						}
-					}}
-					on:touchstart={(e) => {
-						if (scrollPosition.header.remainingWidth > 0) {
-							scrollPosition.header.startX = e.touches[0].pageX;
-							scrollPosition.header.startScrollLeft = header.scrollLeft;
-						}
-					}}
-					on:touchmove={(e) => {
-						if (scrollPosition.header.remainingWidth > 0) {
-							e.stopPropagation();
-							e.preventDefault();
-							const x = e.touches[0].pageX;
-							const walk = (x - scrollPosition.header.startX) * 2;
-							header.scrollLeft = scrollPosition.header.startScrollLeft - walk;
-							scrollPosition.header.x = header.scrollLeft;
-						}
-					}}
-					on:touchend={() => {
-						if (scrollPosition.header.remainingWidth > 0) {
-							scrollPosition.header.startX = 0;
-							scrollPosition.header.startScrollLeft = 0;
-						}
-					}}
-					class:scrollable={scrollPosition.header.remainingWidth > 0}
-					class:scrolled={scrollPosition.header.x > 1}
-					class:scrolled__max={scrollPosition.header.remainingWidth - scrollPosition.header.x < 1}
-					class="inline-block mr-1 w-full text-left"
+			<span class="flex max-w-full h-fit items-start relative">
+				<span
+					class="w-[calc(85%-10vw)] xs:w-[calc(90%-6vw)] sm:w-[88%] md:w-[90%] lg:w-[calc(95%-2.5vw)] relative"
 				>
-					{item.subject}
-				</h1>
-			</span>
-			<article
-				class="flex grow justify-between min-w-full h-full flex-col"
-				class:md:flex-row={!expand}
-			>
-				<div class="flex flex-col min-h-full" class:md:max-w-[50%]={!expand}>
-					<div class="stats p-1 flex flex-row gap-x-5">
-						<span title="Read count" aria-label="Number of reads" class="flex items-center">
+					<h1
+						aria-label="Subject line"
+						aria-describedby={item.subject}
+						title={scrollPosition.header.x > 0 ? item.subject : null}
+						bind:this={header}
+						on:wheel={(e) => {
+							if (scrollPosition.header.remainingWidth > 0) {
+								e.stopPropagation();
+								e.preventDefault();
+								header.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY * 0.33;
+								scrollPosition.header.x = header.scrollLeft;
+							}
+						}}
+						on:touchstart={(e) => {
+							if (scrollPosition.header.remainingWidth > 0) {
+								scrollPosition.header.startX = e.touches[0].pageX;
+								scrollPosition.header.startScrollLeft = header.scrollLeft;
+							}
+						}}
+						on:touchmove={(e) => {
+							if (scrollPosition.header.remainingWidth > 0) {
+								e.stopPropagation();
+								e.preventDefault();
+								const x = e.touches[0].pageX;
+								const walk = (x - scrollPosition.header.startX) * 2;
+								header.scrollLeft = scrollPosition.header.startScrollLeft - walk;
+								scrollPosition.header.x = header.scrollLeft;
+							}
+						}}
+						on:touchend={() => {
+							if (scrollPosition.header.remainingWidth > 0) {
+								scrollPosition.header.startX = 0;
+								scrollPosition.header.startScrollLeft = 0;
+							}
+						}}
+						class:scrollable={scrollPosition.header.remainingWidth > 0}
+						class:scrolled={scrollPosition.header.x > 1}
+						class:scrolled__max={scrollPosition.header.remainingWidth - scrollPosition.header.x < 1}
+						class="inline-block mr-1 w-full text-left"
+					>
+						{item.subject}
+					</h1>
+				</span>
+
+				<div class="stats ml-auto flex shrink-0 pl-2 -mt-1 flex-row gap-x-5">
+					<!-- show read count only for emails on blockchain -->
+					<!-- <span title="Read count" aria-label="Number of reads" class="flex items-center">
 							<icon
 								title="Recipient"
 								class="max-w-[36px]"
@@ -339,25 +563,30 @@
 								<RecipientIcon color="#94D2BD" />
 							</icon>
 							{item.open_count != BigInt(0) ? item.open_count : '?'}
-						</span>
-						<span
-							title="Send count"
-							aria-label="Number of sends"
-							class="flex items-center gap-x-1.5"
+						</span> -->
+					<span title="Send count" aria-label="Number of sends" class="flex items-center gap-x-1.5">
+						<icon
+							aria-label="Envelope"
+							class="max-w-[36px]"
+							style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
 						>
-							<icon
-								title="Envelope"
-								class="max-w-[36px]"
-								style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
-							>
-								<SentIcon color="#94D2BD" />
-							</icon>
-							{item.send_count != BigInt(0) ? item.send_count : '?'}
-						</span>
-					</div>
-
+							<SentIcon color="#94D2BD" />
+						</icon>
+						{item.send_count != BigInt(0) ? item.send_count : '?'}
+					</span>
+				</div>
+			</span>
+			<article
+				class="flex grow justify-between min-w-full h-full flex-col"
+				class:md:flex-row={!expand}
+			>
+				<div
+					class="flex flex-col min-h-full"
+					class:md:max-w-[50%]={!expand}
+					class:md:pr-2={!expand}
+				>
 					<div
-						class="tags max-w-[full] h-full justify-between"
+						class="tags max-w-[full] h-full"
 						aria-label="Topic and recepient lists"
 						style="max-width: {!expand ? '35rem' : '100%'};"
 					>
@@ -408,28 +637,31 @@
 									on:click={() => {
 										dispatch('externalAction', { type: 'email', context: item });
 									}}
-									on:keypress={() => {
-										dispatch('externalAction', { type: 'email', context: item });
+									on:keydown={(e) => {
+										if (e.key === 'Enter')
+											dispatch('externalAction', { type: 'email', context: item });
 									}}
 								>
-									click here
-								</span> to send...
+									send...
+								</span>
 							</i>
 						</p>
 						<div
 							role="button"
 							tabindex="0"
 							title="Menu"
-							on:click|stopPropagation={() => {
+							on:click|stopPropagation={(e) => {
 								showMenu = !showMenu;
 							}}
-							on:keypress|stopPropagation={(e) => {
+							on:keydown|stopPropagation={(e) => {
 								if (e.key === 'Enter') {
+									e.preventDefault();
 									showMenu = !showMenu;
 								}
 							}}
 							on:mouseenter={() => (nestedHover = true)}
 							on:mouseleave={() => (nestedHover = false)}
+							on:blur={handleBlur}
 							class="w-[22%] mr-auto self-start max-w-[28px] max-h-fit cursor-context-menu mx-1 hover:scale-125 active:scale-100 ease-in-out duration-150"
 						>
 							<MenuIcon />
@@ -445,13 +677,10 @@
 						tabindex="-1"
 						aria-expanded={expand}
 						aria-label="Email body"
-						class="cursor-alias"
 						class:mt-6={expand}
 						on:click={(e) => {
 							if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 								e.stopPropagation();
-							} else {
-								dispatch('externalAction', { type: 'email', context: item });
 							}
 						}}
 						on:keypress={(e) => {

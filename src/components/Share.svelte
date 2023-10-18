@@ -7,10 +7,12 @@
 	import Social from './Social.svelte';
 	import type { email } from '@prisma/client';
 	import { page } from '$app/stores';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
 	import { handleMailto } from '$lib/data/email';
 	import { handleCopy } from '$lib/data/select';
+	import { goto } from '$app/navigation';
+	import type { Writable } from 'svelte/store';
 
 	export let item: email;
 
@@ -19,7 +21,15 @@
 
 	let sent = false;
 
+	$: closeButtonText = sent ? 'Confirm' : 'Close';
+
+	let sessionStore: Writable<UserState>;
+
 	const dispatch = createEventDispatcher();
+
+	onMount(async () => {
+		sessionStore = (await import('$lib/data/sessionStorage')).store;
+	});
 
 	function setPopover(value: boolean) {
 		dispatch('popover', value);
@@ -102,9 +112,22 @@
 						linkMessage="Share this email:"
 					/>
 				</div>
-				<div class="mt-auto" class:blur-sm={linkCopied}>
+				<div
+					class="mt-auto cursor-pointer"
+					role="checkbox"
+					aria-checked={sent}
+					tabindex="0"
+					on:click|preventDefault|stopPropagation={() => (sent = !sent)}
+					on:keypress={(e) => {
+						if (e.key === 'Enter') {
+							sent = !sent;
+						}
+					}}
+					class:blur-sm={linkCopied}
+				>
 					<input
 						bind:checked={sent}
+						on:click|stopPropagation
 						name="Sent!"
 						id="sendStatus"
 						type="checkbox"
@@ -115,8 +138,40 @@
 			</span>
 		</div>
 	</div>
-	<button class="w-full h-10" on:click={() => setPopover(false)}>
-		{sent ? 'Confirm' : 'Close'}
+	<button
+		class="w-full h-10"
+		on:click={async () => {
+			setPopover(false);
+			if (!$page.data.session && sent) {
+				goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
+				setPopover(true);
+				return;
+			} else if (sent && $page.data.session?.user?.email) {
+				closeButtonText = 'Confirming...';
+				const response = await fetch('/data/email/' + item.shortid, {
+					method: 'POST',
+					headers: {
+						'Increment-Send': 'true',
+						'Sender-Email': $page.data.session?.user?.email,
+						'CSRF-Token': $sessionStore.csrfToken
+					}
+				});
+				if ((await response.text()) === 'incremented') {
+					$sessionStore.template.primary.cardList = $sessionStore.template.primary.cardList.map(
+						(email) => {
+							if (email.shortid === item.shortid) {
+								email.send_count = String(Number(email.send_count) + 1);
+							}
+							return email;
+						}
+					);
+				} else {
+					closeButtonText = 'Confirm';
+				}
+			}
+		}}
+	>
+		{closeButtonText}
 	</button>
 </article>
 

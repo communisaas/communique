@@ -51,4 +51,4 @@ jobs:
             --build-secret DATABASE_URL=$DATABASE_URL \
             --build-secret DISCORD_CLIENT_ID=$DISCORD_CLIENT_ID \
             --build-secret DISCORD_CLIENT_SECRET=$DISCORD_CLIENT_SECRET \
-            --build-secret AUTH_SECRET=$AUTH_SECRET
+            --build-secret AUTH_SECRET=$AUTH_SECRET \

@@ -15,6 +15,13 @@ export function find(table: string, options: Clause, scope: 'unique' | 'many' = 
 	}
 }
 
+export function upsert(table: string, options: Clause) {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore indexing type error
+	const currentTable = objectMapper[table];
+	return currentTable.upsert({ ...options });
+}
+
 export async function rawSqlQuery(query: Sql, params: unknown[] = []) {
 	return await objectMapper.$queryRaw(query, ...params);
 }

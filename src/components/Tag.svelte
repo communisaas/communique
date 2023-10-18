@@ -37,7 +37,7 @@
 		on:click|stopPropagation={() => {
 			handleSelect();
 		}}
-		on:keypress|stopPropagation={(e) => {
+		on:keydown|stopPropagation={(e) => {
 			if (e.key === 'Enter') {
 				handleSelect();
 			}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, type ComponentType } from 'svelte';
+	import { flip } from 'svelte/animate';
 
 	export let items: Selectable[] | string[];
 	export let selectable: ComponentType; // item component template
@@ -125,16 +126,18 @@
 			}
 		}}
 	>
-		{#each items as item}
-			<svelte:component
-				this={selectable}
-				bind:selected={selectedContent}
-				style={itemStyle}
-				{item}
-				on:select
-				on:blur
-				on:externalAction
-			/>
+		{#each items as item (item)}
+			<span class="max-w-full" animate:flip={{ duration: 200 }}>
+				<svelte:component
+					this={selectable}
+					bind:selected={selectedContent}
+					style={itemStyle}
+					{item}
+					on:select
+					on:blur
+					on:externalAction
+				/>
+			</span>
 		{/each}
 	</div>
 </section>
@@ -145,12 +148,6 @@
 		&::-webkit-scrollbar {
 			display: none;
 		}
-
-		&:hover {
-			overflow: scroll;
-			overflow: overlay; // prevent scrollbar from changing container dimensions in webkit
-		}
-
 		&X {
 			&::before {
 				content: '';

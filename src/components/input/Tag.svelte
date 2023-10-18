@@ -161,7 +161,7 @@
 			{#each tagList as tag}
 				<li class="relative mx-2 min-w-0 {tagStyle}">
 					<span
-						class="relative h-full shrink flow-root whitespace-nowrap"
+						class="relative h-full shrink flex whitespace-nowrap"
 						on:mouseenter={() => (deleteVisible[tag.item] = true)}
 						on:mouseleave={() => (deleteVisible[tag.item] = false)}
 						on:touchend={() => (deleteVisible[tag.item] = false)}
@@ -296,7 +296,7 @@
 										handleSubmit(autocomplete);
 										inputField.focus();
 									}}
-									on:keypress|preventDefault|stopPropagation={(e) => {
+									on:keydown|preventDefault|stopPropagation={(e) => {
 										if (e.key === 'Enter') {
 											autocompleted = autocomplete;
 											handleSubmit(autocomplete);

@@ -16,6 +16,7 @@ interface Selectable {
 	target?: SelectableKey;
 	index?: number;
 	content?: email;
+	[key: string];
 }
 
 interface MenuItemClickArgs {
@@ -29,14 +30,26 @@ type MenuItem = {
 	class: string;
 	show: boolean;
 	actionToggled: boolean;
-	actionComponent: SvelteComponent;
+	actionComponent: { component: SvelteComponent; props: props } | undefined;
 	onClick: (MenuItemClickArgs?) => void;
 };
 
+interface SettablePage {
+	show: boolean;
+	class: string;
+	onSubmit: (e: FormEventHandler<HTMLInputElement>) => Promise<unknown>;
+	onLoad?: () => void;
+	items: Settable[];
+}
 interface Settable {
 	name: string;
 	description: string;
-	inputType:
+	label: string;
+	class: string;
+	value?: string | boolean | number;
+	placeholder?: string;
+	maxLength?: number;
+	type:
 		| radio
 		| checkbox
 		| text
@@ -50,9 +63,12 @@ interface Settable {
 		| url
 		| search
 		| tel
-		| color;
+		| color
+		| 'menuitem';
 	key: string;
 	onUpdate: (e: FormEventHandler<HTMLInputElement>) => void;
+	onFocus?: (e: FocusEvent) => void;
+	onLoad?: () => void;
 }
 
 interface Props {

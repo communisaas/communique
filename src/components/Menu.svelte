@@ -7,11 +7,13 @@
 	import { fade, fly, scale, slide } from 'svelte/transition';
 
 	export let items: MenuItem[];
+	export let focusableElements = writable<HTMLElement[]>([]);
 
 	let menu: HTMLElement;
-	let focusableElements = writable<HTMLElement[]>([]);
+	let nestedFocusableElements = writable<HTMLElement[]>([]);
 	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let lastFocusableElement = writable<HTMLElement | null>(null);
+	let firstFocus = true;
 
 	let focusHandler: (e: KeyboardEvent) => void;
 
@@ -25,17 +27,21 @@
 		firstFocusableElement.set(firstElem);
 		lastFocusableElement.set(lastElem);
 
+		focusHandler = (e) => {
+			lastElem.classList.remove('focus:outline-none');
+			firstFocus = false;
+			trapFocus(e, $focusableElements);
+		};
+
 		firstFocusableElement.update((first) => {
 			if (first) {
-				first.focus();
+				lastElem.focus();
+				lastElem.classList.add('focus:outline-none');
+				firstFocus = false;
 				return null;
 			}
 			return first;
 		});
-
-		focusHandler = (e) => {
-			trapFocus(e, $focusableElements);
-		};
 
 		menu.addEventListener('keydown', focusHandler);
 	});
@@ -46,12 +52,13 @@
 			HTMLElement,
 			HTMLElement
 		];
-		focusableElements.set(
-			focusElems.filter((element) => {
+		focusableElements.set([
+			...$nestedFocusableElements,
+			...focusElems.filter((element) => {
 				const shownItems = items.filter((item) => item.show && item.key).map((item) => item.key);
 				if (shownItems.includes(element.id)) return element;
 			})
-		);
+		]);
 	});
 
 	onDestroy(() => {
@@ -60,7 +67,7 @@
 </script>
 
 <aside
-	class="menu rounded absolute top-0 left-0 min-h-full min-w-full z-20 flex justify-center"
+	class="menu rounded absolute top-0 left-0 min-h-full w-full z-20 flex justify-center"
 	in:fade={{ delay: 25, duration: 300, easing: expoIn }}
 	out:fade={{ delay: 50, duration: 300, easing: expoOut }}
 	on:mouseenter
@@ -75,34 +82,49 @@
 			class="flex flex-col gap-y-2"
 		>
 			{#each items.filter((item) => item.show) as item, index (item.key)}
-				<button
-					class={item.class}
+				<div
+					tabindex="0"
+					role="menuitem"
+					class="flex justify-center items-center cursor-pointer {item.class}"
+					class:flex-col={item.actionToggled}
+					class:cursor-default={item.actionToggled}
+					class:pointer-events-none={item.actionToggled}
+					class:scale-105={item.actionToggled}
 					id={item.key}
-					animate:flip={{ delay: 0, duration: 250, easing: quintOut }}
+					animate:flip={{ delay: 0, duration: 100, easing: quintOut }}
 					out:fly={{
-						delay: 0,
 						duration: 250,
 						x: 500,
 						easing: quintOut
 					}}
-					in:fade={{ delay: 0, duration: 250, easing: expoIn }}
+					in:fade={{ duration: 250, easing: expoIn }}
 					on:click|stopPropagation={(e) => {
 						item.onClick({ event: e, focusableElements: $focusableElements });
 					}}
-					on:keypress={(e) => {
+					on:keypress|stopPropagation={(e) => {
 						if (e.key === 'Enter') {
+							e.preventDefault();
 							item.onClick({ event: e, focusableElements: $focusableElements });
 						}
 					}}
 					on:blur
 				>
-					<span transition:scale={{ delay: 50, duration: 250, easing: expoIn }}>
+					<span
+						transition:scale={{ duration: 250, easing: expoIn }}
+						class:cursor-default={item.actionToggled}
+					>
 						{item.name}
 					</span>
 					{#if item.actionToggled && item.actionComponent !== undefined}
-						<svelte:component this={item.actionComponent} />
+						<svelte:component
+							this={item.actionComponent.component}
+							{...item.actionComponent.props}
+							on:blur
+							bind:focusableElements={nestedFocusableElements}
+							bind:firstFocus
+						/>
 					{/if}
-				</button>
+				</div>
 			{/each}
 		</div>
 	</section>
@@ -117,21 +139,13 @@
 		&__item {
 			min-width: 200%;
 			background-color: theme('colors.peacockFeather.500');
-			padding: 0.33em;
-			margin-top: 0.5em;
+			padding: 0.3em;
 			margin-left: -50%;
-			cursor: pointer;
 			transition: ease-in-out 0.2s;
+
 			&--close {
-				margin-top: 2em;
 				background-color: theme('colors.peacockFeather.600');
 			}
-		}
-		&__item:hover {
-			transform: scale(1.08);
-		}
-		&__item:active {
-			transform: scale(0.92);
 		}
 	}
 </style>

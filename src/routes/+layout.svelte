@@ -5,7 +5,7 @@
 	import weMakeChangeLogo from '$lib/assets/We Make Change Logo.png';
 	import Navigation from '$components/Navigation.svelte';
 
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 	import { signIn, signOut } from '@auth/sveltekit/client';
 	import type { topic } from '@prisma/client';
 	import Selector from '$components/Selector.svelte';
@@ -16,13 +16,47 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { routeModal } from '$lib/ui/hash';
+	import { browser } from '$app/environment';
 
 	export let data: LayoutSchema;
 	const dispatch = createEventDispatcher();
 
-	let sessionStore: Writable<UserState>;
+	let sessionStore: Writable<UserState>,
+		navCollapsed = false;
+
+	function handleHashChange(e: HashChangeEvent) {
+		$sessionStore.show = {
+			login: false,
+			share: false,
+			privacyPolicy: false,
+			termsOfUse: false
+		};
+		if (window.location.hash === '#terms-of-use') {
+			$sessionStore.show.termsOfUse = true;
+		} else if (window.location.hash === '#privacy-policy') {
+			$sessionStore.show.privacyPolicy = true;
+		} else {
+			dispatch('popover', false);
+		}
+	}
+
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
+
+		$sessionStore.csrfToken =
+			($sessionStore.csrfToken || (await (await fetch('/auth/csrf')).json()).csrfToken) ?? '';
+
+		if ($page.data.session && $page.data.session?.user?.email) {
+			const ignoredEmails = await fetch('/data/user/' + $page.data.session.user?.email, {
+				method: 'GET',
+				headers: {
+					'CSRF-Token': $sessionStore.csrfToken,
+					'Ignored-Emails': 'true'
+				}
+			}).then((res) => res.json());
+			$sessionStore.hiddenEmails = ignoredEmails.ignored_email_list ?? [];
+		}
+
 		$sessionStore.topic = $sessionStore.topic || { id: topicNames[0], type: 'topic' };
 		$sessionStore.recipient = $sessionStore.recipient || {
 			id: '',
@@ -37,20 +71,35 @@
 			privacyPolicy: false,
 			termsOfUse: false
 		};
+		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
 		const hashes = window.location.hash.substring(1).split('#');
 		// TODO use enum
 		$sessionStore = await routeModal(hashes, $page, $sessionStore, dispatch);
+		window.addEventListener('hashchange', handleHashChange);
 	});
+
+	onDestroy(() => {
+		if (browser) window.removeEventListener('hashchange', handleHashChange);
+	});
+
 	$: topicNames = data.loudestTopics.map((topic: topic) => topic.name);
 </script>
 
 <main class="flex">
-	<div class="grow-0 shrink-0 lg:w-20"><Navigation /></div>
-	<div class="w-full relative flex flex-col min-h-full">
+	<div
+		class="grow-0 shrink-0 sm:m-0 w-[7%] md:w-[4.5rem] xl:w-[5rem]"
+		style={navCollapsed ? 'max-width: 0' : 'min-width: 50px;'}
+	>
+		<Navigation bind:collapsed={navCollapsed} />
+	</div>
+	<div
+		class="relative flex flex-col min-h-full w-[calc(100%-50px)] xl:w-full overflow-hidden"
+		class:min-w-full={navCollapsed}
+	>
 		<section class="min-h-screen mb-3">
 			<header
 				aria-label="Popular topics list"
-				class="flex px-3 md:h-12 h-14 bg-peacockFeather-700 items-center relative align-middle"
+				class="flex md:h-12 h-14 bg-peacockFeather-700 items-center relative align-middle w-full"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
@@ -77,7 +126,7 @@
 						}}
 					/>
 				{/if}
-				<span class="ml-auto flex flex-col items-center justify-center h-full text-paper-500">
+				<span class="ml-auto px-2 flex flex-col items-center justify-center h-full text-paper-500">
 					{#if $page.data.session}
 						{#if $page.data.session.user?.image}
 							<img
@@ -106,7 +155,7 @@
 			<slot />
 		</section>
 		<!-- TODO aria labels for footer -->
-		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full z-10">
+		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full xl:w-full z-10">
 			<div class="container mx-auto flex flex-wrap items-center justify-center px-4">
 				<div class="mb-4 md:mb-0">
 					<div class="flex justify-center md:justify-start">
@@ -143,14 +192,14 @@
 					<span class="border-l border-gray-600 pl-2 ml-2">
 						<a
 							href="#terms-of-use"
-							on:click={() => ($sessionStore.show.termsOfUse = true)}
+							on:click={() => (window.location.hash = '#terms-of-use')}
 							class="text-teal-400 hover:text-teal-500">Terms of Use</a
 						>
 					</span>
 					<span class="border-l border-gray-600 pl-2 ml-2">
 						<a
 							href="#privacy-policy"
-							on:click={() => ($sessionStore.show.privacyPolicy = true)}
+							on:click={() => (window.location.hash = '#privacy-policy')}
 							class="text-teal-400 hover:text-teal-500">Privacy Policy</a
 						>
 					</span>
