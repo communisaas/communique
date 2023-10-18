@@ -67,7 +67,7 @@
 </script>
 
 <aside
-	class="menu rounded absolute top-0 left-0 min-h-full min-w-full z-20 flex justify-center"
+	class="menu rounded absolute top-0 left-0 min-h-full w-full z-20 flex justify-center"
 	in:fade={{ delay: 25, duration: 300, easing: expoIn }}
 	out:fade={{ delay: 50, duration: 300, easing: expoOut }}
 	on:mouseenter
