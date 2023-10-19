@@ -99,7 +99,7 @@
 		<section class="min-h-screen mb-3">
 			<header
 				aria-label="Popular topics list"
-				class="flex md:h-12 h-14 bg-peacockFeather-700 items-center relative align-middle w-full"
+				class="flex md:h-12 h-14 px-2 bg-peacockFeather-700 items-center relative align-middle w-full"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
@@ -112,6 +112,7 @@
 						backgroundColor={colors.peacockFeather[700]}
 						bind:selectedContent={$sessionStore.topic}
 						on:select={async (e) => {
+							// TODO loading placeholders on topic change
 							if ($sessionStore.template.primary) {
 								$sessionStore.template.primary.cardList = await handleSelect(e);
 								$sessionStore.template.primary.focus = {
@@ -128,16 +129,16 @@
 				{/if}
 				<span class="ml-auto px-2 flex flex-col items-center justify-center h-full text-paper-500">
 					{#if $page.data.session}
-						{#if $page.data.session.user?.image}
-							<img
-								src={$page.data.session.user.image}
-								alt="avatar"
-								class="h-7 w-7 md:h-10 md:w-10"
-							/>
-						{/if}
-
 						<button on:click={() => signOut({ callbackUrl: '/', redirect: false })}>
-							Sign out
+							{#if $page.data.session.user?.image}
+								<img
+									src={$page.data.session.user.image}
+									alt="avatar"
+									class="h-7 w-7 md:h-10 md:w-10"
+								/>
+							{:else}
+								<LoginIcon />
+							{/if}
 						</button>
 					{:else}
 						<span class="whitespace-nowrap text-[11px] self-end justify-self-end ml-1.5 -mb-0.5"

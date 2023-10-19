@@ -88,7 +88,7 @@
 	});
 </script>
 
-<section class="flex flex-col relative px-5 gradient-background h-full">
+<section class="flex flex-col relative gradient-background h-full">
 	<aside class="flex flex-nowrap pb-3 max-w-full" style="justify-content: {alignment}">
 		{#if filterable && selectorTarget != 'spotlight'}
 			<h1
@@ -143,8 +143,8 @@
 	<Selector
 		{selectable}
 		{items}
-		alignment="center"
-		selectorStyle="flex-col px-0.5 items-center min-h-[13rem] md:max-w-7xl max-w-3xl m-auto overflow-visible"
+		alignment="match-parent"
+		selectorStyle="flex-col px-2 min-h-[13rem] md:max-w-7xl max-w-3xl m-auto overflow-visible"
 		overflow="visible"
 		target={selected.type}
 		scrollable={false}
