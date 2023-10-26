@@ -124,6 +124,7 @@
 
 								const submitterElement = e.submitter as HTMLElement; // Identifying the submitter element
 
+								const originalValue = (submitterElement as HTMLInputElement)?.value;
 								if (submitterElement) {
 									(submitterElement as HTMLInputElement).value = 'Confirming...'; // Setting the innerHTML to "Confirming..."
 								}
@@ -139,6 +140,7 @@
 									firstReportInput?.setCustomValidity('Please set an option');
 									firstReportInput?.reportValidity();
 									e.preventDefault();
+									(submitterElement as HTMLInputElement).value = originalValue;
 									throw new Error('Please set an option');
 								}
 
@@ -459,7 +461,7 @@
 		justify-center w-[80vw] max-w-full {style}"
 	class:cursor-default={expand}
 	class:clickable={!nestedHover}
-	style="min-width: {expand ? '100%' : '95%'};"
+	style="min-width: {expand ? '99%' : '95%'};"
 >
 	{#if showMenu}
 		<div

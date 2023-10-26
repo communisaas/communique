@@ -102,7 +102,7 @@
 		<section class="min-h-screen mb-3">
 			<header
 				aria-label="Popular topics list"
-				class="flex md:h-12 h-14 px-2 bg-peacockFeather-700 items-center relative align-middle w-full"
+				class="flex md:h-12 h-14 px-2 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1550px)]"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
@@ -131,18 +131,17 @@
 					/>
 				{/if}
 				<span
-					class=" relative overflow-visible ml-auto px-2 flex flex-col items-center justify-center h-full text-paper-500"
+					class="relative overflow-visible ml-auto min-w-fit pl-2 flex flex-col items-center justify-center h-full text-paper-500"
 				>
 					{#if $page.data.session}
-						<button
-							class="group relative p-2 rounded hover:bg-peacockFeather-600 transition-all duration-200"
-							on:click={() => signOut({ callbackUrl: '/', redirect: false })}
+						<div
+							class="group relative rounded hover:bg-peacockFeather-600 transition-all duration-200"
 						>
 							{#if $page.data.session.user?.image}
 								<img
 									src={$page.data.session.user.image}
 									alt="avatar"
-									class="h-7 w-7 md:h-10 md:w-10 rounded-full"
+									class="h-7 w-7 md:h-10 md:w-10"
 								/>
 							{:else}
 								<LoginIcon />
@@ -151,12 +150,12 @@
 							<div
 								role="menu"
 								tabindex="0"
-								class="absolute z-40 right-0 w-auto hidden group-hover:block bg-peacockFeather-700 shadow-lg"
+								class="p-2 absolute z-40 right-0 w-auto hidden group-hover:block bg-peacockFeather-700 shadow-lg"
 							>
-								<ul class="p-2 flex flex-col items-start space-y-1">
+								<ul class="flex flex-col items-start space-y-1">
 									<button
 										class="whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
-										>Sign out</button
+										on:click={() => signOut({ callbackUrl: '/', redirect: false })}>Sign out</button
 									>
 									<button
 										class="whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
@@ -164,7 +163,7 @@
 									>
 								</ul>
 							</div>
-						</button>
+						</div>
 					{:else}
 						<span class="whitespace-nowrap text-[11px] self-end justify-self-end ml-1.5 -mb-0.5"
 							>Sign in</span

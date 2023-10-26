@@ -12,7 +12,7 @@
 	export let selectorTarget: 'topic' | 'recipient' | 'spotlight';
 	export let selected: Selectable;
 	export let initialSelection: Descriptor<string>;
-	export let items: Selectable[];
+	export let items: Selectable[] = [];
 	export let filterable = false;
 	let searchResults: Descriptor<string>[] = [];
 
@@ -89,7 +89,7 @@
 </script>
 
 <section class="flex flex-col relative gradient-background h-full">
-	<aside class="flex flex-nowrap pb-3 max-w-full" style="justify-content: {alignment}">
+	<aside class="flex flex-nowrap pb-3" style="justify-content: {alignment}">
 		{#if filterable && selectorTarget != 'spotlight'}
 			<h1
 				class="text-paper-500 h-fit self-center md:mx-2 my-1 text-xl md:text-3xl leading-tight md:leading-normal"
@@ -98,7 +98,9 @@
 				{header}
 			</h1>
 		{/if}
-		<div class="tab tab__{alignment} sm:max-w-[85%] max-w-[calc(90%-1rem)]">
+		<div
+			class="tab tab__{alignment} sm:max-w-[85%] max-w-[calc(90%-1rem)] 2xl:pr-[calc(100vw-1500px)]"
+		>
 			<span class="space">
 				{#if filterable && selectorTarget != 'spotlight'}
 					<TagInput
@@ -140,27 +142,31 @@
 	<span class="control">
 		<slot />
 	</span>
-	<Selector
-		{selectable}
-		{items}
-		alignment="match-parent"
-		selectorStyle="flex-col px-2 min-h-[13rem] md:max-w-7xl max-w-3xl m-auto overflow-visible"
-		overflow="visible"
-		target={selected.type}
-		scrollable={false}
-		bind:selectedContent={selected}
-		on:select={async (e) => {
-			if (e.detail.type === selected.type) {
-			} else if (e.detail.type === 'topic' || e.detail.type === 'recipient') {
-				window.scrollTo({ top: 0, behavior: 'smooth' }); // TODO handle this in parent page component
-				dispatch('select', e.detail);
-			} else {
-				dispatch('select', e.detail);
-			}
-		}}
-		on:externalAction
-		on:blur
-	/>
+	{#if items}
+		<Selector
+			{selectable}
+			{items}
+			alignment="match-parent"
+			selectorStyle="flex-col px-2 min-h-[13rem] md:max-w-7xl max-w-3xl m-auto overflow-visible"
+			overflow="visible"
+			target={selected.type}
+			scrollable={false}
+			bind:selectedContent={selected}
+			on:select={async (e) => {
+				if (e.detail.type === selected.type) {
+				} else if (e.detail.type === 'topic' || e.detail.type === 'recipient') {
+					window.scrollTo({ top: 0, behavior: 'smooth' }); // TODO handle this in parent page component
+					dispatch('select', e.detail);
+				} else {
+					dispatch('select', e.detail);
+				}
+			}}
+			on:externalAction
+			on:blur
+		/>
+	{:else}
+		<slot />
+	{/if}
 </section>
 
 <style lang="scss">
@@ -182,6 +188,7 @@
 		filter: drop-shadow(1px 2px 1px theme('colors.artistBlue.500'));
 		position: relative;
 		z-index: 20;
+
 		&__start {
 			margin-left: -1.25rem;
 			align-items: start;

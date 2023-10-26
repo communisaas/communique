@@ -75,7 +75,7 @@
 	on:click|preventDefault
 	on:keypress|preventDefault
 >
-	<section role="menu" tabindex="0" class="pt-[0.75rem] w-full">
+	<section role="menu" tabindex="0" class="menu pt-[0.75rem] w-full">
 		<div
 			bind:this={menu}
 			transition:slide={{ delay: 50, axis: 'x', easing: quintOut }}
