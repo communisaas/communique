@@ -159,7 +159,7 @@
 									>
 									<button
 										class="whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
-										>Profile</button
+										on:click={() => goto('/profile')}>Profile</button
 									>
 								</ul>
 							</div>

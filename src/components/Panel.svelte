@@ -8,10 +8,10 @@
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 
-	export let selectable: ComponentType;
-	export let selectorTarget: 'topic' | 'recipient' | 'spotlight';
-	export let selected: Selectable;
-	export let initialSelection: Descriptor<string>;
+	export let selectable: ComponentType | undefined = undefined;
+	export let selectorTarget: 'topic' | 'recipient' | 'spotlight' | undefined = undefined;
+	export let selected: Selectable = { item: '', type: 'option', id: '' };
+	export let initialSelection: Descriptor<string> = { item: '', type: '' };
 	export let items: Selectable[] = [];
 	export let filterable = false;
 	let searchResults: Descriptor<string>[] = [];
@@ -90,7 +90,7 @@
 
 <section class="flex flex-col relative gradient-background h-full">
 	<aside class="flex flex-nowrap pb-3" style="justify-content: {alignment}">
-		{#if filterable && selectorTarget != 'spotlight'}
+		{#if selectorTarget != 'spotlight'}
 			<h1
 				class="text-paper-500 h-fit self-center md:mx-2 my-1 text-xl md:text-3xl leading-tight md:leading-normal"
 				style="background-color: transparent; padding: unset"
@@ -132,9 +132,9 @@
 						}}
 					/>
 				{:else}
-					<h1 class="text-paper-500">
-						{header + ' ' + initialSelection}
-					</h1>
+					<p class="text-paper-500 z-10 ml-10">
+						{initialSelection.item}
+					</p>
 				{/if}
 			</span>
 		</div>
@@ -142,7 +142,7 @@
 	<span class="control">
 		<slot />
 	</span>
-	{#if items}
+	{#if items && selectable}
 		<Selector
 			{selectable}
 			{items}
