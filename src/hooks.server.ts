@@ -6,7 +6,7 @@ import { decode } from '@auth/core/jwt';
 import { AUTH_SECRET } from '$env/static/private';
 
 async function protectDataEndpoints({ event, resolve }) {
-	// Check for POST method and if it's a /data endpoint
+	// Check for POST method and if it's a protected /data endpoint
 	if (
 		(event.request.method === 'POST' && event.url.pathname.startsWith('/data')) ||
 		event.url.pathname.startsWith('/data/user')

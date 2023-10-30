@@ -9,7 +9,7 @@ export async function GET({ request, params, url }) {
 
 	if (request.headers.get('ignored-emails') === 'true') {
 		options.select = { ignored_email_list: true };
-		const results = await objectMapper.user.findUnique(options);
-		return new Response(JSON.stringify(results));
 	}
+	const results = await objectMapper.user.findUnique(options);
+	return new Response(JSON.stringify(results));
 }

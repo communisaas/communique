@@ -5,7 +5,6 @@
 	export let items: Selectable[] | string[];
 	export let selectable: ComponentType; // item component template
 	export let selectedContent: Selectable;
-	export let target: SelectableKey;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let overflow: 'scroll' | 'hidden' | 'visible' | 'wrap' | 'auto' = 'auto';
 	export let scrollable = true;
@@ -40,7 +39,6 @@
 	let resizeObserver: ResizeObserver;
 	let list: HTMLElement;
 	onMount(async () => {
-		selectedContent.target = target;
 		resizeObserver = new ResizeObserver(() => {
 			updateScrollableElements();
 		});

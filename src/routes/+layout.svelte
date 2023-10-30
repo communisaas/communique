@@ -21,8 +21,6 @@
 	export let data: LayoutSchema;
 	const dispatch = createEventDispatcher();
 
-	$: console.log(userLoginHover);
-
 	let sessionStore: Writable<UserState>,
 		navCollapsed = false,
 		userLoginHover = false;
@@ -50,14 +48,14 @@
 			($sessionStore.csrfToken || (await (await fetch('/auth/csrf')).json()).csrfToken) ?? '';
 
 		if ($page.data.session && $page.data.session?.user?.email) {
-			const ignoredEmails = await fetch('/data/user/' + $page.data.session.user?.email, {
-				method: 'GET',
-				headers: {
-					'CSRF-Token': $sessionStore.csrfToken,
-					'Ignored-Emails': 'true'
-				}
-			}).then((res) => res.json());
-			$sessionStore.hiddenEmails = ignoredEmails.ignored_email_list ?? [];
+			$sessionStore.user =
+				(await fetch('data/user/' + $page.data.session?.user?.email, {
+					method: 'GET',
+					headers: {
+						'CSRF-Token': $sessionStore.csrfToken
+					}
+				}).then((res) => res.json())) || $sessionStore.user;
+			$sessionStore.hiddenEmails = $sessionStore.user.ignored_email_list ?? [];
 		}
 
 		$sessionStore.topic = $sessionStore.topic || { id: topicNames[0], type: 'topic' };
@@ -107,7 +105,6 @@
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
 						selectable={Tag}
-						target="email"
 						itemStyle="whitespace-nowrap text-base bg-peacockFeather-500 text-paper-500"
 						selectorStyle="md:py-2"
 						items={topicNames}
@@ -154,11 +151,11 @@
 							>
 								<ul class="flex flex-col items-start space-y-1">
 									<button
-										class="whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
+										class="min-w-full text-left whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
 										on:click={() => signOut({ callbackUrl: '/', redirect: false })}>Sign out</button
 									>
 									<button
-										class="whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
+										class="min-w-full text-left whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
 										on:click={() => goto('/profile')}>Profile</button
 									>
 								</ul>

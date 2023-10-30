@@ -11,6 +11,7 @@ interface UserState {
 	loginCallbackURL?: `/${string}`;
 	profile: unknown;
 	show: ModalState;
+	user?: user;
 	[key: string];
 }
 

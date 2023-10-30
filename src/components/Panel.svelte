@@ -4,6 +4,7 @@
 	import type { Writable } from 'svelte/store';
 	import TagInput from './input/Tag.svelte';
 	import { debounce, fetchSearchResults, handleSelect } from '$lib/data/select';
+	import { page } from '$app/stores';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
@@ -82,10 +83,6 @@
 			.join('&');
 		return await (await fetch(`data/email?${tagString}`)).json();
 	}
-
-	onMount(async () => {
-		store = (await import('$lib/data/sessionStorage')).store;
-	});
 </script>
 
 <section class="flex flex-col relative gradient-background h-full">
@@ -132,7 +129,7 @@
 						}}
 					/>
 				{:else}
-					<p class="text-paper-500 z-10 ml-10">
+					<p class="text-paper-500 z-10 mx-10 my-3">
 						{initialSelection.item}
 					</p>
 				{/if}
@@ -149,7 +146,6 @@
 			alignment="match-parent"
 			selectorStyle="flex-col px-2 min-h-[13rem] md:max-w-7xl max-w-3xl m-auto overflow-visible"
 			overflow="visible"
-			target={selected.type}
 			scrollable={false}
 			bind:selectedContent={selected}
 			on:select={async (e) => {
@@ -164,8 +160,6 @@
 			on:externalAction
 			on:blur
 		/>
-	{:else}
-		<slot />
 	{/if}
 </section>
 

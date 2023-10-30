@@ -21,7 +21,8 @@ export async function GET({ url }: { url: URL }) {
 						break;
 					}
 					case 'email': {
-						clause = valueList.length > 1 ? { in: valueList } : { equals: valueList[0] };
+						fieldName = 'shortid';
+						clause = { in: valueList };
 						break;
 					}
 					default: {

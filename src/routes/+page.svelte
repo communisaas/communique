@@ -62,7 +62,6 @@
 				<Panel
 					header={`${panel.selectable in $sessionStore ? panel.header : 'Loading...'}`}
 					selectable={Email}
-					selectorTarget={panel.selectable}
 					alignment={panel.alignment}
 					filterable={true}
 					initialSelection={$sessionStore.template[index].focus}

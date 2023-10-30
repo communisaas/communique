@@ -129,8 +129,6 @@
 									(submitterElement as HTMLInputElement).value = 'Confirming...'; // Setting the innerHTML to "Confirming..."
 								}
 
-								console.log(e);
-
 								const selectedPreset = formElement.querySelector(
 									'input[name="reportType"]:checked'
 								)?.id;
@@ -600,7 +598,6 @@
 								selectorStyle="pt-2 max-w-full"
 								alignment="start"
 								overflow="wrap"
-								target="email"
 								bind:selectedContent={$sessionStore.topic}
 								on:select={(e) => {
 									setExpand(false);
@@ -617,7 +614,6 @@
 								selectorStyle="pt-1 max-w-full"
 								alignment="start"
 								overflow="wrap"
-								target="email"
 								bind:selectedContent={$sessionStore.recipient}
 								on:select={(e) => {
 									setExpand(false);
