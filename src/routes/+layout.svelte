@@ -30,12 +30,15 @@
 			login: false,
 			share: false,
 			privacyPolicy: false,
-			termsOfUse: false
+			termsOfUse: false,
+			confirm: false
 		};
 		if (window.location.hash === '#terms-of-use') {
 			$sessionStore.show.termsOfUse = true;
 		} else if (window.location.hash === '#privacy-policy') {
 			$sessionStore.show.privacyPolicy = true;
+		} else if (window.location.hash === '#confirm') {
+			$sessionStore.show.confirm = true;
 		} else {
 			dispatch('popover', false);
 		}
@@ -70,12 +73,13 @@
 			login: false,
 			share: false,
 			privacyPolicy: false,
-			termsOfUse: false
+			termsOfUse: false,
+			confirm: false
 		};
 		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
 		const hashes = window.location.hash.substring(1).split('#');
 		// TODO use enum
-		$sessionStore = await routeModal(hashes, $page, $sessionStore, dispatch);
+		routeModal(hashes, $sessionStore, dispatch);
 		window.addEventListener('hashchange', handleHashChange);
 	});
 
@@ -88,7 +92,7 @@
 
 <main class="flex">
 	<div
-		class="grow-0 shrink-0 sm:m-0 w-[7%] md:w-[4.5rem] xl:w-[5rem]"
+		class="grow-0 shrink-0 sm:m-0 w-[7%] md:w-[4rem]"
 		style={navCollapsed ? 'max-width: 0' : 'min-width: 50px;'}
 	>
 		<Navigation bind:collapsed={navCollapsed} />
@@ -143,7 +147,6 @@
 							{:else}
 								<LoginIcon />
 							{/if}
-
 							<div
 								role="menu"
 								tabindex="0"

@@ -8,12 +8,39 @@
 	import Email from '$components/Email.svelte';
 	import type { email } from '@prisma/client';
 	import Selector from '$components/Selector.svelte';
+	import modal, { handlePopover } from '$lib/ui/modal';
+	import Modal from '$components/Modal.svelte';
+	import Login from '$components/Login.svelte';
+	import Share from '$components/Share.svelte';
+	import Reader from '$components/Reader.svelte';
+	import Confirm from '$components/Confirm.svelte';
 
 	export let data;
 
 	let store: Writable<UserState>,
 		selectedSentEmail: Selectable = { item: '', type: 'option', id: '' },
-		sentEmails = [] as Selectable[];
+		sentEmails = [] as Selectable[],
+		modalMapping: ModalMap = {
+			confirm: {
+				component: Confirm,
+				props: () => ({
+					advisoryText:
+						'If you really want to delete your account, type your email address below to confirm. Some data might be retained according to local laws.',
+					confirmInput: $store.user?.email
+				})
+			},
+			share: { component: Share, props: () => ({ item: $store.email.content }) },
+			login: { component: Login, props: () => ({ providers: data.authProviders }) },
+			privacyPolicy: {
+				component: Reader,
+				props: () => ({ item: $page.data.privacyPolicy, inModal: true })
+			},
+			termsOfUse: {
+				component: Reader,
+				props: () => ({ item: $page.data.termsOfUse, inModal: true })
+			}
+		};
+
 	onMount(async () => {
 		store = (await import('$lib/data/sessionStorage')).store;
 		sentEmails = await dataFetcher('data/email', 'email', $store.user.sent_email_list.slice(0, 10));
@@ -47,7 +74,7 @@
 				</span>
 			</p>
 
-			<div class="max-w-[99%]">
+			<div class="max-w-[98%]">
 				<p class="p-2 text-paper-500">
 					Last {$store.user.sent_email_list.slice(0, 10).length} emails you sent:
 				</p>
@@ -73,7 +100,8 @@
 				/>
 			</div>
 			<button
-				class="w-40 m-auto bg-artistBlue-700 hover:bg-artistBlue-800 text-white py-2 px-4 rounded-full transition duration-300 ease-in-out shadow-card focus:outline-none focus:ring-2 focus:ring-artistBlue-900 focus:ring-opacity-50"
+				class="w-40 m-auto bg-artistBlue-700 hover:bg-artistBlue-800 hover:-translate-y-[1px] active:translate-y-0 text-white py-2 px-4 rounded-full transition duration-300 ease-in-out shadow-card focus:outline-none focus:ring-2 focus:ring-larimarGreen-700 focus:ring-opacity-50"
+				on:click={() => (window.location.hash = '#confirm')}
 			>
 				Delete Account
 			</button>
@@ -90,4 +118,18 @@
 			speed={0.5}
 		/>
 	</div> -->
+{/if}
+
+{#if $store && $store.hasOwnProperty('show')}
+	{#each Object.keys($store.show) as modalName (modalName)}
+		{#if $store.show[modalName]}
+			<div use:modal>
+				<Modal
+					popoverComponent={modalMapping[modalName].component}
+					props={modalMapping[modalName].props()}
+					on:popover={(e) => handlePopover(e, store, modalName, '/profile')}
+				/>
+			</div>
+		{/if}
+	{/each}
 {/if}

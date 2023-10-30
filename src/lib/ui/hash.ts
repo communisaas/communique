@@ -1,11 +1,11 @@
 import { goto } from '$app/navigation';
 import { handleMailto, setActiveEmail } from '$lib/data/email';
-import type { Page } from '@sveltejs/kit';
 import type { DispatchOptions } from 'svelte/internal';
+import { page } from '$app/stores';
+import { get } from 'svelte/store';
 
 export async function routeModal(
 	urlHashes: string[],
-	page: Page<Record<string, string>>,
 	sessionStore: UserState,
 	eventDispatcher: <EventKey extends string>(
 		type: EventKey,
@@ -16,17 +16,18 @@ export async function routeModal(
 	sessionStore.show.login = false; // reset login modal
 	if (urlHashes.length === 1 && urlHashes[0]) {
 		const slug = urlHashes[0];
-
 		if (slug === 'signin') {
-			if (!page.data.session) {
+			if (!get(page).data.session) {
 				sessionStore.show.login = true;
 			} else {
-				goto(`/`, { noScroll: true });
+				get(page).route.id || '/', { noScroll: true };
 			}
 		} else if (slug === 'terms-of-use') {
 			sessionStore.show.termsOfUse = true;
 		} else if (slug == 'privacy-policy') {
 			sessionStore.show.privacyPolicy = true;
+		} else if (slug == 'confirm') {
+			sessionStore.show.confirm = true;
 		} else if (
 			sessionStore &&
 			'email' in sessionStore &&
@@ -47,10 +48,10 @@ export async function routeModal(
 			const hashParams = new URLSearchParams(hash);
 
 			if (hashParams.has('signin')) {
-				if (!page.data.session) {
+				if (!get(page).data.session) {
 					sessionStore.show.login = true;
 				} else {
-					goto(`/`, { noScroll: true });
+					goto(get(page).route.id || '/', { noScroll: true });
 				}
 			}
 

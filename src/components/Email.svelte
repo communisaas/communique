@@ -624,8 +624,8 @@
 						</div>
 					</div>
 				</div>
-				{#if expand}
-					<span class="flex max-w-full gap-5">
+				{#if expand && $page.route.id === '/'}
+					<span class="flex max-w-full gap-5 mb-6">
 						<p aria-label="Info text" class="text-center ml-auto mt-1">
 							<i>
 								<span
@@ -667,7 +667,7 @@
 					</span>
 				{/if}
 				<details
-					style="text-align: initial; margin-top: {!expand ? '-1.5rem' : '0'};"
+					style="text-align: initial;"
 					class="whitespace-normal flex flex-col appearance-none self-center"
 					class:w-full={expand}
 				>
@@ -675,7 +675,6 @@
 						tabindex="-1"
 						aria-expanded={expand}
 						aria-label="Email body"
-						class:mt-6={expand}
 						on:click={(e) => {
 							if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
 								e.stopPropagation();
