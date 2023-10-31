@@ -26,7 +26,7 @@
 				component: Confirm,
 				props: () => ({
 					advisoryText:
-						'If you really want to delete your account, type your email address below to confirm. Some data might be retained according to local laws.',
+						'If you really want to delete your account, type your email address below to confirm. Some data might be retained, like message counts, in addition to personal info according to local laws.',
 					inputToConfirm: $store.user?.email,
 					action: async (e: SubmitEvent) => {
 						const response = await fetch('/data/user/' + $store.user?.email, {
