@@ -5,21 +5,36 @@ import Instagram from '@auth/core/providers/instagram';
 import Linkedin from '@auth/core/providers/linkedin';
 import Reddit from '@auth/core/providers/reddit';
 import Twitter from '@auth/core/providers/twitter';
+import Apple from '@auth/core/providers/apple';
+import Google from '@auth/core/providers/google';
+import Twitch from '@auth/core/providers/twitch';
 
 import type { Provider } from '@auth/core/providers';
-import { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, AUTH_SECRET } from '$env/static/private';
+import {
+	DISCORD_CLIENT_ID,
+	DISCORD_CLIENT_SECRET,
+	FACEBOOK_CLIENT_ID,
+	FACEBOOK_CLIENT_SECRET,
+	AUTH_SECRET
+} from '$env/static/private';
 import { find, objectMapper, upsert } from './database';
 
 export const providers: Provider[] = [
-	Facebook({}) as Provider,
+	Facebook({
+		clientId: process.env.FACEBOOK_CLIENT_ID || FACEBOOK_CLIENT_ID,
+		clientSecret: process.env.FACEBOOK_CLIENT_SECRET || FACEBOOK_CLIENT_SECRET
+	}) as Provider,
 	Instagram({}) as Provider,
-	Linkedin({}) as Provider,
 	Twitter({}) as Provider,
+	Google({}) as Provider,
+	Apple({}) as Provider,
+	Linkedin({}) as Provider,
 	Reddit({}) as Provider,
 	Discord({
 		clientId: process.env.DISCORD_CLIENT_ID || DISCORD_CLIENT_ID,
 		clientSecret: process.env.DISCORD_CLIENT_SECRET || DISCORD_CLIENT_SECRET
-	}) as Provider
+	}),
+	Twitch({}) as Provider
 ];
 
 export const baseProviderLogoURL = new URL('https://authjs.dev/img/providers');

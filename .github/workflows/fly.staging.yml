@@ -41,6 +41,8 @@ jobs:
       DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
       DISCORD_CLIENT_SECRET: ${{ secrets.DISCORD_CLIENT_SECRET }}
       AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      FACEBOOK_CLIENT_ID: ${{ secrets.FACEBOOK_CLIENT_ID }}
+      FACEBOOK_CLIENT_SECRET: ${{ secrets.FACEBOOK_CLIENT_SECRET }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -51,4 +53,6 @@ jobs:
             --build-secret DATABASE_URL=$DATABASE_URL \
             --build-secret DISCORD_CLIENT_ID=$DISCORD_CLIENT_ID \
             --build-secret DISCORD_CLIENT_SECRET=$DISCORD_CLIENT_SECRET \
+            --build-secret FACEBOOK_CLIENT_ID=$FACEBOOK_CLIENT_ID \
+            --build-secret FACEBOOK_CLIENT_SECRET=$FACEBOOK_CLIENT_SECRET \
             --build-secret AUTH_SECRET=$AUTH_SECRET \

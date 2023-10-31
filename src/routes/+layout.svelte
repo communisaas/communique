@@ -159,11 +159,11 @@
 								<ul class="flex flex-col items-start space-y-1">
 									<button
 										class="min-w-full text-left whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
-										on:click={() => signOut({ callbackUrl: '/', redirect: false })}>Sign out</button
+										on:click={() => goto('/profile')}>Profile</button
 									>
 									<button
 										class="min-w-full text-left whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
-										on:click={() => goto('/profile')}>Profile</button
+										on:click={() => signOut({ callbackUrl: '/', redirect: false })}>Sign out</button
 									>
 								</ul>
 							</div>
