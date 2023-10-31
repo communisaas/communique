@@ -63,6 +63,8 @@
 	function setPopover(value: boolean) {
 		dispatch('popover', value);
 	}
+
+	console.log(providers.providers)
 </script>
 
 <section role="dialog" bind:this={dialog} class="flex flex-col items-center relative">
@@ -85,7 +87,7 @@
 						class="flex flex-col items-center justify-center md:w-14 md:h-14 h-fit w-fit"
 					>
 						<img
-							src={providers.baseLogoURL + attributes.style.logoDark}
+							src={providers.baseLogoURL + attributes.style.logo}
 							alt="{attributes.name} logo"
 							class="p-2"
 						/>

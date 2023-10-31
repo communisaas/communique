@@ -14,6 +14,7 @@
 	import Share from '$components/Share.svelte';
 	import Reader from '$components/Reader.svelte';
 	import Confirm from '$components/Confirm.svelte';
+	import { signOut } from '@auth/sveltekit/client';
 
 	export let data;
 
@@ -26,7 +27,20 @@
 				props: () => ({
 					advisoryText:
 						'If you really want to delete your account, type your email address below to confirm. Some data might be retained according to local laws.',
-					confirmInput: $store.user?.email
+					inputToConfirm: $store.user?.email,
+					action: async (e: SubmitEvent) => {
+						const response = await fetch('/data/user/' + $store.user?.email, {
+							method: 'DELETE',
+							headers: {
+								'CSRF-Token': $store.csrfToken
+							}
+						});
+						if (response.status !== 200) {
+							throw new Error(`Could not delete user: (${response.status}) ${response.statusText}`);
+						} else {
+							signOut({ callbackUrl: '/', redirect: false });
+						}
+					}
 				})
 			},
 			share: { component: Share, props: () => ({ item: $store.email.content }) },
@@ -43,7 +57,8 @@
 
 	onMount(async () => {
 		store = (await import('$lib/data/sessionStorage')).store;
-		sentEmails = await dataFetcher('data/email', 'email', $store.user.sent_email_list.slice(0, 10));
+		const lastEmailId = $store.user.sent_email_list.slice(-1);
+		sentEmails = await dataFetcher('data/email', 'email', [lastEmailId]);
 	});
 
 	const dataFetcher = async (endpoint: string, type: string, values: string[]) => {
@@ -73,10 +88,11 @@
 					/>
 				</span>
 			</p>
-			{#if $store.user.sent_email_list.length > 0}
+			{#if $store.user.sent_email_list.length >= 1}
 				<div class="max-w-[98%]">
 					<p class="p-2 text-paper-500">
-						Last {$store.user.sent_email_list.slice(0, 10).length} emails you sent:
+						You have sent {$store.user.sent_email_list.length}
+						{$store.user.sent_email_list.length === 1 ? 'email' : 'emails'} so far! Here's the last one:
 					</p>
 					<Selector
 						selectable={Email}
@@ -99,6 +115,10 @@
 						on:blur
 					/>
 				</div>
+			{:else}
+				<p class="p-2 m-auto text-paper-500">
+					You have not sent any emails yet. When you do, the last one will appear here.
+				</p>
 			{/if}
 			<button
 				class="w-40 m-auto bg-artistBlue-700 hover:bg-artistBlue-800 hover:-translate-y-[1px] active:translate-y-0 text-white py-2 px-4 rounded-full transition duration-300 ease-in-out shadow-card focus:outline-none focus:ring-2 focus:ring-larimarGreen-700 focus:ring-opacity-50"

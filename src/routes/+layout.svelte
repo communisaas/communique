@@ -14,7 +14,7 @@
 	import type { Writable } from 'svelte/store';
 	import { handleSelect } from '$lib/data/select';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { routeModal } from '$lib/ui/hash';
 	import { browser } from '$app/environment';
 
@@ -23,7 +23,6 @@
 
 	let sessionStore: Writable<UserState>,
 		navCollapsed = false,
-		userLoginHover = false;
 
 	function handleHashChange(e: HashChangeEvent) {
 		$sessionStore.show = {
@@ -49,6 +48,11 @@
 
 		$sessionStore.csrfToken =
 			($sessionStore.csrfToken || (await (await fetch('/auth/csrf')).json()).csrfToken) ?? '';
+
+		if ($sessionStore.template) {
+			// reload data if session already exists
+			await invalidateAll();
+		}
 
 		if ($page.data.session && $page.data.session?.user?.email) {
 			$sessionStore.user =

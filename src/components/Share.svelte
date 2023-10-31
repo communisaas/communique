@@ -11,7 +11,7 @@
 
 	import { handleMailto } from '$lib/data/email';
 	import { handleCopy } from '$lib/data/select';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import type { Writable } from 'svelte/store';
 
 	export let item: email;
@@ -165,6 +165,7 @@
 							return email;
 						}
 					);
+					$sessionStore.user.sent_email_list.push(item.shortid);
 				} else {
 					closeButtonText = 'Confirm';
 				}

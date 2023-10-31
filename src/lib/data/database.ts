@@ -9,7 +9,7 @@ export function find(table: string, options: Clause, scope: 'unique' | 'many' = 
 	const currentTable = objectMapper[table];
 	switch (scope) {
 		case 'unique':
-			return currentTable.findUnique({ ...options });
+			return currentTable.findFirst({ ...options });
 		case 'many':
 			return currentTable.findMany({ ...options });
 	}

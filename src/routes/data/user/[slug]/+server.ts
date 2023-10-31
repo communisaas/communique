@@ -13,3 +13,16 @@ export async function GET({ request, params, url }) {
 	const results = await objectMapper.user.findUnique(options);
 	return new Response(JSON.stringify(results));
 }
+
+/** @type {import('./$types').RequestHandler} */
+export async function DELETE({ request, params, url }) {
+	const options: Clause = {
+		where: { email: params.slug }
+	};
+
+	// a privilege of -1 means "delete"
+	options.data = { privilege: -1 };
+
+	const results = await objectMapper.user.update(options);
+	return new Response(JSON.stringify(results));
+}

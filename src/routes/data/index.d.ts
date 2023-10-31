@@ -1,5 +1,5 @@
 interface FieldMap {
-	[field: string]: string | Clause | Operator;
+	[field: string]: string | Clause | Operator | unknown;
 }
 
 interface QueryResult {
@@ -17,6 +17,7 @@ interface Clause {
 	where?: Criteria;
 	data?: FieldMap;
 	take?: number;
+	select?: FieldMap;
 }
 
 interface Criteria {

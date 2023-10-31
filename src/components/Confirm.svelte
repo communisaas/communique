@@ -4,7 +4,8 @@
 	import { trapFocus, updateFocusableElements } from '$lib/ui/ux';
 
 	export let advisoryText: string;
-	export let confirmInput: string;
+	export let inputToConfirm: string;
+	export let action: (e: SubmitEvent) => Response | Promise<Response>;
 
 	let focusableElements = writable<HTMLElement[]>([]);
 	let lastFocusableElement = writable<HTMLElement>();
@@ -14,6 +15,7 @@
 	let store: Writable<UserState>;
 
 	let dialog: HTMLElement;
+	let confirmButton: HTMLButtonElement;
 	let submitDisabled = false;
 	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let firstFocus = true;
@@ -49,7 +51,7 @@
 		if (context) {
 			// TODO measure input width smoothly using in-dom placeholder
 			context.font = getComputedStyle(inputField).font;
-			inputValueWidth = context.measureText(confirmInput).width * 1.1;
+			inputValueWidth = context.measureText(inputToConfirm).width * 1.1;
 		}
 		dialog.addEventListener('keydown', focusHandler);
 	});
@@ -62,10 +64,27 @@
 	function setPopover(value: boolean) {
 		dispatch('popover', value);
 	}
+
+	$: confirmButtonText = currentInputValue.length > 0 ? 'Confirm' : 'Close';
 </script>
 
 <section tabindex="-1" class="flex flex-col gap-2 markdown-content m-10" bind:this={dialog}>
-	<form on:submit|preventDefault>
+	<form
+		on:submit|preventDefault={async (e) => {
+			if (!submitDisabled && currentInputValue.length > 0 && e.submitter) {
+				e.submitter.innerHTML = 'Confirming...';
+				try {
+					await action(e);
+				} catch (err) {
+					console.error(err);
+					e.submitter.innerHTML = "Error! Try again; we'll look into it";
+					e.stopPropagation();
+					return;
+				}
+			}
+			if (!submitDisabled) setPopover(false);
+		}}
+	>
 		<aside
 			tabindex="-1"
 			style="text-align: initial;"
@@ -76,11 +95,12 @@
 
 				<input
 					bind:this={inputField}
-					placeholder={confirmInput}
+					placeholder={inputToConfirm}
 					bind:value={currentInputValue}
 					on:input={(e) => {
 						e.currentTarget.setCustomValidity('');
-						if (currentInputValue.length > 0 && currentInputValue !== confirmInput) {
+						confirmButton.innerHTML = confirmButtonText;
+						if (currentInputValue.length > 0 && currentInputValue !== inputToConfirm) {
 							submitDisabled = true;
 							e.currentTarget.setCustomValidity('Does not match!');
 						} else {
@@ -93,12 +113,7 @@
 				/>
 			</div>
 		</aside>
-		<button
-			class="w-full h-10 mt-2"
-			on:click={() => {
-				if (!submitDisabled) setPopover(false);
-			}}>{currentInputValue.length > 0 ? 'Confirm' : 'Close'}</button
-		>
+		<button bind:this={confirmButton} class="w-full h-10 mt-2">{confirmButtonText}</button>
 	</form>
 </section>
 

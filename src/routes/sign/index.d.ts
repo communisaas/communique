@@ -1,6 +1,5 @@
 interface ProviderStyle {
 	logo: `/${string}.svg`;
-	logoDark: `/${string}.svg`;
 	bg: `#${string}`;
 	text: `#${string}`;
 	bgDark: `#${string}`;
