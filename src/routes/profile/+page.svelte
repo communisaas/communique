@@ -73,32 +73,33 @@
 					/>
 				</span>
 			</p>
-
-			<div class="max-w-[98%]">
-				<p class="p-2 text-paper-500">
-					Last {$store.user.sent_email_list.slice(0, 10).length} emails you sent:
-				</p>
-				<Selector
-					selectable={Email}
-					items={sentEmails}
-					alignment="match-parent"
-					selectorStyle="flex-col px-2 min-h-[13rem] md:max-w-7xl max-w-3xl m-auto overflow-visible"
-					overflow="visible"
-					scrollable={false}
-					bind:selectedContent={selectedSentEmail}
-					on:select={async (e) => {
-						// if (e.detail.type === selected.type) {
-						// } else if (e.detail.type === 'topic' || e.detail.type === 'recipient') {
-						// 	window.scrollTo({ top: 0, behavior: 'smooth' }); // TODO handle this in parent page component
-						// 	dispatch('select', e.detail);
-						// } else {
-						// 	dispatch('select', e.detail);
-						// }
-					}}
-					on:externalAction
-					on:blur
-				/>
-			</div>
+			{#if $store.user.sent_email_list.length > 0}
+				<div class="max-w-[98%]">
+					<p class="p-2 text-paper-500">
+						Last {$store.user.sent_email_list.slice(0, 10).length} emails you sent:
+					</p>
+					<Selector
+						selectable={Email}
+						items={sentEmails}
+						alignment="match-parent"
+						selectorStyle="flex-col px-2 min-h-[13rem] md:max-w-7xl max-w-3xl m-auto overflow-visible"
+						overflow="visible"
+						scrollable={false}
+						bind:selectedContent={selectedSentEmail}
+						on:select={async (e) => {
+							// if (e.detail.type === selected.type) {
+							// } else if (e.detail.type === 'topic' || e.detail.type === 'recipient') {
+							// 	window.scrollTo({ top: 0, behavior: 'smooth' }); // TODO handle this in parent page component
+							// 	dispatch('select', e.detail);
+							// } else {
+							// 	dispatch('select', e.detail);
+							// }
+						}}
+						on:externalAction
+						on:blur
+					/>
+				</div>
+			{/if}
 			<button
 				class="w-40 m-auto bg-artistBlue-700 hover:bg-artistBlue-800 hover:-translate-y-[1px] active:translate-y-0 text-white py-2 px-4 rounded-full transition duration-300 ease-in-out shadow-card focus:outline-none focus:ring-2 focus:ring-larimarGreen-700 focus:ring-opacity-50"
 				on:click={() => (window.location.hash = '#confirm')}

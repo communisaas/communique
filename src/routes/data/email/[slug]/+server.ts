@@ -60,6 +60,19 @@ export async function POST({ params, request, cookies, url }) {
 			});
 
 			if (sentEmailList.length <= 0) {
+				const email = await objectMapper.email.findFirst({ where: whereCriteria });
+				if (!email) {
+					return new Response('Email not found', { status: 404 });
+				}
+
+				const topicOptions: Clause = {
+					where: { name: { in: email.topic_list } }
+				};
+
+				topicOptions.data = {
+					email_sent_count: { increment: 1 }
+				};
+
 				emailOptions.data = {
 					send_count: { increment: 1 }
 				};
@@ -67,7 +80,8 @@ export async function POST({ params, request, cookies, url }) {
 				// TODO merge into single query once cockroachdb supports record types https://github.com/cockroachdb/cockroach/issues/70099?version=v23.1
 				await objectMapper.$transaction([
 					objectMapper.email.update({ ...emailOptions }),
-					objectMapper.user.update({ ...userOptions })
+					objectMapper.user.update({ ...userOptions }),
+					objectMapper.topic.updateMany({ ...topicOptions })
 				]);
 				return new Response('incremented');
 			}
