@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ params }) {
-	const searchTerms = params.slug.split('&');
+	const searchTerms = decodeURIComponent(params.slug).split('&');
 	const searchQuery = searchTerms.map((term) => `${term.trim()}:*`).join(' & ');
 
 	const rawQuery = Prisma.sql`

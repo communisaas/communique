@@ -77,10 +77,10 @@ export async function handleCopy(dataType: 'email' | 'link', content: email | st
 	return true;
 }
 
-export async function fetchSearchResults(item: string, fetch: fetch) {
+export async function fetchSearchResults(item: string, fetch: fetch, source='') {
 	let response;
 	// TODO error handling
-	if (item) response = await fetch(`/data/search/${item}`);
+	if (item) response = await fetch(`/data/search/${encodeURIComponent(item)}` + (source ? `?source=${source}` : ''));
 	if (response.ok) {
 		return await response.json();
 	} else {
@@ -103,4 +103,42 @@ export function debounce(timeout: number, callback: CallableFunction, ...params:
 			}
 		}, timeout);
 	});
+}
+
+export async function handleAutocomplete(e: CustomEvent<string>) {
+	try {
+		return (
+			(await debounce(600, fetchSearchResults, e.detail.value, fetch, e.detail.source)) as QueryResult[]
+		).map((result) => {
+			let fieldName: string,
+				iterable = false;
+			switch (result.source) {
+				case 'recipient':
+					fieldName = 'recipient_list';
+					iterable = true;
+					break;
+				case 'topic':
+					fieldName = 'topic_list';
+					iterable = true;
+					break;
+				case 'email':
+					fieldName = 'subject';
+					iterable = false;
+					break;
+				default: {
+					throw new Error('Invalid source type');
+				}
+			}
+			return {
+				type: result.source === 'recipient' ? 'email' : 'topic',
+				item: result.id,
+				field: fieldName,
+				iterable: iterable,
+				source: result.source
+			} as Descriptor<string>;
+		});
+	} catch (error) {
+		console.error('Error in fetching search results:', error);
+		return [];
+	}
 }

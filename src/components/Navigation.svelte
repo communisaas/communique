@@ -50,7 +50,7 @@
 </script>
 
 <aside class="object-cover inline-flex h-full">
-	<div class="flex flex-col items-center h-full bg-peacockFeather-700 shadow-nav z-50">
+	<div class="flex flex-col items-center h-full bg-peacockFeather-700 shadow-nav">
 		<nav aria-label="Page navigation" class="flex flex-col sticky h-screen top-0 md:top-0 md:h-fit">
 			{#if collapsed}
 				<div
