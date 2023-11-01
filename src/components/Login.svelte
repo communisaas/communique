@@ -73,7 +73,7 @@
 			{`Going to ${chosenProvider}...`}
 		</p>
 	{/if}
-	<article class="flex flex-col gap-3 md:w-60 w-56">
+	<article class="flex flex-col gap-3 md:w-40 w-36">
 		<div class="flex flex-wrap items-center justify-center gap-5">
 			{#each Object.entries(providers.providers) as [id, attributes]}
 				{#if !chosenProvider || chosenProvider === attributes.name}
@@ -93,7 +93,7 @@
 				{/if}
 			{/each}
 		</div>
-		<div class="w-48 md:w-56 h-10 m-auto">
+		<div class="w-36 md:w-40 h-10 m-auto">
 			{#if !chosenProvider}
 				<button
 					out:scale={{ delay: 20, duration: 150 }}
