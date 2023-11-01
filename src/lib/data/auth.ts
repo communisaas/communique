@@ -1,40 +1,61 @@
 import { SvelteKitAuth, type SvelteKitAuthConfig } from '@auth/sveltekit';
 import Discord from '@auth/core/providers/discord';
 import Facebook from '@auth/core/providers/facebook';
-import Instagram from '@auth/core/providers/instagram';
 import Linkedin from '@auth/core/providers/linkedin';
 import Reddit from '@auth/core/providers/reddit';
 import Twitter from '@auth/core/providers/twitter';
-import Apple from '@auth/core/providers/apple';
 import Google from '@auth/core/providers/google';
+import Slack from '@auth/core/providers/slack';
 import Twitch from '@auth/core/providers/twitch';
 
 import type { Provider } from '@auth/core/providers';
 import {
+	AUTH_SECRET,
 	DISCORD_CLIENT_ID,
 	DISCORD_CLIENT_SECRET,
 	FACEBOOK_CLIENT_ID,
 	FACEBOOK_CLIENT_SECRET,
-	AUTH_SECRET
+	GOOGLE_CLIENT_ID,
+	GOOGLE_CLIENT_SECRET,
+	LINKEDIN_CLIENT_ID,
+	LINKEDIN_CLIENT_SECRET,
+	SLACK_CLIENT_ID,
+	SLACK_CLIENT_SECRET,
+	TWITCH_CLIENT_ID,
+	TWITCH_CLIENT_SECRET,
+	TWITTER_CLIENT_ID,
+	TWITTER_CLIENT_SECRET
 } from '$env/static/private';
 import { find, objectMapper, upsert } from './database';
 
 export const providers: Provider[] = [
+	Google({
+		clientId: process.env.GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID,
+		clientSecret: process.env.GOOGLE_CLIENT_SECRET || GOOGLE_CLIENT_SECRET
+	}) as Provider,
 	Facebook({
 		clientId: process.env.FACEBOOK_CLIENT_ID || FACEBOOK_CLIENT_ID,
 		clientSecret: process.env.FACEBOOK_CLIENT_SECRET || FACEBOOK_CLIENT_SECRET
 	}) as Provider,
-	Instagram({}) as Provider,
-	Twitter({}) as Provider,
-	Google({}) as Provider,
-	Apple({}) as Provider,
-	Linkedin({}) as Provider,
+	// Linkedin({
+	// 	clientId: process.env.LINKEDIN_CLIENT_ID || LINKEDIN_CLIENT_ID,
+	// 	clientSecret: process.env.LINKEDIN_CLIENT_SECRET || LINKEDIN_CLIENT_SECRET
+	// }) as Provider, // TODO enable when auth.js fixes OIDC changes in LinkedIn https://github.com/nextauthjs/next-auth/issues/8831
 	Reddit({}) as Provider,
+
+	// Twitter({
+	// 	clientId: process.env.TWITTER_CLIENT_ID || TWITTER_CLIENT_ID,
+	// 	clientSecret: process.env.TWITTER_CLIENT_SECRET || TWITTER_CLIENT_SECRET,
+	// 	 // TODO enable when Twitter returns email addresses for oauth2.0
+	// }) as Provider,
 	Discord({
 		clientId: process.env.DISCORD_CLIENT_ID || DISCORD_CLIENT_ID,
 		clientSecret: process.env.DISCORD_CLIENT_SECRET || DISCORD_CLIENT_SECRET
 	}),
-	Twitch({}) as Provider
+	Twitch({
+		clientId: process.env.TWITCH_CLIENT_ID || TWITCH_CLIENT_ID,
+		clientSecret: process.env.TWITCH_CLIENT_SECRET || TWITCH_CLIENT_SECRET
+	}) as Provider
 ];
 
 export const baseProviderLogoURL = new URL('https://authjs.dev/img/providers');

@@ -40,9 +40,19 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
       DISCORD_CLIENT_SECRET: ${{ secrets.DISCORD_CLIENT_SECRET }}
-      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
       FACEBOOK_CLIENT_ID: ${{ secrets.FACEBOOK_CLIENT_ID }}
       FACEBOOK_CLIENT_SECRET: ${{ secrets.FACEBOOK_CLIENT_SECRET }}
+      TWITTER_CLIENT_ID: ${{ secrets.TWITTER_CLIENT_ID }}
+      TWITTER_CLIENT_SECRET: ${{ secrets.TWITTER_CLIENT_SECRET }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
+      LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
+      TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+      TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+      REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+      REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -55,4 +65,14 @@ jobs:
             --build-secret DISCORD_CLIENT_SECRET=$DISCORD_CLIENT_SECRET \
             --build-secret FACEBOOK_CLIENT_ID=$FACEBOOK_CLIENT_ID \
             --build-secret FACEBOOK_CLIENT_SECRET=$FACEBOOK_CLIENT_SECRET \
+            --build-secret TWITTER_CLIENT_ID=$TWITTER_CLIENT_ID \
+            --build-secret TWITTER_CLIENT_SECRET=$TWITTER_CLIENT_SECRET \
+            --build-secret GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+            --build-secret GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
+            --build-secret LINKEDIN_CLIENT_ID=$LINKEDIN_CLIENT_ID \
+            --build-secret LINKEDIN_CLIENT_SECRET=$LINKEDIN_CLIENT_SECRET \
+            --build-secret TWITCH_CLIENT_ID=$TWITCH_CLIENT_ID \
+            --build-secret TWITCH_CLIENT_SECRET=$TWITCH_CLIENT_SECRET \
+            --build-secret REDDIT_CLIENT_ID=$REDDIT_CLIENT_ID \
+            --build-secret REDDIT_CLIENT_SECRET=$REDDIT_CLIENT_SECRET \
             --build-secret AUTH_SECRET=$AUTH_SECRET \

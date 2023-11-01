@@ -63,8 +63,6 @@
 	function setPopover(value: boolean) {
 		dispatch('popover', value);
 	}
-
-	console.log(providers.providers)
 </script>
 
 <section role="dialog" bind:this={dialog} class="flex flex-col items-center relative">
@@ -75,7 +73,7 @@
 			{`Going to ${chosenProvider}...`}
 		</p>
 	{/if}
-	<article class="flex flex-col gap-3 w-56">
+	<article class="flex flex-col gap-3 md:w-60 w-56">
 		<div class="flex flex-wrap items-center justify-center gap-5">
 			{#each Object.entries(providers.providers) as [id, attributes]}
 				{#if !chosenProvider || chosenProvider === attributes.name}
@@ -84,7 +82,7 @@
 							signIn(id, { callbackUrl: $sessionStore.loginCallbackURL });
 							chosenProvider = attributes.name;
 						}}
-						class="flex flex-col items-center justify-center md:w-14 md:h-14 basis-1/4 h-fit w-fit"
+						class="flex flex-col items-center justify-center md:w-14 md:h-14 h-fit w-fit"
 					>
 						<img
 							src={providers.baseLogoURL + attributes.style.logo}
@@ -95,7 +93,7 @@
 				{/if}
 			{/each}
 		</div>
-		<div class="w-full h-10">
+		<div class="w-48 md:w-56 h-10 m-auto">
 			{#if !chosenProvider}
 				<button
 					out:scale={{ delay: 20, duration: 150 }}
