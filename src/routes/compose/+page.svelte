@@ -12,6 +12,7 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import Modal from '$components/Modal.svelte';
 	import modal, { handlePopover } from '$lib/ui/modal';
+	import { handleAutocomplete } from '$lib/data/select';
 
 	export let data: ComposeSchema;
 
@@ -23,6 +24,9 @@
 
 	let recipientEmails = [] as Descriptor<string>[];
 	let topics = [] as Descriptor<string>[];
+
+	let suggestedRecipientEmails = [] as Descriptor<string>[];
+	let suggestedTopics = [] as Descriptor<string>[];
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
@@ -98,21 +102,37 @@
 			<span class="flex flex-row flex-wrap gap-5 mr-4">
 				<TagInput
 					bind:tagList={recipientEmails}
+					autocomplete={true}
+					allowCustomValues={true}
 					type="email"
 					name="recipient"
+					searchField="recipient"
 					placeholder="Recipient"
 					style="h-14 w-fit bg-larimarGreen-700"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-600 text-paper-500 m-2 w-fit"
+					autocompleteStyle="left-0"
+					bind:searchResults={suggestedRecipientEmails}
+					on:autocomplete={async (e) => {
+						suggestedRecipientEmails = await handleAutocomplete(e);
+					}}
 				>
 					<icon class="w-12 inline-block m-1"><AddRecipient /></icon>
 				</TagInput>
 				<TagInput
 					bind:tagList={topics}
+					autocomplete={true}
+					allowCustomValues={true}
 					type="text"
 					name="topic"
+					searchField="topic"
 					placeholder="Topic"
 					style="h-14 w-fit bg-larimarGreen-700"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500 m-2 w-fit"
+					autocompleteStyle="right-0"
+					bind:searchResults={suggestedTopics}
+					on:autocomplete={async (e) => {
+						suggestedTopics = await handleAutocomplete(e);
+					}}
 				>
 					<icon class="w-12 inline-block m-1"><AddTopic /></icon>
 				</TagInput>

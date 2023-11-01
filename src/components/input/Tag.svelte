@@ -8,7 +8,10 @@
 		placeholder: string,
 		style: string,
 		tagStyle: string,
-		autocomplete: boolean = false;
+		autocompleteStyle: string = '',
+		autocomplete: boolean = false,
+		allowCustomValues: boolean = false,
+		searchField = '';
 	export let tagList: Descriptor<string>[] = [];
 	export let searchResults: Descriptor<string>[] = [];
 	export let inputStyle =
@@ -57,7 +60,7 @@
 			inputValueWidth = placeholderWidth;
 		}
 		if (autocomplete && inputField.value.length > 2) {
-			dispatch('autocomplete', inputField.value);
+			dispatch('autocomplete', {value: inputField.value, source: searchField});
 			autocompleteIndex = 0;
 		}
 	}
@@ -87,7 +90,7 @@
 			inputField.setCustomValidity('Too short!');
 			inputField.reportValidity();
 		} else if (
-			inputField.value.length > 0 &&
+			inputField.value.length > 0 && !allowCustomValues &&
 			!visibleSearchResults.some((result) => result.item === inputField.value)
 		) {
 			inputField.setCustomValidity('Nothing here! Try adding it?');
@@ -121,10 +124,13 @@
 		: [];
 	$: groupedResults = visibleSearchResults.reduce(
 		(accumulator: { [key: string]: Descriptor<string>[] }, result) => {
-			if (!accumulator[result.type]) {
-				accumulator[result.type] = [];
+			// TODO filter by searchfield at endpoint
+			if (result.source && (result.source === searchField || !searchField)) {
+				if (!accumulator[result.source]) {
+					accumulator[result.source] = [];
+				}
+				accumulator[result.source].push(result);
 			}
-			accumulator[result.type].push(result);
 			return accumulator;
 		},
 		{}
@@ -161,6 +167,7 @@
 			{#each tagList as tag}
 				<li class="relative mx-2 min-w-0 {tagStyle}">
 					<span
+						role="listitem"
 						class="relative h-full shrink flex whitespace-nowrap"
 						on:mouseenter={() => (deleteVisible[tag.item] = true)}
 						on:mouseleave={() => (deleteVisible[tag.item] = false)}
@@ -263,7 +270,7 @@
 			/>
 			<ul
 				bind:this={completionList}
-				class="autocomplete flex flex-col bg-paper-500 py-1 max-w-[80vw] w-fit"
+				class="autocomplete flex flex-col bg-paper-500 py-1 max-w-[80vw] w-fit {autocompleteStyle}"
 				class:px-4={Object.keys(groupedResults).length > 0 && inputVisible}
 			>
 				{#if searching}
@@ -389,7 +396,6 @@
 	.autocomplete {
 		position: absolute;
 		top: 100%;
-		right: 0;
 		max-height: 200px;
 		overflow-y: auto;
 		overflow-x: visible;

@@ -3,7 +3,7 @@
 	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import TagInput from './input/Tag.svelte';
-	import { debounce, fetchSearchResults, handleSelect } from '$lib/data/select';
+	import { debounce, fetchSearchResults, handleAutocomplete, handleSelect } from '$lib/data/select';
 	import { page } from '$app/stores';
 
 	export let header: string;
@@ -31,42 +31,7 @@
 		oldInitialSelection = initialSelection;
 	}
 
-	async function handleAutocomplete(e: CustomEvent<string>) {
-		try {
-			searchResults = (
-				(await debounce(600, fetchSearchResults, e.detail, fetch)) as QueryResult[]
-			).map((result) => {
-				let fieldName: string,
-					iterable = false;
-				switch (result.source) {
-					case 'recipient':
-						fieldName = 'recipient_list';
-						iterable = true;
-						break;
-					case 'topic':
-						fieldName = 'topic_list';
-						iterable = true;
-						break;
-					case 'email':
-						fieldName = 'subject';
-						iterable = false;
-						break;
-					default: {
-						throw new Error('Invalid source type');
-					}
-				}
-				return {
-					type: result.source === 'recipient' ? 'email' : 'topic',
-					item: result.id,
-					field: fieldName,
-					iterable: iterable,
-					source: result.source
-				} as Descriptor<string>;
-			});
-		} catch (error) {
-			console.error('Error in fetching search results:', error);
-		}
-	}
+	
 
 	async function handleFilter() {
 		// Grouping by fields
@@ -107,11 +72,12 @@
 						style="h-14 w-fit bg-transparent"
 						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded px-2 pr-1 text-paper-500"
 						addIconStyle="add bg-peacockFeather-500 h-12 w-12 text-5xl inline-block leading-12"
+						autocompleteStyle="right-0"
 						autocomplete={true}
 						bind:tagList={selectionList}
 						bind:searchResults
 						on:autocomplete={async (e) => {
-							handleAutocomplete(e);
+							searchResults = await handleAutocomplete(e);
 						}}
 						on:delete={async (e) => {
 							lastSelection = e.detail;
