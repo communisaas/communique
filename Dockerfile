@@ -30,8 +30,30 @@ RUN npx prisma generate
 # Copy application code
 COPY --link . .
 
-# Build application
-RUN npm run build
+# Build application & expose environment variables
+RUN --mount=type=secret,id=TINYMCE_KEY \
+    --mount=type=secret,id=DATABASE_URL \
+    --mount=type=secret,id=DISCORD_CLIENT_SECRET \
+    --mount=type=secret,id=DISCORD_CLIENT_ID \
+    --mount=type=secret,id=FACEBOOK_CLIENT_SECRET \
+    --mount=type=secret,id=FACEBOOK_CLIENT_ID \
+    --mount=type=secret,id=GOOGLE_CLIENT_SECRET \
+    --mount=type=secret,id=GOOGLE_CLIENT_ID \
+    --mount=type=secret,id=TWITCH_CLIENT_SECRET \
+    --mount=type=secret,id=TWITCH_CLIENT_ID \
+    --mount=type=secret,id=AUTH_SECRET \
+    export TINYMCE_KEY="$(cat /run/secrets/TINYMCE_KEY)" && \
+    export DATABASE_URL="$(cat /run/secrets/DATABASE_URL)" && \
+    export DISCORD_CLIENT_SECRET="$(cat /run/secrets/DISCORD_CLIENT_SECRET)" && \
+    export DISCORD_CLIENT_ID="$(cat /run/secrets/DISCORD_CLIENT_ID)" && \
+    export FACEBOOK_CLIENT_SECRET="$(cat /run/secrets/FACEBOOK_CLIENT_SECRET)" && \
+    export FACEBOOK_CLIENT_ID="$(cat /run/secrets/FACEBOOK_CLIENT_ID)" && \
+    export GOOGLE_CLIENT_SECRET="$(cat /run/secrets/GOOGLE_CLIENT_SECRET)" && \
+    export GOOGLE_CLIENT_ID="$(cat /run/secrets/GOOGLE_CLIENT_ID)" && \
+    export TWITCH_CLIENT_SECRET="$(cat /run/secrets/TWITCH_CLIENT_SECRET)" && \
+    export TWITCH_CLIENT_ID="$(cat /run/secrets/TWITCH_CLIENT_ID)" && \
+    export AUTH_SECRET="$(cat /run/secrets/AUTH_SECRET)" && \
+    npm run build
 
 # Remove development dependencies
 RUN npm prune --omit=dev
