@@ -9,6 +9,8 @@ LABEL fly_launch_runtime="NodeJS/Prisma"
 # NodeJS/Prisma app lives here
 WORKDIR /app
 
+# Set production environment
+ENV NODE_ENV=production
 
 # Throw-away build stage to reduce size of final image
 FROM base as build
@@ -19,7 +21,7 @@ RUN apt-get update -qq && \
 
 # Install node modules
 COPY --link package.json package-lock.json ./
-RUN npm install
+RUN npm ci --include=dev
 
 # Generate Prisma Client
 COPY --link prisma .
@@ -29,27 +31,10 @@ RUN npx prisma generate
 COPY --link . .
 
 # Build application
-RUN --mount=type=secret,id=TINYMCE_KEY \
-    --mount=type=secret,id=DATABASE_URL \
-    --mount=type=secret,id=DISCORD_CLIENT_SECRET \
-    --mount=type=secret,id=DISCORD_CLIENT_ID \
-    --mount=type=secret,id=FACEBOOK_CLIENT_SECRET \
-    --mount=type=secret,id=FACEBOOK_CLIENT_ID \
-    --mount=type=secret,id=AUTH_SECRET \
-    export TINYMCE_KEY="$(cat /run/secrets/TINYMCE_KEY)" && \
-    export DATABASE_URL="$(cat /run/secrets/DATABASE_URL)" && \
-    export DISCORD_CLIENT_SECRET="$(cat /run/secrets/DISCORD_CLIENT_SECRET)" && \
-    export DISCORD_CLIENT_ID="$(cat /run/secrets/DISCORD_CLIENT_ID)" && \
-    export FACEBOOK_CLIENT_SECRET="$(cat /run/secrets/FACEBOOK_CLIENT_SECRET)" && \
-    export FACEBOOK_CLIENT_ID="$(cat /run/secrets/FACEBOOK_CLIENT_ID)" && \
-    export AUTH_SECRET="$(cat /run/secrets/AUTH_SECRET)" && \
-    npm run build
-
-# Set production environment
-ENV NODE_ENV=production
+RUN npm run build
 
 # Remove development dependencies
-RUN npm prune --production
+RUN npm prune --omit=dev
 
 # Final stage for app image
 FROM base

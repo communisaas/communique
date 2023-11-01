@@ -79,8 +79,8 @@ export async function POST({ params, request, cookies, url }) {
 				userOptions.data = { sent_email_list: { push: params.slug } }; // push shortid
 				// TODO merge into single query once cockroachdb supports record types https://github.com/cockroachdb/cockroach/issues/70099?version=v23.1
 				await objectMapper.$transaction([
-					objectMapper.email.update({ ...emailOptions }),
 					objectMapper.user.update({ ...userOptions }),
+					objectMapper.email.update({ ...emailOptions }),
 					objectMapper.topic.updateMany({ ...topicOptions })
 				]);
 				return new Response('incremented');
