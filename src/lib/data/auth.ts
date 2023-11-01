@@ -19,8 +19,8 @@ import {
 	GOOGLE_CLIENT_SECRET,
 	LINKEDIN_CLIENT_ID,
 	LINKEDIN_CLIENT_SECRET,
-	SLACK_CLIENT_ID,
-	SLACK_CLIENT_SECRET,
+	REDDIT_CLIENT_ID,
+	REDDIT_CLIENT_SECRET,
 	TWITCH_CLIENT_ID,
 	TWITCH_CLIENT_SECRET,
 	TWITTER_CLIENT_ID,
@@ -41,7 +41,10 @@ export const providers: Provider[] = [
 	// 	clientId: process.env.LINKEDIN_CLIENT_ID || LINKEDIN_CLIENT_ID,
 	// 	clientSecret: process.env.LINKEDIN_CLIENT_SECRET || LINKEDIN_CLIENT_SECRET
 	// }) as Provider, // TODO enable when auth.js fixes OIDC changes in LinkedIn https://github.com/nextauthjs/next-auth/issues/8831
-	Reddit({}) as Provider,
+	Reddit({
+		clientId: process.env.REDDIT_CLIENT_ID || REDDIT_CLIENT_ID,
+		clientSecret: process.env.REDDIT_CLIENT_SECRET || REDDIT_CLIENT_SECRET
+	}) as Provider,
 
 	// Twitter({
 	// 	clientId: process.env.TWITTER_CLIENT_ID || TWITTER_CLIENT_ID,
