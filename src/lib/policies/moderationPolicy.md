@@ -1,4 +1,4 @@
-# Content Moderation Policy for Communique
+# Content Moderation Policy
 
 At Communique, we aim to provide a platform that facilitates constructive communication between individuals, communities, and decision-makers. This mission comes with the responsibility of ensuring that our platform is not used for any harmful activities, including harassment, threats, or hate speech.
 

@@ -20,6 +20,8 @@ interface ModalState {
 	share: boolean;
 	termsOfUse: boolean;
 	privacyPolicy: boolean;
+	moderatioPolicy: boolean;
+	confirm: boolean
 	[key: string];
 }
 

@@ -89,7 +89,7 @@
 	<aside class="flex flex-nowrap pb-3" style="justify-content: {alignment}">
 		{#if selectorTarget != 'spotlight'}
 			<h1
-				class="text-paper-500 h-fit self-center md:mx-2 my-1 text-xl md:text-3xl leading-tight md:leading-normal"
+				class="text-paper-500 h-fit self-center md:mx-2 ml-2 my-1 text-sm xs:text-2xl md:text-3xl leading-tight md:leading-normal"
 				style="background-color: transparent; padding: unset"
 			>
 				{header}

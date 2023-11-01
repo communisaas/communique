@@ -29,6 +29,7 @@
 			login: false,
 			share: false,
 			privacyPolicy: false,
+			moderatioPolicy: false,
 			termsOfUse: false,
 			confirm: false
 		};
@@ -36,6 +37,8 @@
 			$sessionStore.show.termsOfUse = true;
 		} else if (window.location.hash === '#privacy-policy') {
 			$sessionStore.show.privacyPolicy = true;
+		} else if (window.location.hash === '#moderation-policy') {
+			$sessionStore.show.moderationPolicy = true;
 		} else if (window.location.hash === '#confirm') {
 			$sessionStore.show.confirm = true;
 		} else {
@@ -77,6 +80,7 @@
 			login: false,
 			share: false,
 			privacyPolicy: false,
+			moderatioPolicy: false,
 			termsOfUse: false,
 			confirm: false
 		};
@@ -184,7 +188,7 @@
 			<slot />
 		</section>
 		<!-- TODO aria labels for footer -->
-		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full xl:w-full z-10">
+		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full z-10">
 			<div class="container mx-auto flex flex-wrap items-center justify-center px-4">
 				<div class="mb-4 md:mb-0">
 					<div class="flex justify-center md:justify-start">
@@ -216,7 +220,7 @@
 	</div> -->
 
 				<div class="text-gray-400 md:text-sm text-xs mt-6 flex justify-center items-center">
-					<span class="mr-2">&copy; 2023 Communique. All rights reserved.</span>
+					<span class="ml-3">&copy; 2023 Communique.</span>
 
 					<span class="border-l border-gray-600 pl-2 ml-2">
 						<a
@@ -227,18 +231,26 @@
 					</span>
 					<span class="border-l border-gray-600 pl-2 ml-2">
 						<a
+							href="#moderation-policy"
+							on:click={() => (window.location.hash = '#moderation-policy')}
+							class="text-teal-400 hover:text-teal-500">Moderation Policy</a
+						>
+					</span>
+					<span class="border-l border-gray-600 pl-2 ml-2">
+						<a
 							href="#privacy-policy"
 							on:click={() => (window.location.hash = '#privacy-policy')}
 							class="text-teal-400 hover:text-teal-500">Privacy Policy</a
 						>
 					</span>
-					<span class="border-l border-gray-600 pl-2 ml-2">
+					<!-- <span class="border-l border-gray-600 pl-2 ml-2">
 						<a href="https://www.wemakechange.org/" target="_blank" class="self-start">
 							<img src={weMakeChangeLogo} alt="We Make Change Logo" class="w-[10.125rem]" />
 						</a>
-					</span>
+					</span> -->
 				</div>
 			</div>
+
 		</footer>
 	</div>
 </main>

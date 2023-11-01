@@ -33,6 +33,10 @@
 			component: Reader,
 			props: () => ({ item: $page.data.privacyPolicy, inModal: true })
 		},
+		moderationPolicy: {
+			component: Reader,
+			props: () => ({ item: $page.data.moderationPolicy, inModal: true })
+		},
 		termsOfUse: {
 			component: Reader,
 			props: () => ({ item: $page.data.termsOfUse, inModal: true })

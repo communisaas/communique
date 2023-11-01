@@ -26,6 +26,8 @@ export async function routeModal(
 			sessionStore.show.termsOfUse = true;
 		} else if (slug == 'privacy-policy') {
 			sessionStore.show.privacyPolicy = true;
+		} else if (slug === '#moderation-policy') {
+			sessionStore.show.moderationPolicy = true;
 		} else if (slug == 'confirm') {
 			sessionStore.show.confirm = true;
 		} else if (
