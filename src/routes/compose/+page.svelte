@@ -102,7 +102,7 @@
 			<span class="flex flex-row flex-wrap gap-5 mr-4">
 				<TagInput
 					bind:tagList={recipientEmails}
-					autocomplete={true}
+					autocomplete={false}
 					allowCustomValues={true}
 					type="email"
 					name="recipient"
@@ -110,7 +110,6 @@
 					placeholder="Recipient"
 					style="h-14 w-fit bg-larimarGreen-700"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-600 text-paper-500 m-2 w-fit"
-					autocompleteStyle="left-0"
 					bind:searchResults={suggestedRecipientEmails}
 					on:autocomplete={async (e) => {
 						suggestedRecipientEmails = await handleAutocomplete(e);

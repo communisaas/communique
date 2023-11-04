@@ -47,7 +47,7 @@
 	}
 
 	async function handleInput() {
-		if (inputField.value.length > 2) {
+		if (inputField.value.length > 2 && autocomplete) {
 			searching = true;
 		} else {
 			searching = false;
@@ -60,7 +60,7 @@
 			inputValueWidth = placeholderWidth;
 		}
 		if (autocomplete && inputField.value.length > 2) {
-			dispatch('autocomplete', {value: inputField.value, source: searchField});
+			dispatch('autocomplete', { value: inputField.value, source: searchField });
 			autocompleteIndex = 0;
 		}
 	}
@@ -90,7 +90,8 @@
 			inputField.setCustomValidity('Too short!');
 			inputField.reportValidity();
 		} else if (
-			inputField.value.length > 0 && !allowCustomValues &&
+			inputField.value.length > 0 &&
+			!allowCustomValues &&
 			!visibleSearchResults.some((result) => result.item === inputField.value)
 		) {
 			inputField.setCustomValidity('Nothing here! Try adding it?');
