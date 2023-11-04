@@ -1,41 +1,58 @@
 <script lang="ts">
-	import Editor from '@tinymce/tinymce-svelte';
+	import { onMount } from 'svelte';
 	import type { Writable } from 'svelte/types/runtime/store';
-	import type { Editor as EditorComponent } from 'tinymce';
+	import Paragraph from '@editorjs/paragraph';
 
 	export let apiKey: string = '';
 	export let content: Writable<string>;
 
 	let context: EditorComponent;
 
-	const conf = {
-		placeholder: 'Write me a letter...',
-		menubar: false,
-		contextmenu: 'blocks | forecolor backcolor | link copy cut paste',
-		toolbar: [
-			{ name: 'formatting', items: ['bold', 'italic', 'underline'] },
-			{ name: 'font', items: ['fontfamily'] },
-			{ name: 'color', items: ['forecolor', 'backcolor'] },
-			{ name: 'alignment', items: ['alignleft', 'aligncenter', 'alignright', 'alignjustify'] },
-			{ name: 'media', items: ['link', 'table', 'image', 'example'] }
-		],
-		toolbar_persist: true,
-		toolbar_mode: 'sliding',
-		fixed_toolbar_container: '#toolbar',
-		statusbar: true,
-		plugins: 'quickbars image table autolink link autosave',
-		// TODO implement template strings
-		// external_plugins: { example: '/editorPlugins/placeholder.js' },
-		quickbars_insert_toolbar: false,
-		quickbars_selection_toolbar: 'forecolor backcolor | h1 h2 h3 | link  ',
-		link_default_target: '_blank',
-		browser_spellcheck: true,
-		init_instance_callback: (editor: EditorComponent) => {
-			context = editor;
-		}
-	};
+	// const conf = {
+	// 	placeholder: 'Write me a letter...',
+	// 	menubar: false,
+	// 	contextmenu: 'blocks | forecolor backcolor | link copy cut paste',
+	// 	toolbar: [
+	// 		{ name: 'formatting', items: ['bold', 'italic', 'underline'] },
+	// 		{ name: 'font', items: ['fontfamily'] },
+	// 		{ name: 'color', items: ['forecolor', 'backcolor'] },
+	// 		{ name: 'alignment', items: ['alignleft', 'aligncenter', 'alignright', 'alignjustify'] },
+	// 		{ name: 'media', items: ['link', 'table', 'image', 'example'] }
+	// 	],
+	// 	toolbar_persist: true,
+	// 	toolbar_mode: 'sliding',
+	// 	fixed_toolbar_container: '#toolbar',
+	// 	statusbar: true,
+	// 	plugins: 'quickbars image table autolink link autosave',
+	// 	// TODO implement template strings
+	// 	// external_plugins: { example: '/editorPlugins/placeholder.js' },
+	// 	quickbars_insert_toolbar: false,
+	// 	quickbars_selection_toolbar: 'forecolor backcolor | h1 h2 h3 | link  ',
+	// 	link_default_target: '_blank',
+	// 	browser_spellcheck: true,
+	// 	init_instance_callback: (editor: EditorComponent) => {
+	// 		context = editor;
+	// 	}
+	// };
 
-	const editorID = 'body';
+	const editorID = 'editor';
+	let editor;
+	let editorDiv: HTMLDivElement;
+	onMount(async () => {
+		const EditorJS = await import('@editorjs/editorjs').then((m) => m.default);
+		editor = new EditorJS({
+			holder: editorID,
+			hideToolbar: true,
+			placeholder: 'Write me a letter...',
+			tools: {
+				paragraph: {
+					class: Paragraph,
+					config: { placeholder: 'Write me a letter...' },
+					inlineToolbar: false
+				}
+			}
+		});
+	});
 </script>
 
 <main
@@ -43,34 +60,56 @@
 	on:keypress={(e) => e.currentTarget.focus()}
 	aria-label="Email editor"
 	aria-describedby="Write your email here"
-	class="relative flex flex-col items-center bg-paper-500 px-40 py-5 min-h-[10vh]"
+	class="relative flex flex-col items-center bg-artistBlue-600 p-5 min-h-[10vh]"
 >
 	<span id="toolbar" class="-mt-12 absolute" />
-	<Editor
-		on:change={() => context.save()}
-		{apiKey}
-		{conf}
-		bind:text={$content}
-		inline={true}
-		id={editorID}
+	<div
+		on:click={(e) => e.currentTarget.focus()}
+		on:keypress={(e) => e.currentTarget.focus()}
+		aria-label="Email editor"
+		aria-describedby="Write your email here"
+		class="relative w-full h-full bg-artistBlue-600 [&>*[data-placeholder]]:text-paper-500 text-paper-500 px-5 min-h-[20vh]"
+		id="editor"
 	/>
 </main>
 
-<style>
-	:global(.tox-editor-header) {
-		box-shadow: rgba(0, 0, 0, 0.16) 0px 2px 4px !important;
-		margin: 0 2em !important;
-		transition: box-shadow 0.2s ease-out;
+<style lang="scss">
+	:global(.codex-editor ::selection) {
+		background-color: theme('colors.artistBlue.500');
 	}
-	:global(.tox-editor-header:hover) {
-		box-shadow: rgba(0, 0, 0, 0.16) 0px 4px 10px !important;
-		transition: box-shadow 0.2s ease-in;
+	:global(.codex-editor__redactor) {
+		padding: 0 !important;
 	}
-	:global(.tinymce-wrapper) {
-		padding-top: 1rem;
+	:global(
+			.codex-editor--empty .ce-block:first-child .ce-paragraph[data-placeholder]:empty::before
+		) {
+		color: theme('colors.artistBlue.500');
 	}
-	:global(.mce-content-body) {
-		min-height: 10rem;
-		min-width: 55vw;
+	:global(.ce-toolbar__plus, .ce-toolbar__settings-btn) {
+		color: theme('colors.larimarGreen.600');
+	}
+	:global(.ce-toolbar__plus:hover, .ce-toolbar__settings-btn:hover) {
+		background-color: theme('colors.peacockFeather.700');
+	}
+
+	:global(.ce-block--selected .ce-block__content) {
+		background-color: theme('colors.peacockFeather.700');
+		border-left: 0.45rem solid theme('colors.peacockFeather.700');
+	}
+	:global(.ce-popover) {
+		background: theme('colors.peacockFeather.500');
+		border-color: theme('colors.larimarGreen.700');
+	}
+	:global(.ce-popover-item) {
+		color: theme('colors.paper.700');
+	}
+	:global(.ce-popover-item__icon) {
+		background: theme('colors.peacockFeather.500');
+	}
+	:global(.ce-popover-item:hover:not(.ce-popover-item--no-hover)) {
+		background: theme('colors.larimarGreen.700');
+	}
+	:global(.cdx-search-field__icon svg, .cdx-search-field__input::placeholder) {
+		color: theme('colors.peacockFeather.500');
 	}
 </style>

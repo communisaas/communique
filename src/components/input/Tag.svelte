@@ -14,8 +14,7 @@
 		searchField = '';
 	export let tagList: Descriptor<string>[] = [];
 	export let searchResults: Descriptor<string>[] = [];
-	export let inputStyle =
-		'rounded bg-paper-500 shadow-artistBlue shadow-card w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center';
+	export let inputStyle = '';
 	export let addIconStyle =
 		'add absolute bg-peacockFeather-600 h-6 w-6 text-2xl leading-6 font-bold';
 
@@ -264,7 +263,7 @@
 					handleInput();
 				}}
 				style="width: {inputVisible ? inputValueWidth : 0}px;"
-				class={inputStyle}
+				class="rounded shadow-artistBlue shadow-card w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center {inputStyle}"
 				class:show={inputVisible}
 				class:p-1={inputVisible}
 				{type}
@@ -343,7 +342,6 @@
 <style lang="scss">
 	input {
 		transition: all 0.2s;
-		color: black;
 	}
 	button span {
 		filter: drop-shadow(1px 1px 0.5px rgb(0 0 0 / 0.4));

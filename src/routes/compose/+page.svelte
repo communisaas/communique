@@ -108,7 +108,8 @@
 					name="recipient"
 					searchField="recipient"
 					placeholder="Recipient"
-					style="h-14 w-fit bg-larimarGreen-700"
+					style="h-14 w-fit bg-peacockFeather-700"
+					inputStyle="bg-artistBlue-700 text-paper-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-600 text-paper-500 m-2 w-fit"
 					bind:searchResults={suggestedRecipientEmails}
 					on:autocomplete={async (e) => {
@@ -125,7 +126,8 @@
 					name="topic"
 					searchField="topic"
 					placeholder="Topic"
-					style="h-14 w-fit bg-larimarGreen-700"
+					style="h-14 w-fit bg-peacockFeather-700"
+					inputStyle="bg-artistBlue-700 text-paper-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500 m-2 w-fit"
 					autocompleteStyle="right-0"
 					bind:searchResults={suggestedTopics}
@@ -137,7 +139,7 @@
 				</TagInput>
 			</span>
 
-			<span class="px-1 py-1 w-fit rounded bg-larimarGreen-700">
+			<span class="px-1 py-1 w-fit rounded bg-peacockFeather-700">
 				<input
 					required
 					autocomplete="off"
@@ -151,7 +153,7 @@
 					}}
 					name="subject"
 					placeholder="Subject"
-					class="w-42 h-fit p-0.5 rounded"
+					class="w-42 h-fit p-0.5 bg-artistBlue-700 text-paper-500 rounded"
 				/>
 			</span>
 		</div>
@@ -164,7 +166,7 @@
 			type="submit"
 			name="post"
 			title="Post"
-			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-larimarGreen-700 text-white"
+			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-peacockFeather-700 text-white"
 			aria-label="Post button"
 			on:mouseenter={() => ($postButtonHovered = true)}
 			on:touchstart={() => ($postButtonHovered = true)}

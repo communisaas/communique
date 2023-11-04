@@ -22,7 +22,7 @@
 	const dispatch = createEventDispatcher();
 
 	let sessionStore: Writable<UserState>,
-		navCollapsed = false,
+		navCollapsed = false;
 
 	function handleHashChange(e: HashChangeEvent) {
 		$sessionStore.show = {
@@ -118,7 +118,7 @@
 					<Selector
 						selectable={Tag}
 						itemStyle="whitespace-nowrap text-base bg-peacockFeather-500 text-paper-500"
-						selectorStyle="md:py-2"
+						selectorStyle="self-center m-auto w-full h-full"
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}
@@ -250,7 +250,6 @@
 					</span> -->
 				</div>
 			</div>
-
 		</footer>
 	</div>
 </main>
