@@ -94,7 +94,6 @@ const config: SvelteKitAuthConfig = {
 						auth_provider: account?.provider
 					}
 				});
-				console.log(userCheckInResult);
 			} catch (error) {
 				console.error(error);
 				throw new Error('Database error');

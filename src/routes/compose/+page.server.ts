@@ -1,17 +1,37 @@
-import { TINYMCE_KEY } from '$env/static/private';
+import { AUTH_SECRET, TINYMCE_KEY } from '$env/static/private';
 import { v4 as uuidv4 } from 'uuid';
 import type { RequestEvent, PageServerLoad } from './$types';
 
 import { objectMapper } from '$lib/data/database';
 import { fail } from '@sveltejs/kit';
 import { EmailForm } from '$lib/data/email';
+import { decode } from '@auth/core/jwt';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-	publish: async ({ request }: RequestEvent) => {
-		const formSubmission = await request.formData();
+	publish: async ({ request, url, cookies }: RequestEvent) => {
+		const authCookieName =
+			url.protocol === 'https:' ? '__Secure-next-auth.session-token' : 'next-auth.session-token';
 
-		// TODO implement openid account linking to store profile
+		const jwt = await decode({
+			token: cookies.get(authCookieName),
+			secret: process.env.AUTH_SECRET || AUTH_SECRET
+		});
+
+		if (!jwt) {
+			throw new Error('Invalid token');
+		}
+
+		// TODO filter compose submissions through openAI API:
+		// 	- classify content risk & label --> ask action suggestion, hold off publishing
+		//  if moderation pass:
+		//  - suggest shortid --> ensure unique in database
+		//  - suggest topics --> cross-examine existing topics
+		//  - if variable subjects toggled: suggest
+
+		// TODO geolocation scope
+
+		const formSubmission = await request.formData();
 
 		// const profileRequestID: string | undefined = formSubmission.get('profileRequestID')?.toString();
 
@@ -24,28 +44,38 @@ export const actions = {
 		// 	formSubmission.delete('profileRequestId');
 		// } else return fail(400, { name: 'profile', missing: true });
 
-		const emailForm = new EmailForm(formSubmission);
+		// TODO email shortid creation
+		const stagingID = uuidv4();
+		if (!('shortid' in formSubmission.keys())) {
+			formSubmission.set('shortid', stagingID.slice(-8));
+		}
+
+		const emailForm = new EmailForm(
+			formSubmission,
+			formSubmission.get('author_email')?.toString() || ''
+		);
 		try {
 			emailForm.validate();
 		} catch (error) {
-			fail(400, { name: error, missing: true });
+			return fail(400, { name: error.toString(), missing: true });
 		}
 
-		const stagingID = uuidv4();
 		await objectMapper.$transaction(async (tx) => {
 			const updateTime = new Date().toISOString();
 			await tx.author.upsert({
-				where: {
-					rowid: stagingID
+				where: { email_address: emailForm.author_email },
+				update: {
+					last_updated: updateTime
 				},
-				update: {}, // { profile },
 				create: {
-					rowid: stagingID,
-					profile: {},
 					read_email_count: 0,
 					sent_email_count: 0,
 					open_email_count: 0,
-					is_registered: false
+					user: {
+						connect: {
+							email: emailForm.author_email
+						}
+					}
 				}
 			});
 
@@ -56,15 +86,11 @@ export const actions = {
 						create: {
 							name: topic,
 							last_updated: updateTime,
+							added_by: emailForm.author_email,
 							email_count: 1,
 							email_open_count: 0,
 							email_read_count: 0,
-							email_sent_count: 0,
-							author: {
-								connect: {
-									rowid: stagingID
-								}
-							}
+							email_sent_count: 0
 						},
 						update: {
 							email_count: { increment: 1 },
@@ -79,15 +105,11 @@ export const actions = {
 						create: {
 							address: address,
 							last_updated: updateTime,
+							added_by: emailForm.author_email,
 							email_count: 1,
 							email_open_count: 0,
 							email_read_count: 0,
-							email_sent_count: 0,
-							author: {
-								connect: {
-									rowid: stagingID
-								}
-							}
+							email_sent_count: 0
 						},
 						update: {
 							email_count: { increment: 1 },
@@ -96,19 +118,12 @@ export const actions = {
 					})
 			);
 
-			// TODO email shortid creation
-			if (!('shortid' in emailForm.inputFields)) {
-				emailForm.inputFields.shortid = stagingID.slice(-8);
-			}
+			// TODO duplicate email detection
 			await tx.email.create({
 				data: {
 					...emailForm.inputFields,
 					...emailForm.defaultMetrics,
-					author: {
-						connect: {
-							rowid: stagingID
-						}
-					}
+					added_by: emailForm.author_email
 				}
 			});
 		});

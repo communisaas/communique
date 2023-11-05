@@ -12,11 +12,10 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import Modal from '$components/Modal.svelte';
 	import modal, { handlePopover } from '$lib/ui/modal';
+	import type EditorJS from '@editorjs/editorjs';
 	import { handleAutocomplete } from '$lib/data/select';
+	import { invalidateAll } from '$app/navigation';
 
-	export let data: ComposeSchema;
-
-	let composed: Writable<string> = writable('');
 	let postButtonHovered = writable(false);
 	let sessionStore: Writable<UserState>;
 
@@ -28,6 +27,7 @@
 	let suggestedRecipientEmails = [] as Descriptor<string>[];
 	let suggestedTopics = [] as Descriptor<string>[];
 
+	let editor: EditorJS;
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
 	});
@@ -60,19 +60,23 @@
 		action="?/publish"
 		aria-label="Compose form"
 		aria-describedby="Add topics, recipients, a subject line, and email body here"
-		use:enhance={async ({ form, data: post, action, cancel }) => {
-			// `form` is the `<form>` element
-			// `data` is its `FormData` object
+		use:enhance={async ({ formData, action, cancel, submitter }) => {
+			// `formData` is its `FormData` object that's about to be submitted
 			// `action` is the URL to which the form is posted
 			// `cancel()` will prevent the submission
+
+			let outputData = await editor.save();
+			formData.set('body', JSON.stringify(outputData));
+			formData.set('author_email', $sessionStore.user.email);
+
 			for (const [tagName, list] of Object.entries({
 				recipient_list: recipientEmails,
 				topic_list: topics
 			})) {
-				post.set(tagName, list.join('␞'));
+				const listValues = list.map((entry) => entry.item);
+				formData.set(tagName, listValues.join('␞'));
 			}
 
-			const letterInput = document.querySelector("input[name='body']");
 			// TODO validate & sanitize email body, use openAI moderation API + cheapest model to generate a shortID
 
 			// const webProfile = (
@@ -86,11 +90,17 @@
 			// post.set('profileRequestID', (await webProfile).requestId);
 
 			return async ({ result, update }) => {
+				console.log(result);
 				if (result.status == 200) {
 					// TODO submit confirmation
 					recipientEmails = [];
 					topics = [];
 					update();
+					invalidateAll();
+				} else {
+					// TODO present server-side submission errors
+					console.error(result);
+					if (submitter) submitter.innerHTML = "Error!! We're working on it~";
 				}
 
 				// `result` is an `ActionResult` object
@@ -159,7 +169,7 @@
 		</div>
 
 		<span class="py-8">
-			<Editor apiKey={data.editorKey} content={composed} />
+			<Editor bind:editor />
 		</span>
 
 		<button

@@ -14,6 +14,7 @@ export class EmailForm {
 		topic_list: [],
 		recipient_list: []
 	};
+	author_email = '';
 
 	set subject(line: string) {
 		this.inputFields.subject = line;
@@ -34,17 +35,40 @@ export class EmailForm {
 	defaultMetrics = { open_count: 0, clipboard_count: 0, send_count: 0, read_count: 0 };
 	emailForm: FormData;
 
-	constructor(emailForm: FormData) {
+	constructor(emailForm: FormData, author_email: string) {
 		this.emailForm = emailForm;
+		this.author_email = author_email;
 	}
 
 	validate() {
+		if (!this.author_email) throw new Error('Author email not set');
+
 		for (const field of Object.keys(this.inputFields)) {
 			const value = this.emailForm.get(field);
-			if (value != null || value != undefined) {
+			if ((value != null || value != undefined) && field != 'body') {
 				(this as RawEmailForm)[field] = value.toString();
-			} else throw new Error(`${field} is empty`);
+			} else if ((value != null || value != undefined) && field == 'body') {
+				const parsedBody = this.serializeBody(value.toString());
+				if (parsedBody.length > 0) {
+					(this as RawEmailForm)[field] = parsedBody;
+				} else throw new Error(`${field} is empty`);
+			} else {
+				throw new Error(`${field} is empty`);
+			}
 		}
+	}
+
+	serializeBody(editorDataString: string) {
+		const dataObject = JSON.parse(editorDataString);
+		let runningText = '';
+		for (const block of dataObject.blocks) {
+			if (block.type === 'paragraph') {
+				// Check if the block is a paragraph
+				runningText += `<p>${he.encode(block.data.text)}</p><br>`; // Wrap the text in <p> tags and add <br>
+			}
+			// You might want to handle other types of blocks differently here
+		}
+		return runningText;
 	}
 }
 
