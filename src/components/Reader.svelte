@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, afterUpdate, beforeUpdate, createEventDispatcher } from 'svelte';
 	import type { Writable } from 'svelte/store';
-	import { sanitize } from 'isomorphic-dompurify';
+	import DOMPurify from 'isomorphic-dompurify';
 
 	export let expand = true;
 	export let inModal = false;
@@ -73,7 +73,7 @@
 				: '11rem'}; pointer-events: {expand ? 'auto' : 'none'}"
 			class="cursor-text"
 		>
-			{@html sanitize(item)}
+			{@html DOMPurify.sanitize(item)}
 		</div>
 	</aside>
 	{#if inModal}

@@ -261,7 +261,7 @@
 				on:input={() => {
 					handleInput();
 				}}
-				style="width: {inputVisible ? inputValueWidth : 0}px;"
+				style="width: {inputVisible && inputValueWidth ? inputValueWidth : 0}px;"
 				class="rounded shadow-artistBlue shadow-card w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center {inputStyle}"
 				class:show={inputVisible}
 				class:p-1={inputVisible}

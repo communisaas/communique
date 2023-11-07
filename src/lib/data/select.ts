@@ -3,7 +3,7 @@
 
 import { page } from '$app/stores';
 import { get } from 'svelte/store';
-import { sanitize } from 'isomorphic-dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import { convertHtmlToText } from './email';
 import he from 'he';
 
@@ -30,7 +30,7 @@ export async function handleCopy(dataType: 'email' | 'link', content: email | st
 	let copyData, cleanedBody;
 
 	if (dataType === 'email') {
-		cleanedBody = sanitize(content);
+		cleanedBody = DOMPurify.DOMPurify.sanitize(content);
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(cleanedBody, 'text/html');
 		content = convertHtmlToText(doc.body);

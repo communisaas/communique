@@ -2,7 +2,7 @@ import he from 'he';
 
 import { get } from 'svelte/store';
 import { error } from '@sveltejs/kit';
-import { sanitize } from 'isomorphic-dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 
 import type { email } from '@prisma/client';
 
@@ -64,7 +64,7 @@ export class EmailForm {
 		for (const block of dataObject.blocks) {
 			if (block.type === 'paragraph') {
 				// Check if the block is a paragraph
-				runningText += sanitize(`<p>${block.data.text}</p><br>`); // Wrap the text in <p> tags and add <br>
+				runningText += DOMPurify.sanitize(`<p>${block.data.text}</p><br>`); // Wrap the text in <p> tags and add <br>
 			}
 			// You might want to handle other types of blocks differently here
 		}
@@ -124,7 +124,10 @@ export async function handleMailto(
 
 	// Parse the HTML string into a DOM
 	const parser = new DOMParser();
-	const doc = parser.parseFromString(sanitize(get(sessionStore).email.content.body), 'text/html');
+	const doc = parser.parseFromString(
+		DOMPurify.sanitize(get(sessionStore).email.content.body),
+		'text/html'
+	);
 
 	let mailBody = '';
 	if (includeBody) {

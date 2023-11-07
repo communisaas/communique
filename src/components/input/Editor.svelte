@@ -15,7 +15,6 @@
 			tools: {
 				paragraph: {
 					class: Paragraph,
-					config: { placeholder: 'Write me a letter...' },
 					inlineToolbar: false
 				}
 			}
