@@ -133,9 +133,6 @@ export async function handleMailto(
 		// Decode any HTML entities
 		plainBody = he.decode(plainBody);
 
-		// Collapse consecutive newlines
-		plainBody = plainBody.replace(/\n{4,}/g, '\n');
-
 		// URL encode the plain text body
 		mailBody = `&body=${encodeURIComponent(plainBody)}`;
 	}

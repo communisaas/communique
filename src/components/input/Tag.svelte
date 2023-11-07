@@ -17,14 +17,14 @@
 	export let inputStyle = '';
 	export let addIconStyle =
 		'add absolute bg-peacockFeather-600 h-6 w-6 text-2xl leading-6 font-bold';
+	export let inputVisible: boolean = false;
+	export let inputField: HTMLInputElement;
 
-	let inputVisible: boolean = false;
 	$: searching = false;
 
 	let autocompleted = true;
 	let deleteVisible: FlagMap = {}; // A map to hold visibility states
 
-	let inputField: HTMLInputElement;
 	let completionList: HTMLUListElement;
 	let deleteButtons: ButtonElementMap = {}; // A map to hold the delete buttons
 
@@ -68,7 +68,7 @@
 		if (
 			(!Object.keys(deleteVisible).some((k) => deleteVisible[k]) &&
 				!completionList.contains(e.relatedTarget as Node)) ||
-			e.relatedTarget === null
+			!autocomplete
 		) {
 			searching = false;
 			inputVisible = false;
@@ -113,7 +113,6 @@
 		searchResults = [];
 	}
 
-	$: if (inputVisible) inputField.focus();
 	$: if (searchResults) {
 		searching = false;
 	}
@@ -150,7 +149,7 @@
 	});
 </script>
 
-<div class="px-5 rounded max-w-full h-max inline-block items-center justify-center z-10 {style}">
+<div class="px-2 rounded max-w-full h-max inline-block items-center justify-center z-10 {style}">
 	<form
 		autocomplete="off"
 		class="flex flex-nowrap max-w-full"
@@ -327,11 +326,12 @@
 			on:click={(e) => {
 				if (!inputVisible) {
 					inputVisible = true;
+					inputField.focus();
 					e.preventDefault();
 				}
 			}}
 		>
-			<span title={`Add ${name}`} class="flex" class:active={inputVisible}>
+			<span title={`Add ${name}`} class="flex">
 				<slot />
 				<icon class={addIconStyle} />
 			</span>

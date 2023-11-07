@@ -109,7 +109,7 @@
 		class="relative flex flex-col min-h-full w-[calc(100%-50px)] xl:w-full overflow-hidden"
 		class:min-w-full={navCollapsed}
 	>
-		<section class="min-h-screen mb-3">
+		<section class="min-h-screen">
 			<header
 				aria-label="Popular topics list"
 				class="flex md:h-12 h-14 px-2 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1550px)]"

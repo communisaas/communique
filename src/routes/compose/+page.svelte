@@ -28,6 +28,8 @@
 	let suggestedTopics = [] as Descriptor<string>[];
 
 	let editor: EditorJS;
+	let topicInput: HTMLInputElement;
+	let recipientInput: HTMLInputElement;
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
 	});
@@ -53,7 +55,7 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<section class="py-4 min-h-screen">
+<section class="pt-4 min-h-screen">
 	<h1 class="text-paper-500 text-left ml-20 pb-5">email composer</h1>
 	<form
 		class="flex flex-col gap-y-5 rounded-full"
@@ -65,10 +67,33 @@
 			// `formData` is its `FormData` object that's about to be submitted
 			// `action` is the URL to which the form is posted
 			// `cancel()` will prevent the submission
+			if (!submitter) throw Error('No submitter element found');
+			const initialSubmitterState = submitter.innerHTML;
 
-			let outputData = await editor.save();
-			formData.set('body', JSON.stringify(outputData));
+			let composerData = await editor.save();
+
+			formData.set('body', JSON.stringify(composerData));
 			formData.set('author_email', $sessionStore.user.email);
+
+			// validate email length
+			let runningBodyLength = 0;
+			for (const block of composerData.blocks) {
+				runningBodyLength += block.data.text.length;
+			}
+			if (runningBodyLength < 250) {
+				submitter.innerHTML = `Email has ${runningBodyLength} characters... Try for at least 250.`;
+				setTimeout(() => {
+					if (submitter && initialSubmitterState) submitter.innerHTML = initialSubmitterState;
+				}, 5000);
+				return;
+			}
+
+			// validate metadata fields
+			if (recipientEmails.length <= 0 || topics.length <= 0) {
+				if (recipientEmails.length <= 0) recipientInput.reportValidity();
+				if (topics.length <= 0) topicInput.reportValidity();
+				return;
+			}
 
 			for (const [tagName, list] of Object.entries({
 				recipient_list: recipientEmails,
@@ -92,7 +117,6 @@
 
 			return async ({ result, update }) => {
 				console.log(result);
-				const initialSubmitterState = submitter?.innerHTML;
 				if (result.status == 200) {
 					// TODO submit confirmation
 					recipientEmails = [];
@@ -117,6 +141,7 @@
 			<span class="flex flex-row flex-wrap gap-5 mr-4">
 				<TagInput
 					bind:tagList={recipientEmails}
+					bind:inputField={recipientInput}
 					autocomplete={false}
 					allowCustomValues={true}
 					type="email"
@@ -126,6 +151,7 @@
 					style="h-14 w-fit bg-peacockFeather-700"
 					inputStyle="bg-artistBlue-700 text-paper-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-600 text-paper-500 m-2 w-fit"
+					inputVisible={true}
 					bind:searchResults={suggestedRecipientEmails}
 					on:autocomplete={async (e) => {
 						suggestedRecipientEmails = await handleAutocomplete(e);
@@ -135,6 +161,7 @@
 				</TagInput>
 				<TagInput
 					bind:tagList={topics}
+					bind:inputField={topicInput}
 					autocomplete={true}
 					allowCustomValues={true}
 					type="text"
@@ -144,6 +171,7 @@
 					style="h-14 w-fit bg-peacockFeather-700"
 					inputStyle="bg-artistBlue-700 text-paper-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500 m-2 w-fit"
+					inputVisible={true}
 					autocompleteStyle="right-0"
 					bind:searchResults={suggestedTopics}
 					on:autocomplete={async (e) => {
@@ -190,7 +218,7 @@
 			on:touchend={() => ($postButtonHovered = false)}
 			on:blur={() => ($postButtonHovered = false)}
 		>
-			<span class="w-8"><Post hovered={$postButtonHovered} /></span>
+			<span class="w-16 -mr-2"><Post hovered={$postButtonHovered} /></span>
 			Post
 		</button>
 	</form>

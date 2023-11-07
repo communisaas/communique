@@ -16,6 +16,7 @@
 	export let items: Selectable[] = [];
 	export let filterable = false;
 	let searchResults: Descriptor<string>[] = [];
+	let searchInput: HTMLInputElement;
 
 	const dispatch = createEventDispatcher();
 
@@ -30,8 +31,6 @@
 		selectionList = [initialSelection];
 		oldInitialSelection = initialSelection;
 	}
-
-	
 
 	async function handleFilter() {
 		// Grouping by fields
@@ -66,10 +65,11 @@
 			<span class="space">
 				{#if filterable && selectorTarget != 'spotlight'}
 					<TagInput
+						bind:inputField={searchInput}
 						type="search"
 						name="search item"
 						placeholder={'Search'}
-						style="h-14 w-fit bg-transparent"
+						style="h-14 mx-4 w-fit bg-transparent"
 						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded px-2 pr-1 text-paper-500"
 						addIconStyle="add bg-peacockFeather-500 h-12 w-12 text-5xl inline-block leading-12"
 						autocompleteStyle="right-0"
