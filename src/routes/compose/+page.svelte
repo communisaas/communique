@@ -56,7 +56,7 @@
 </svelte:head>
 
 <section class="pt-4 min-h-screen">
-	<h1 class="text-paper-500 text-left ml-20 pb-5">email composer</h1>
+	<h1 class="text-paper-500 text-left ml-5 md:ml-20 pb-5">email composer</h1>
 	<form
 		class="flex flex-col gap-y-5 rounded-full"
 		method="POST"
@@ -137,13 +137,14 @@
 			};
 		}}
 	>
-		<div class="ml-20 mr-20 flex flex-col w-fit h-full max-md:w-18 gap-x-20 gap-y-3">
-			<span class="flex flex-row flex-wrap gap-5 mr-4">
+		<div class="ml-5 md:ml-20 mr-20 flex flex-col w-fit h-full max-md:w-18 gap-x-20 gap-y-3">
+			<span class="flex flex-row flex-wrap gap-5 mr-4 pr-14">
 				<TagInput
 					bind:tagList={recipientEmails}
 					bind:inputField={recipientInput}
 					autocomplete={false}
 					allowCustomValues={true}
+					maxItems={100}
 					type="email"
 					name="recipient"
 					searchField="recipient"
@@ -164,6 +165,7 @@
 					bind:inputField={topicInput}
 					autocomplete={true}
 					allowCustomValues={true}
+					maxItems={5}
 					type="text"
 					name="topic"
 					searchField="topic"
@@ -209,7 +211,7 @@
 			type="submit"
 			name="post"
 			title="Post"
-			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-min min-w-fit h-14 rounded bg-peacockFeather-700 text-white"
+			class="flex flex-row items-center gap-4 ml-5 md:ml-20 px-3 py-2 w-min min-w-fit h-14 rounded bg-peacockFeather-700 text-white"
 			aria-label="Post button"
 			on:mouseenter={() => ($postButtonHovered = true)}
 			on:touchstart={() => ($postButtonHovered = true)}
@@ -218,7 +220,7 @@
 			on:touchend={() => ($postButtonHovered = false)}
 			on:blur={() => ($postButtonHovered = false)}
 		>
-			<span class="w-16 -mr-2"><Post hovered={$postButtonHovered} /></span>
+			<span class="w-14 -mr-2"><Post hovered={$postButtonHovered} /></span>
 			Post
 		</button>
 	</form>

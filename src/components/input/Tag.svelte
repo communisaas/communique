@@ -11,7 +11,8 @@
 		autocompleteStyle: string = '',
 		autocomplete: boolean = false,
 		allowCustomValues: boolean = false,
-		searchField = '';
+		searchField = '',
+		maxItems = 100;
 	export let tagList: Descriptor<string>[] = [];
 	export let searchResults: Descriptor<string>[] = [];
 	export let inputStyle = '';
@@ -71,21 +72,22 @@
 			!autocomplete
 		) {
 			searching = false;
-			inputVisible = false;
+			if (inputVisible && tagList.length > 0) inputVisible = false;
 			inputValueWidth = placeholderWidth;
 			groupedResults = {};
 			dispatch('blur', e.detail);
 		}
 	}
 
-	function handleSubmit(autocompleted = false) {
+	function handleSubmit() {
 		if (searching && !groupedResults) return;
+		if (tagList.length == maxItems) {
+			inputField.setCustomValidity(`Maximum of ${maxItems} ${name}s!`);
+			inputField.reportValidity();
+			return;
+		}
 
-		if (autocompleted && visibleSearchResults !== null && visibleSearchResults.length > 0) {
-			// Trigger the autocomplete item at `autocompleteIndex`
-			addTag(visibleSearchResults[autocompleteIndex]);
-			inputValueWidth = placeholderWidth;
-		} else if (inputField.value.length < 3) {
+		if (inputField.value.length < 3) {
 			inputField.setCustomValidity('Too short!');
 			inputField.reportValidity();
 		} else if (
@@ -143,7 +145,7 @@
 		if (context) {
 			// TODO measure input width smoothly using in-dom placeholder
 			context.font = getComputedStyle(inputField).font;
-			inputValueWidth = context.measureText(placeholder).width * 1.25;
+			inputValueWidth = context.measureText(placeholder).width * 1.2;
 			placeholderWidth = inputValueWidth;
 		}
 	});
@@ -187,8 +189,10 @@
 							deleteX = Math.max(deleteX, 0); // To keep it within left boundary
 							deleteY = Math.max(deleteY, 0); // To keep it within top boundary
 
-							deleteButtons[tag.item].style.left = `${deleteX}px`;
-							deleteButtons[tag.item].style.top = `${deleteY}px`;
+							if (deleteButtons[tag.item]) {
+								deleteButtons[tag.item].style.left = `${deleteX}px`;
+								deleteButtons[tag.item].style.top = `${deleteY}px`;
+							}
 						}}
 					>
 						<button
@@ -250,7 +254,7 @@
 
 					if (e.key === 'Enter') {
 						e.preventDefault();
-						handleSubmit(autocomplete);
+						handleSubmit();
 					}
 
 					if (e.key === 'Escape' || (e.key === 'Tab' && !visibleSearchResults)) {
@@ -298,14 +302,14 @@
 											(r) => r.item === result.item
 										))}
 									on:click|preventDefault|stopPropagation={(e) => {
-										autocompleted = autocomplete;
-										handleSubmit(autocomplete);
+										addTag(visibleSearchResults[autocompleteIndex]);
+										inputValueWidth = placeholderWidth;
 										inputField.focus();
 									}}
 									on:keydown|preventDefault|stopPropagation={(e) => {
 										if (e.key === 'Enter') {
-											autocompleted = autocomplete;
-											handleSubmit(autocomplete);
+											addTag(visibleSearchResults[autocompleteIndex]);
+											inputValueWidth = placeholderWidth;
 											inputField.focus();
 										}
 									}}

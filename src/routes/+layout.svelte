@@ -118,7 +118,7 @@
 					<Selector
 						selectable={Tag}
 						itemStyle="whitespace-nowrap text-base bg-peacockFeather-500 text-paper-500"
-						selectorStyle="self-center m-auto w-full h-full"
+						selectorStyle="self-center m-auto w-full h-full px-2"
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}

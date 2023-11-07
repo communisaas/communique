@@ -11,7 +11,7 @@
 		editor = new EditorJS({
 			holder: editorID,
 			hideToolbar: true,
-			placeholder: 'Write me a letter...',
+			placeholder: 'Write a letter here...',
 			tools: {
 				paragraph: {
 					class: Paragraph,
@@ -25,12 +25,12 @@
 <main
 	aria-label="Email editor"
 	aria-describedby="Write your email here"
-	class="relative flex flex-col w-full h-full items-start bg-artistBlue-600 p-5"
+	class="relative flex flex-col w-full h-full items-start bg-artistBlue-600 p-5 md:px-20"
 >
 	<div
 		aria-label="Email editor"
 		aria-describedby="Write your email here"
-		class="relative w-full self-start bg-artistBlue-600 [&>*[data-placeholder]]:text-paper-500 text-paper-500 px-5 min-h-[20vh]"
+		class="relative w-full self-start bg-artistBlue-600 [&>*[data-placeholder]]:text-paper-500 max-w-7xl text-paper-500 px-5 min-h-[20vh]"
 		id="editor"
 	/>
 </main>

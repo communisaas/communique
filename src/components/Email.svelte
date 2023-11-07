@@ -459,7 +459,7 @@
 		justify-center w-[80vw] max-w-full {style}"
 	class:cursor-default={expand}
 	class:clickable={!nestedHover}
-	style="min-width: {expand ? '99%' : '95%'};"
+	style="width: {expand ? 'calc(99% + 0.25rem)' : '95%'}; margin-left: {expand ? '-0.25rem' : 0};"
 >
 	{#if showMenu}
 		<div
