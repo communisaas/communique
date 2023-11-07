@@ -1,0 +1,63 @@
+/* editor.css */
+
+/* Base styles */
+.codex-editor ::selection {
+    background-color: theme('colors.artistBlue.500');
+}
+
+.codex-editor__redactor {
+    padding: 0 !important;
+}
+
+.codex-editor--empty .ce-block:first-child .ce-paragraph[data-placeholder]:empty::before {
+    color: theme('colors.artistBlue.500');
+}
+
+.ce-toolbar__plus,
+.ce-toolbar__settings-btn {
+    color: theme('colors.larimarGreen.600');
+}
+
+.ce-toolbar__plus:hover,
+.ce-toolbar__settings-btn:hover {
+    background-color: theme('colors.peacockFeather.700');
+}
+
+.ce-block--selected .ce-block__content {
+    background-color: theme('colors.peacockFeather.700');
+    border-left: 0.45rem solid theme('colors.peacockFeather.700');
+}
+
+.ce-popover {
+    background: theme('colors.peacockFeather.500');
+    border-color: theme('colors.larimarGreen.700');
+}
+
+.ce-popover-item {
+    color: theme('colors.paper.700');
+}
+
+.ce-popover-item__icon {
+    background: theme('colors.peacockFeather.500');
+}
+
+.ce-popover-item:hover:not(.ce-popover-item--no-hover) {
+    background: theme('colors.larimarGreen.700');
+}
+
+.cdx-search-field__icon svg,
+.cdx-search-field__input::placeholder {
+    color: theme('colors.peacockFeather.500');
+}
+
+/* Media query to override styles up to a max-width of 650px */
+@media (max-width: 650px) {
+    .ce-toolbar__plus,
+    .ce-toolbar__settings-btn {
+        background-color: theme('colors.peacockFeather.700');
+    }
+    .ce-toolbar__plus:hover,
+    .ce-toolbar__settings-btn:hover {
+        background-color: theme('colors.peacockFeather.700');
+    }
+}

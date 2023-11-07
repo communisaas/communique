@@ -53,7 +53,8 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<section class="py-8 min-h-screen">
+<section class="py-4 min-h-screen">
+	<h1 class="text-paper-500 text-left ml-20 pb-5">email composer</h1>
 	<form
 		class="flex flex-col gap-y-5 rounded-full"
 		method="POST"
@@ -91,6 +92,7 @@
 
 			return async ({ result, update }) => {
 				console.log(result);
+				const initialSubmitterState = submitter?.innerHTML;
 				if (result.status == 200) {
 					// TODO submit confirmation
 					recipientEmails = [];
@@ -100,7 +102,10 @@
 				} else {
 					// TODO present server-side submission errors
 					console.error(result);
-					if (submitter) submitter.innerHTML = "Error!! We're working on it~";
+					if (submitter) submitter.innerHTML = "Error!! We're working on it.";
+					setTimeout(() => {
+						if (submitter && initialSubmitterState) submitter.innerHTML = initialSubmitterState;
+					}, 5000);
 				}
 
 				// `result` is an `ActionResult` object
@@ -176,7 +181,7 @@
 			type="submit"
 			name="post"
 			title="Post"
-			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-28 h-14 rounded bg-peacockFeather-700 text-white"
+			class="flex flex-row items-center gap-4 ml-20 px-3 py-2 w-min min-w-fit h-14 rounded bg-peacockFeather-700 text-white"
 			aria-label="Post button"
 			on:mouseenter={() => ($postButtonHovered = true)}
 			on:touchstart={() => ($postButtonHovered = true)}
@@ -185,7 +190,8 @@
 			on:touchend={() => ($postButtonHovered = false)}
 			on:blur={() => ($postButtonHovered = false)}
 		>
-			<span><Post hovered={$postButtonHovered} /></span>Post
+			<span class="w-8"><Post hovered={$postButtonHovered} /></span>
+			Post
 		</button>
 	</form>
 </section>

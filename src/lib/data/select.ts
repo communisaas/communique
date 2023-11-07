@@ -3,7 +3,7 @@
 
 import { page } from '$app/stores';
 import { get } from 'svelte/store';
-import DOMPurify from 'dompurify';
+import { sanitize } from 'isomorphic-dompurify';
 import { convertHtmlToText } from './email';
 import he from 'he';
 
@@ -30,7 +30,7 @@ export async function handleCopy(dataType: 'email' | 'link', content: email | st
 	let copyData, cleanedBody;
 
 	if (dataType === 'email') {
-		cleanedBody = DOMPurify.sanitize(content);
+		cleanedBody = sanitize(content);
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(cleanedBody, 'text/html');
 		content = convertHtmlToText(doc.body);
@@ -77,10 +77,13 @@ export async function handleCopy(dataType: 'email' | 'link', content: email | st
 	return true;
 }
 
-export async function fetchSearchResults(item: string, fetch: fetch, source='') {
+export async function fetchSearchResults(item: string, fetch: fetch, source = '') {
 	let response;
 	// TODO error handling
-	if (item) response = await fetch(`/data/search/${encodeURIComponent(item)}` + (source ? `?source=${source}` : ''));
+	if (item)
+		response = await fetch(
+			`/data/search/${encodeURIComponent(item)}` + (source ? `?source=${source}` : '')
+		);
 	if (response.ok) {
 		return await response.json();
 	} else {
@@ -108,7 +111,13 @@ export function debounce(timeout: number, callback: CallableFunction, ...params:
 export async function handleAutocomplete(e: CustomEvent<string>) {
 	try {
 		return (
-			(await debounce(600, fetchSearchResults, e.detail.value, fetch, e.detail.source)) as QueryResult[]
+			(await debounce(
+				600,
+				fetchSearchResults,
+				e.detail.value,
+				fetch,
+				e.detail.source
+			)) as QueryResult[]
 		).map((result) => {
 			let fieldName: string,
 				iterable = false;

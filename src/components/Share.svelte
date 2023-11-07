@@ -2,7 +2,7 @@
 	import { backInOut } from 'svelte/easing';
 	import { fade, scale } from 'svelte/transition';
 	import Clipboard from './icon/Clipboard.svelte';
-	import DOMPurify from 'dompurify';
+	import { sanitize } from 'isomorphic-dompurify';
 	import Checkmark from './icon/Checkmark.svelte';
 	import Social from './Social.svelte';
 	import type { email } from '@prisma/client';
@@ -98,7 +98,7 @@
 					class:clipboard={!emailCopied}
 				>
 					<Clipboard>
-						{@html DOMPurify.sanitize(item.body)}
+						{@html sanitize(item.body)}
 					</Clipboard>
 				</icon>
 			</button>
