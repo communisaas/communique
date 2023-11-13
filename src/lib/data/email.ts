@@ -45,9 +45,10 @@ export class EmailForm {
 
 		for (const field of Object.keys(this.inputFields)) {
 			const value = this.emailForm.get(field);
-			if ((value != null || value != undefined) && field != 'body') {
+			console.log(field, value);
+			if (value != null && value != undefined && field != 'body') {
 				if (field == 'recipient_list' || field == 'topic_list') {
-					if (value.toString().split('␞').length > 0) {
+					if (value.toString().split('␞').length === 0) {
 						throw new Error(`${field} is empty`);
 					}
 					if (value.toString().split('␞').length > 5 && field == 'topic_list') {
@@ -56,9 +57,9 @@ export class EmailForm {
 					if (value.toString().split('␞').length > 100 && field == 'recipient_list') {
 						throw new Error(`Too many recipients! (Max 100)`);
 					}
-					(this as RawEmailForm)[field] = value.toString();
 				}
-			} else if ((value != null || value != undefined) && field == 'body') {
+				(this as RawEmailForm)[field] = value.toString();
+			} else if (value != null && value != undefined && field == 'body') {
 				const parsedBody = this.serializeBody(value.toString());
 				if (parsedBody.length < 250) {
 					throw new Error(`Email body is too short! (Min 250 characters)`);

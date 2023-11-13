@@ -14,7 +14,7 @@
 	import modal, { handlePopover } from '$lib/ui/modal';
 	import type EditorJS from '@editorjs/editorjs';
 	import { handleAutocomplete } from '$lib/data/select';
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 
 	let postButtonHovered = writable(false);
 	let sessionStore: Writable<UserState>;
@@ -56,9 +56,9 @@
 </svelte:head>
 
 <section class="pt-4 min-h-screen">
-	<h1 class="text-paper-500 text-left ml-5 md:ml-20 pb-5">email composer</h1>
+	<h1 class="text-paper-500 text-left ml-5 md:ml-20 pb-5 text-xl xs:text-3xl">email composer</h1>
 	<form
-		class="flex flex-col gap-y-5 rounded-full"
+		class="flex flex-col gap-y-5 mb-4 rounded-full"
 		method="POST"
 		action="?/publish"
 		aria-label="Compose form"
@@ -81,6 +81,7 @@
 				runningBodyLength += block.data.text.length;
 			}
 			if (runningBodyLength < 250) {
+				// TODO make user error messages accessible
 				submitter.innerHTML = `Email has ${runningBodyLength} characters... Try for at least 250.`;
 				setTimeout(() => {
 					if (submitter && initialSubmitterState) submitter.innerHTML = initialSubmitterState;
@@ -116,13 +117,12 @@
 			// post.set('profileRequestID', (await webProfile).requestId);
 
 			return async ({ result, update }) => {
-				console.log(result);
 				if (result.status == 200) {
 					// TODO submit confirmation
 					recipientEmails = [];
 					topics = [];
-					update();
-					invalidateAll();
+					// update();
+					await goto('/', { invalidateAll: true });
 				} else {
 					// TODO present server-side submission errors
 					console.error(result);
@@ -174,7 +174,7 @@
 					inputStyle="bg-artistBlue-700 text-paper-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500 m-2 w-fit"
 					inputVisible={true}
-					autocompleteStyle="right-0"
+					autocompleteStyle="left-0"
 					bind:searchResults={suggestedTopics}
 					on:autocomplete={async (e) => {
 						suggestedTopics = await handleAutocomplete(e);
@@ -243,13 +243,6 @@
 {/if}
 
 <style>
-	:global(.mce-content-body) {
-		padding: 0.125rem;
-	}
-	:global(.mce-content-body::before) {
-		padding: calc(0.125rem / 2) 0.125rem;
-	}
-
 	button[type='submit'] span {
 		transform: scale(0.9);
 		transition: 0.1s all ease-out;

@@ -21,10 +21,10 @@
 	export let inputVisible: boolean = false;
 	export let inputField: HTMLInputElement;
 
-	$: searching = false;
+	let searching = false;
 
-	let autocompleted = true;
 	let deleteVisible: FlagMap = {}; // A map to hold visibility states
+	let firstFocus = true;
 
 	let completionList: HTMLUListElement;
 	let deleteButtons: ButtonElementMap = {}; // A map to hold the delete buttons
@@ -33,11 +33,13 @@
 
 	const dispatch = createEventDispatcher();
 
+	$: tagValues = tagList.map((tag) => tag.item);
+
 	function addTag(tag: Descriptor<string>) {
 		inputField.value = '';
-		if (tagList.includes(tag)) {
+		if (tagValues.includes(tag.item)) {
 			inputField.setCustomValidity(
-				`${name.replace(name[0], name[0].toLocaleUpperCase())} already entered.`
+				`${name.replace(name[0], name[0].toLocaleUpperCase())} ${tag.item} already entered.`
 			);
 			inputField.reportValidity();
 		} else {
@@ -61,7 +63,39 @@
 		}
 		if (autocomplete && inputField.value.length > 2) {
 			dispatch('autocomplete', { value: inputField.value, source: searchField });
-			autocompleteIndex = 0;
+			autocompleteIndex = -1;
+		}
+	}
+
+	async function handleEmailPaste(event: ClipboardEvent) {
+		// Define a regex pattern to match email addresses
+		const emailRegex = /[\w.-]+@[\w.-]+\.\w+/g;
+
+		// Get the pasted text from the clipboard event
+		const pastedText = event.clipboardData?.getData('text') || '';
+
+		// Extract all email addresses from the pasted text using the regex
+		const extractedEmails = pastedText.match(emailRegex) || [];
+
+		const deduplicatedEmails = extractedEmails.filter((email) => {
+			if (!tagValues.includes(email)) return email;
+		});
+
+		if (deduplicatedEmails.length < 1) {
+			inputField.setCustomValidity('No valid email addresses found!');
+			inputField.reportValidity();
+			return;
+		}
+
+		// Iterate over the extracted emails and call handleSubmit for each email
+		for (const email of deduplicatedEmails) {
+			inputField.value = email; // Set the inputField value to the current email
+			handleSubmit(); // Call handleSubmit
+		}
+
+		if (deduplicatedEmails.length != extractedEmails.length) {
+			inputField.setCustomValidity('Some email addresses were duplicates!');
+			inputField.reportValidity();
 		}
 	}
 
@@ -72,22 +106,41 @@
 			!autocomplete
 		) {
 			searching = false;
-			if (inputVisible && tagList.length > 0) inputVisible = false;
-			inputValueWidth = placeholderWidth;
+			if (tagList.length > 0) inputVisible = false;
 			groupedResults = {};
-			dispatch('blur', e.detail);
 		}
+		dispatch('blur', e.detail);
 	}
 
 	function handleSubmit() {
 		if (searching && !groupedResults) return;
+		else if (searching && type === 'search') {
+			inputField.setCustomValidity('Still searching! Wait for results...');
+			inputField.reportValidity();
+			return;
+		}
 		if (tagList.length == maxItems) {
 			inputField.setCustomValidity(`Maximum of ${maxItems} ${name}s!`);
 			inputField.reportValidity();
 			return;
 		}
 
-		if (inputField.value.length < 3) {
+		if (autocomplete) {
+			if (inputField.checkValidity()) {
+				if (autocomplete) {
+					if (autocompleteIndex >= 0) {
+						addTag(visibleSearchResults[autocompleteIndex]);
+					} else {
+						addTag({ item: inputField.value, type: type });
+					}
+				} else {
+					addTag({ item: inputField.value, type: type });
+				}
+				inputValueWidth = placeholderWidth;
+			} else {
+				inputField.reportValidity();
+			}
+		} else if (inputField.value.length < 3) {
 			inputField.setCustomValidity('Too short!');
 			inputField.reportValidity();
 		} else if (
@@ -97,22 +150,8 @@
 		) {
 			inputField.setCustomValidity('Nothing here! Try adding it?');
 			inputField.reportValidity();
-		} else {
-			if (inputField.checkValidity()) {
-				const matchingItem = visibleSearchResults.find(
-					(result) => result.item === inputField.value
-				);
-				if (matchingItem) {
-					addTag(matchingItem);
-				} else {
-					addTag({ item: inputField.value, type: 'text' });
-				}
-				inputValueWidth = placeholderWidth;
-			} else {
-				inputField.reportValidity();
-			}
+			searchResults = [];
 		}
-		searchResults = [];
 	}
 
 	$: if (searchResults) {
@@ -156,7 +195,6 @@
 		autocomplete="off"
 		class="flex flex-nowrap max-w-full"
 		on:submit|preventDefault={() => {
-			searching = false;
 			handleSubmit();
 		}}
 	>
@@ -230,7 +268,14 @@
 				inputmode={type}
 				bind:this={inputField}
 				on:blur={handleBlur}
-				on:focus={() => (inputVisible = true)}
+				on:focus={() => {
+					if (firstFocus && type == 'email') {
+						inputField.setCustomValidity('Also paste in any list of email addresses!');
+						inputField.reportValidity();
+					}
+					firstFocus = false;
+					inputVisible = true;
+				}}
 				on:keydown|self={(e) => {
 					// clear earlier validation errors
 					inputField.setCustomValidity('');
@@ -264,6 +309,12 @@
 				}}
 				on:input={() => {
 					handleInput();
+				}}
+				on:paste={(e) => {
+					if (type === 'email') {
+						handleEmailPaste(e);
+						e.preventDefault();
+					}
 				}}
 				style="width: {inputVisible && inputValueWidth ? inputValueWidth : 0}px;"
 				class="rounded shadow-artistBlue shadow-card w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center {inputStyle}"
@@ -327,11 +378,11 @@
 			name={`Add ${name}`}
 			aria-label="Add button for {name}s"
 			class="flex justify-center items-center relative min-w-fit shrink-0"
-			on:click={(e) => {
-				if (!inputVisible) {
-					inputVisible = true;
-					inputField.focus();
-					e.preventDefault();
+			on:mousedown|preventDefault
+			on:click|preventDefault={(e) => {
+				inputField.focus();
+				if (inputField.value.length > 0) {
+					handleSubmit();
 				}
 			}}
 		>

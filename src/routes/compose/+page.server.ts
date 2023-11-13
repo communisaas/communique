@@ -49,6 +49,9 @@ export const actions = {
 		if (!('shortid' in formSubmission.keys())) {
 			formSubmission.set('shortid', stagingID.slice(-8));
 		}
+		for (const [field, value] of formSubmission.entries()) {
+			console.log(field, value);
+		}
 
 		const emailForm = new EmailForm(
 			formSubmission,
@@ -59,6 +62,8 @@ export const actions = {
 		} catch (error) {
 			return fail(400, { name: error.toString(), missing: true });
 		}
+
+		console.log('shortid', emailForm.inputFields.shortid);
 
 		await objectMapper.$transaction(async (tx) => {
 			const updateTime = new Date().toISOString();

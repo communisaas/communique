@@ -459,7 +459,7 @@
 		justify-center w-[80vw] max-w-full {style}"
 	class:cursor-default={expand}
 	class:clickable={!nestedHover}
-	style="width: {expand ? 'calc(99% + 0.25rem)' : '95%'}; margin-left: {expand ? '-0.25rem' : 0};"
+	style="width: {expand ? 'calc(100% + 0.25rem)' : '95%'}; margin-left: {expand ? '-0.25rem' : 0};"
 >
 	{#if showMenu}
 		<div
@@ -504,7 +504,7 @@
 			: ''} min-w-full min-h-fit overflow-hidden"
 	>
 		{#if sessionStore}
-			<span class="flex max-w-full h-fit items-start relative">
+			<span class="flex max-w-full h-fit items-baseline relative">
 				<span
 					class="w-[calc(85%-10vw)] xs:w-[calc(90%-6vw)] sm:w-[88%] md:w-[90%] lg:w-[calc(95%-2.5vw)] relative"
 				>
@@ -546,7 +546,7 @@
 						class:scrollable={scrollPosition.header.remainingWidth > 0}
 						class:scrolled={scrollPosition.header.x > 1}
 						class:scrolled__max={scrollPosition.header.remainingWidth - scrollPosition.header.x < 1}
-						class="inline-block mr-1 w-full text-left"
+						class="inline-block mr-1 w-full text-left xs:text-xl text-base"
 					>
 						{item.subject}
 					</h1>
@@ -564,10 +564,14 @@
 							</icon>
 							{item.open_count != BigInt(0) ? item.open_count : '?'}
 						</span> -->
-					<span title="Send count" aria-label="Number of sends" class="flex items-center gap-x-1.5">
+					<span
+						title="Send count"
+						aria-label="Number of sends"
+						class="flex items-center gap-x-1.5 text-base"
+					>
 						<icon
 							aria-label="Envelope"
-							class="max-w-[36px]"
+							class="sm:max-w-[36px] max-w-[32px]"
 							style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
 						>
 							<SentIcon color="#94D2BD" />
@@ -594,7 +598,7 @@
 							<Selector
 								selectable={Tag}
 								items={item.topic_list}
-								itemStyle="sm:text-sm text-paper-500 bg-peacockFeather-500"
+								itemStyle="text-xs sm:text-sm text-paper-500 bg-peacockFeather-500"
 								selectorStyle="pt-2 max-w-full"
 								alignment="start"
 								overflow="wrap"
@@ -610,7 +614,7 @@
 							<Selector
 								selectable={Tag}
 								items={item.recipient_list}
-								itemStyle="sm:text-sm text-paper-500 bg-peacockFeather-600"
+								itemStyle="text-xs sm:text-sm text-paper-500 bg-peacockFeather-600"
 								selectorStyle="pt-1 max-w-full"
 								alignment="start"
 								overflow="wrap"
@@ -728,7 +732,6 @@
 		}
 	}
 	h1 {
-		font-size: 1.4rem;
 		font-weight: 600;
 		white-space: nowrap;
 		overflow-x: overlay;

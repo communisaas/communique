@@ -69,9 +69,9 @@
 						type="search"
 						name="search item"
 						placeholder={'Search'}
-						style="h-14 xs:mx-4 mr-5 ml-1 w-fit bg-transparent"
+						style="h-14  xs:mx-4 mr-5 ml-1 w-fit bg-transparent xs:pr-0.5 pr-0 pl-2"
 						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded xs:px-2 px-1 pr-1 text-paper-500"
-						addIconStyle="add bg-peacockFeather-500 h-12 w-12 text-5xl inline-block leading-12"
+						addIconStyle="add bg-peacockFeather-500 h-10 w-10 md:h-12 md:w-12 text-4xl md:text-5xl inline-block leading-12"
 						autocompleteStyle="right-0"
 						autocomplete={true}
 						bind:tagList={selectionList}
@@ -110,7 +110,7 @@
 			{selectable}
 			{items}
 			alignment="match-parent"
-			selectorStyle="flex-col px-2 min-h-[13rem] max-w-3xl md:max-w-7xl m-auto overflow-visible"
+			selectorStyle="flex-col sm:px-2 pl-2 pr-0.5 min-h-[13rem] max-w-3xl md:max-w-7xl m-auto overflow-visible"
 			overflow="visible"
 			scrollable={false}
 			bind:selectedContent={selected}
@@ -152,9 +152,9 @@
 		filter: drop-shadow(1px 2px 1px theme('colors.artistBlue.500'));
 		position: relative;
 		z-index: 20;
+		min-width: 0;
 
 		&__start {
-			margin-left: -1.25rem;
 			align-items: start;
 			& .space {
 				padding: 0.5em 0;
@@ -175,7 +175,6 @@
 			}
 		}
 		&__end {
-			margin-right: -1.25rem;
 			& .space {
 				padding: 0.5em 0;
 				padding-left: 0.5em;

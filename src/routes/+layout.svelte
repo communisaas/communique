@@ -112,13 +112,13 @@
 		<section class="min-h-screen">
 			<header
 				aria-label="Popular topics list"
-				class="flex md:h-12 h-14 px-2 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1550px)]"
+				class="flex md:h-12 pr-2 py-2 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
 						selectable={Tag}
-						itemStyle="whitespace-nowrap text-base bg-peacockFeather-500 text-paper-500"
-						selectorStyle="self-center m-auto w-full h-full px-2"
+						itemStyle="whitespace-nowrap sm:text-base bg-peacockFeather-500 text-paper-500 text-sm"
+						selectorStyle="self-center m-auto w-full h-full sm:px-2"
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}
@@ -219,24 +219,26 @@
 		</div>
 	</div> -->
 
-				<div class="text-gray-400 md:text-sm text-xs mt-6 flex justify-center items-center">
-					<span class="ml-3">&copy; 2023 Communique.</span>
+				<div
+					class="text-gray-400 md:text-sm text-xs mt-6 flex xs:flex-row flex-col-reverse justify-center items-center"
+				>
+					<span class="mt-2 xs:mt-0 xs:ml-3">&copy; 2023 Communique.</span>
 
-					<span class="border-l border-gray-600 pl-2 ml-2">
+					<span class="xs:border-l border-gray-600 pl-2 xs:ml-2 sm:mt-0 mt-2">
 						<a
 							href="#terms-of-use"
 							on:click={() => (window.location.hash = '#terms-of-use')}
 							class="text-teal-400 hover:text-teal-500">Terms of Use</a
 						>
 					</span>
-					<span class="border-l border-gray-600 pl-2 ml-2">
+					<span class="xs:border-l border-gray-600 pl-2 xs:ml-2 sm:mt-0 mt-2">
 						<a
 							href="#moderation-policy"
 							on:click={() => (window.location.hash = '#moderation-policy')}
 							class="text-teal-400 hover:text-teal-500">Moderation Policy</a
 						>
 					</span>
-					<span class="border-l border-gray-600 pl-2 ml-2">
+					<span class="xs:border-l border-gray-600 pl-2 xs:ml-2 sm:mt-0 mt-2">
 						<a
 							href="#privacy-policy"
 							on:click={() => (window.location.hash = '#privacy-policy')}
