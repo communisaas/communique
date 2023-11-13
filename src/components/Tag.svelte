@@ -53,7 +53,7 @@
 		margin: 0;
 		transition: 0.1s ease-in;
 		&:hover {
-			transform: translateY(-2px);
+			transform: translateY(-1px);
 			box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
 
 			transition: 0.1s ease-in;

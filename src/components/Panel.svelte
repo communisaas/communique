@@ -16,6 +16,7 @@
 	export let items: Selectable[] = [];
 	export let filterable = false;
 	let searchResults: Descriptor<string>[] = [];
+	let searchInput: HTMLInputElement;
 
 	const dispatch = createEventDispatcher();
 
@@ -30,8 +31,6 @@
 		selectionList = [initialSelection];
 		oldInitialSelection = initialSelection;
 	}
-
-	
 
 	async function handleFilter() {
 		// Grouping by fields
@@ -54,7 +53,7 @@
 	<aside class="flex flex-nowrap pb-3" style="justify-content: {alignment}">
 		{#if selectorTarget != 'spotlight'}
 			<h1
-				class="text-paper-500 h-fit self-center md:mx-2 ml-2 my-1 text-sm xs:text-2xl md:text-3xl leading-tight md:leading-normal"
+				class="text-paper-500 h-fit self-center md:mx-2 ml-2 my-1 text-base xs:text-2xl md:text-3xl leading-tight md:leading-normal"
 				style="background-color: transparent; padding: unset"
 			>
 				{header}
@@ -63,15 +62,16 @@
 		<div
 			class="tab tab__{alignment} sm:max-w-[85%] max-w-[calc(90%-1rem)] 2xl:pr-[calc(100vw-1500px)]"
 		>
-			<span class="space">
+			<span class="space space__{alignment}">
 				{#if filterable && selectorTarget != 'spotlight'}
 					<TagInput
+						bind:inputField={searchInput}
 						type="search"
 						name="search item"
 						placeholder={'Search'}
-						style="h-14 w-fit bg-transparent"
-						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded px-2 pr-1 text-paper-500"
-						addIconStyle="add bg-peacockFeather-500 h-12 w-12 text-5xl inline-block leading-12"
+						style="h-14  xs:mx-4 mr-5 ml-1 w-fit bg-transparent xs:pr-0.5 pr-0 pl-2"
+						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded xs:px-2 px-1 pr-1 text-paper-500"
+						addIconStyle="add bg-peacockFeather-500 h-10 w-10 md:h-12 md:w-12 text-4xl md:text-5xl inline-block leading-12"
 						autocompleteStyle="right-0"
 						autocomplete={true}
 						bind:tagList={selectionList}
@@ -110,7 +110,7 @@
 			{selectable}
 			{items}
 			alignment="match-parent"
-			selectorStyle="flex-col px-2 min-h-[13rem] md:max-w-7xl max-w-3xl m-auto overflow-visible"
+			selectorStyle="flex-col sm:px-2 pl-2 pr-0.5 min-h-[13rem] max-w-3xl md:max-w-7xl m-auto overflow-visible"
 			overflow="visible"
 			scrollable={false}
 			bind:selectedContent={selected}
@@ -142,15 +142,19 @@
 	.space {
 		display: flex;
 		height: 100%;
+
+		&__end {
+			margin-right: 5%;
+		}
 	}
 
 	.tab {
 		filter: drop-shadow(1px 2px 1px theme('colors.artistBlue.500'));
 		position: relative;
 		z-index: 20;
+		min-width: 0;
 
 		&__start {
-			margin-left: -1.25rem;
 			align-items: start;
 			& .space {
 				padding: 0.5em 0;
@@ -171,7 +175,6 @@
 			}
 		}
 		&__end {
-			margin-right: -1.25rem;
 			& .space {
 				padding: 0.5em 0;
 				padding-left: 0.5em;

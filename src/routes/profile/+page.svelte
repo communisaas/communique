@@ -63,7 +63,6 @@
 		store = (await import('$lib/data/sessionStorage')).store;
 		const lastEmailId = $store.user.sent_email_list.slice(-1);
 		sentEmails = await dataFetcher('data/email', 'email', [lastEmailId]);
-		console.log(data);
 	});
 
 	const dataFetcher = async (endpoint: string, type: string, values: string[]) => {

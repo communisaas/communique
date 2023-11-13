@@ -6,41 +6,46 @@ export async function GET({ params }) {
 	const searchTerms = decodeURIComponent(params.slug).split('&');
 	const searchQuery = searchTerms.map((term) => `${term.trim()}:*`).join(' & ');
 
+	const pageSize = 10; // Number of items per page
+	const page = 1; // Page number, starting from 1
+
+	const offset = (page - 1) * pageSize;
+
 	const rawQuery = Prisma.sql`
-    WITH 
-    email_search AS (
-        SELECT 
-            'email' AS source, 
-            subject AS id, 
-            ts_rank(to_tsvector('english', subject), plainto_tsquery('english', ${searchQuery})) AS rank
-        FROM email 
-        WHERE to_tsvector('english', subject) @@ plainto_tsquery('english', ${searchQuery})
-        LIMIT 10
-    ),
-    recipient_search AS (
-        SELECT 
-            'recipient' AS source, 
-            address AS id, 
-            ts_rank(to_tsvector('english', address), plainto_tsquery('english', ${searchQuery})) AS rank
-        FROM recipient 
-        WHERE to_tsvector('english', address) @@ plainto_tsquery('english', ${searchQuery})
-        LIMIT 10
-    ),
-    topic_search AS (
-        SELECT 
-            'topic' AS source, 
-            name AS id, 
-            ts_rank(to_tsvector('english', name), plainto_tsquery('english', ${searchQuery})) AS rank
-        FROM topic 
-        WHERE to_tsvector('english', name) @@ plainto_tsquery('english', ${searchQuery})
-        LIMIT 10
-    )
-    SELECT * FROM email_search
-    UNION ALL
-    SELECT * FROM recipient_search
-    UNION ALL
-    SELECT * FROM topic_search
-    ORDER BY rank DESC;
+        WITH 
+        email_search AS (
+            SELECT 
+                'email' AS source, 
+                subject AS id, 
+                ts_rank(to_tsvector('english', subject), plainto_tsquery('english', ${searchQuery})) AS rank
+            FROM email 
+            WHERE to_tsvector('english', subject) @@ plainto_tsquery('english', ${searchQuery})
+        ),
+        recipient_search AS (
+            SELECT 
+                'recipient' AS source, 
+                address AS id, 
+                ts_rank(to_tsvector('english', address), plainto_tsquery('english', ${searchQuery})) AS rank
+            FROM recipient 
+            WHERE to_tsvector('english', address) @@ plainto_tsquery('english', ${searchQuery})
+        ),
+        topic_search AS (
+            SELECT 
+                'topic' AS source, 
+                name AS id, 
+                ts_rank(to_tsvector('english', name), plainto_tsquery('english', ${searchQuery})) AS rank
+            FROM topic 
+            WHERE to_tsvector('english', name) @@ plainto_tsquery('english', ${searchQuery})
+        )
+        SELECT * FROM (
+            SELECT * FROM email_search
+            UNION ALL
+            SELECT * FROM recipient_search
+            UNION ALL
+            SELECT * FROM topic_search
+        ) AS combined_search
+        ORDER BY rank DESC
+        LIMIT ${pageSize} OFFSET ${offset};
     `;
 
 	let results;

@@ -203,8 +203,7 @@
 			top: 0;
 			right: 0;
 			bottom: 0;
-			background-image: linear-gradient(to right, var(--backgroundColor) 3%, transparent 15%),
-				linear-gradient(to bottom, var(--backgroundColor) 3%, transparent 15%);
+			background-image: linear-gradient(to right, var(--backgroundColor) 3%, transparent 15%);
 			background-repeat: no-repeat;
 		}
 	}

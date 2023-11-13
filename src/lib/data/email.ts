@@ -1,8 +1,8 @@
 import he from 'he';
-import DOMPurify from 'dompurify';
 
 import { get } from 'svelte/store';
 import { error } from '@sveltejs/kit';
+import DOMPurify from 'isomorphic-dompurify';
 
 import type { email } from '@prisma/client';
 
@@ -14,6 +14,7 @@ export class EmailForm {
 		topic_list: [],
 		recipient_list: []
 	};
+	author_email = '';
 
 	set subject(line: string) {
 		this.inputFields.subject = line;
@@ -34,17 +35,54 @@ export class EmailForm {
 	defaultMetrics = { open_count: 0, clipboard_count: 0, send_count: 0, read_count: 0 };
 	emailForm: FormData;
 
-	constructor(emailForm: FormData) {
+	constructor(emailForm: FormData, author_email: string) {
 		this.emailForm = emailForm;
+		this.author_email = author_email;
 	}
 
 	validate() {
+		if (!this.author_email) throw new Error('Author email not set');
+
 		for (const field of Object.keys(this.inputFields)) {
 			const value = this.emailForm.get(field);
-			if (value != null || value != undefined) {
+			console.log(field, value);
+			if (value != null && value != undefined && field != 'body') {
+				if (field == 'recipient_list' || field == 'topic_list') {
+					if (value.toString().split('␞').length === 0) {
+						throw new Error(`${field} is empty`);
+					}
+					if (value.toString().split('␞').length > 5 && field == 'topic_list') {
+						throw new Error(`Too many topics! (Max 5)`);
+					}
+					if (value.toString().split('␞').length > 100 && field == 'recipient_list') {
+						throw new Error(`Too many recipients! (Max 100)`);
+					}
+				}
 				(this as RawEmailForm)[field] = value.toString();
-			} else throw new Error(`${field} is empty`);
+			} else if (value != null && value != undefined && field == 'body') {
+				const parsedBody = this.serializeBody(value.toString());
+				if (parsedBody.length < 250) {
+					throw new Error(`Email body is too short! (Min 250 characters)`);
+				} else if (parsedBody.length > 0) {
+					(this as RawEmailForm)[field] = parsedBody;
+				} else throw new Error(`${field} is empty`);
+			} else {
+				throw new Error(`${field} is empty`);
+			}
 		}
+	}
+
+	serializeBody(editorDataString: string) {
+		const dataObject = JSON.parse(editorDataString);
+		let runningText = '';
+		for (const block of dataObject.blocks) {
+			if (block.type === 'paragraph') {
+				// Check if the block is a paragraph
+				runningText += DOMPurify.sanitize(`<p>${block.data.text}</p><br>`); // Wrap the text in <p> tags and add <br>
+			}
+			// You might want to handle other types of blocks differently here
+		}
+		return runningText;
 	}
 }
 
@@ -111,9 +149,6 @@ export async function handleMailto(
 
 		// Decode any HTML entities
 		plainBody = he.decode(plainBody);
-
-		// Collapse consecutive newlines
-		plainBody = plainBody.replace(/\n{4,}/g, '\n');
 
 		// URL encode the plain text body
 		mailBody = `&body=${encodeURIComponent(plainBody)}`;

@@ -15,6 +15,7 @@
 	export let collapsed = false;
 
 	let lastScrollY = 0;
+	let scrollTimeout: NodeJS.Timeout | null;
 	const smallScreenBreakpoint = 640; // 640px is the default breakpoint for Tailwind's 'sm'
 
 	// Update collapsed based on screen width and scroll position
@@ -30,8 +31,12 @@
 	}
 
 	function handleScroll() {
-		lastScrollY = window.scrollY;
-		setTimeout(() => updateCollapsedState(), 100);
+		if (!scrollTimeout) {
+			scrollTimeout = setTimeout(() => {
+				scrollTimeout = null;
+				updateCollapsedState();
+			}, 200); // 200ms for throttling
+		}
 	}
 	onMount(() => {
 		window.addEventListener('resize', handleResize);
@@ -50,7 +55,7 @@
 </script>
 
 <aside class="object-cover inline-flex h-full">
-	<div class="flex flex-col items-center h-full bg-peacockFeather-700 shadow-nav">
+	<div class="flex flex-col items-center h-full bg-peacockFeather-700 shadow-nav z-20">
 		<nav aria-label="Page navigation" class="flex flex-col sticky h-screen top-0 md:top-0 md:h-fit">
 			{#if collapsed}
 				<div

@@ -11,21 +11,21 @@
 		autocompleteStyle: string = '',
 		autocomplete: boolean = false,
 		allowCustomValues: boolean = false,
-		searchField = '';
+		searchField = '',
+		maxItems = 100;
 	export let tagList: Descriptor<string>[] = [];
 	export let searchResults: Descriptor<string>[] = [];
-	export let inputStyle =
-		'rounded bg-paper-500 shadow-artistBlue shadow-card w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center';
+	export let inputStyle = '';
 	export let addIconStyle =
 		'add absolute bg-peacockFeather-600 h-6 w-6 text-2xl leading-6 font-bold';
+	export let inputVisible: boolean = false;
+	export let inputField: HTMLInputElement;
 
-	let inputVisible: boolean = false;
-	$: searching = false;
+	let searching = false;
 
-	let autocompleted = true;
 	let deleteVisible: FlagMap = {}; // A map to hold visibility states
+	let firstFocus = true;
 
-	let inputField: HTMLInputElement;
 	let completionList: HTMLUListElement;
 	let deleteButtons: ButtonElementMap = {}; // A map to hold the delete buttons
 
@@ -33,11 +33,13 @@
 
 	const dispatch = createEventDispatcher();
 
+	$: tagValues = tagList.map((tag) => tag.item);
+
 	function addTag(tag: Descriptor<string>) {
 		inputField.value = '';
-		if (tagList.includes(tag)) {
+		if (tagValues.includes(tag.item)) {
 			inputField.setCustomValidity(
-				`${name.replace(name[0], name[0].toLocaleUpperCase())} already entered.`
+				`${name.replace(name[0], name[0].toLocaleUpperCase())} ${tag.item} already entered.`
 			);
 			inputField.reportValidity();
 		} else {
@@ -47,7 +49,7 @@
 	}
 
 	async function handleInput() {
-		if (inputField.value.length > 2) {
+		if (inputField.value.length > 2 && autocomplete) {
 			searching = true;
 		} else {
 			searching = false;
@@ -60,8 +62,40 @@
 			inputValueWidth = placeholderWidth;
 		}
 		if (autocomplete && inputField.value.length > 2) {
-			dispatch('autocomplete', {value: inputField.value, source: searchField});
-			autocompleteIndex = 0;
+			dispatch('autocomplete', { value: inputField.value, source: searchField });
+			autocompleteIndex = -1;
+		}
+	}
+
+	async function handleEmailPaste(event: ClipboardEvent) {
+		// Define a regex pattern to match email addresses
+		const emailRegex = /[\w.-]+@[\w.-]+\.\w+/g;
+
+		// Get the pasted text from the clipboard event
+		const pastedText = event.clipboardData?.getData('text') || '';
+
+		// Extract all email addresses from the pasted text using the regex
+		const extractedEmails = pastedText.match(emailRegex) || [];
+
+		const deduplicatedEmails = extractedEmails.filter((email) => {
+			if (!tagValues.includes(email)) return email;
+		});
+
+		if (deduplicatedEmails.length < 1) {
+			inputField.setCustomValidity('No valid email addresses found!');
+			inputField.reportValidity();
+			return;
+		}
+
+		// Iterate over the extracted emails and call handleSubmit for each email
+		for (const email of deduplicatedEmails) {
+			inputField.value = email; // Set the inputField value to the current email
+			handleSubmit(); // Call handleSubmit
+		}
+
+		if (deduplicatedEmails.length != extractedEmails.length) {
+			inputField.setCustomValidity('Some email addresses were duplicates!');
+			inputField.reportValidity();
 		}
 	}
 
@@ -69,51 +103,57 @@
 		if (
 			(!Object.keys(deleteVisible).some((k) => deleteVisible[k]) &&
 				!completionList.contains(e.relatedTarget as Node)) ||
-			e.relatedTarget === null
+			!autocomplete
 		) {
 			searching = false;
-			inputVisible = false;
-			inputValueWidth = placeholderWidth;
+			if (tagList.length > 0) inputVisible = false;
 			groupedResults = {};
-			dispatch('blur', e.detail);
 		}
+		dispatch('blur', e.detail);
 	}
 
-	function handleSubmit(autocompleted = false) {
+	function handleSubmit() {
 		if (searching && !groupedResults) return;
+		else if (searching && type === 'search') {
+			inputField.setCustomValidity('Still searching! Wait for results...');
+			inputField.reportValidity();
+			return;
+		}
+		if (tagList.length == maxItems) {
+			inputField.setCustomValidity(`Maximum of ${maxItems} ${name}s!`);
+			inputField.reportValidity();
+			return;
+		}
 
-		if (autocompleted && visibleSearchResults !== null && visibleSearchResults.length > 0) {
-			// Trigger the autocomplete item at `autocompleteIndex`
-			addTag(visibleSearchResults[autocompleteIndex]);
-			inputValueWidth = placeholderWidth;
-		} else if (inputField.value.length < 3) {
-			inputField.setCustomValidity('Too short!');
-			inputField.reportValidity();
-		} else if (
-			inputField.value.length > 0 && !allowCustomValues &&
-			!visibleSearchResults.some((result) => result.item === inputField.value)
-		) {
-			inputField.setCustomValidity('Nothing here! Try adding it?');
-			inputField.reportValidity();
-		} else {
+		if (autocomplete) {
 			if (inputField.checkValidity()) {
-				const matchingItem = visibleSearchResults.find(
-					(result) => result.item === inputField.value
-				);
-				if (matchingItem) {
-					addTag(matchingItem);
+				if (autocomplete) {
+					if (autocompleteIndex >= 0) {
+						addTag(visibleSearchResults[autocompleteIndex]);
+					} else {
+						addTag({ item: inputField.value, type: type });
+					}
 				} else {
-					addTag({ item: inputField.value, type: 'text' });
+					addTag({ item: inputField.value, type: type });
 				}
 				inputValueWidth = placeholderWidth;
 			} else {
 				inputField.reportValidity();
 			}
+		} else if (inputField.value.length < 3) {
+			inputField.setCustomValidity('Too short!');
+			inputField.reportValidity();
+		} else if (
+			inputField.value.length > 0 &&
+			!allowCustomValues &&
+			!visibleSearchResults.some((result) => result.item === inputField.value)
+		) {
+			inputField.setCustomValidity('Nothing here! Try adding it?');
+			inputField.reportValidity();
+			searchResults = [];
 		}
-		searchResults = [];
 	}
 
-	$: if (inputVisible) inputField.focus();
 	$: if (searchResults) {
 		searching = false;
 	}
@@ -144,18 +184,17 @@
 		if (context) {
 			// TODO measure input width smoothly using in-dom placeholder
 			context.font = getComputedStyle(inputField).font;
-			inputValueWidth = context.measureText(placeholder).width * 1.25;
+			inputValueWidth = context.measureText(placeholder).width * 1.2;
 			placeholderWidth = inputValueWidth;
 		}
 	});
 </script>
 
-<div class="px-5 rounded max-w-full h-max inline-block items-center justify-center z-10 {style}">
+<div class="px-2 rounded max-w-full h-max inline-block items-center justify-center z-10 {style}">
 	<form
 		autocomplete="off"
 		class="flex flex-nowrap max-w-full"
 		on:submit|preventDefault={() => {
-			searching = false;
 			handleSubmit();
 		}}
 	>
@@ -188,8 +227,10 @@
 							deleteX = Math.max(deleteX, 0); // To keep it within left boundary
 							deleteY = Math.max(deleteY, 0); // To keep it within top boundary
 
-							deleteButtons[tag.item].style.left = `${deleteX}px`;
-							deleteButtons[tag.item].style.top = `${deleteY}px`;
+							if (deleteButtons[tag.item]) {
+								deleteButtons[tag.item].style.left = `${deleteX}px`;
+								deleteButtons[tag.item].style.top = `${deleteY}px`;
+							}
 						}}
 					>
 						<button
@@ -227,7 +268,14 @@
 				inputmode={type}
 				bind:this={inputField}
 				on:blur={handleBlur}
-				on:focus={() => (inputVisible = true)}
+				on:focus={() => {
+					if (firstFocus && type == 'email') {
+						inputField.setCustomValidity('Also paste in any list of email addresses!');
+						inputField.reportValidity();
+					}
+					firstFocus = false;
+					inputVisible = true;
+				}}
 				on:keydown|self={(e) => {
 					// clear earlier validation errors
 					inputField.setCustomValidity('');
@@ -251,7 +299,7 @@
 
 					if (e.key === 'Enter') {
 						e.preventDefault();
-						handleSubmit(autocomplete);
+						handleSubmit();
 					}
 
 					if (e.key === 'Escape' || (e.key === 'Tab' && !visibleSearchResults)) {
@@ -262,8 +310,14 @@
 				on:input={() => {
 					handleInput();
 				}}
-				style="width: {inputVisible ? inputValueWidth : 0}px;"
-				class={inputStyle}
+				on:paste={(e) => {
+					if (type === 'email') {
+						handleEmailPaste(e);
+						e.preventDefault();
+					}
+				}}
+				style="width: {inputVisible && inputValueWidth ? inputValueWidth : 0}px;"
+				class="rounded shadow-artistBlue shadow-card w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center {inputStyle}"
 				class:show={inputVisible}
 				class:p-1={inputVisible}
 				{type}
@@ -299,14 +353,14 @@
 											(r) => r.item === result.item
 										))}
 									on:click|preventDefault|stopPropagation={(e) => {
-										autocompleted = autocomplete;
-										handleSubmit(autocomplete);
+										addTag(visibleSearchResults[autocompleteIndex]);
+										inputValueWidth = placeholderWidth;
 										inputField.focus();
 									}}
 									on:keydown|preventDefault|stopPropagation={(e) => {
 										if (e.key === 'Enter') {
-											autocompleted = autocomplete;
-											handleSubmit(autocomplete);
+											addTag(visibleSearchResults[autocompleteIndex]);
+											inputValueWidth = placeholderWidth;
 											inputField.focus();
 										}
 									}}
@@ -324,14 +378,15 @@
 			name={`Add ${name}`}
 			aria-label="Add button for {name}s"
 			class="flex justify-center items-center relative min-w-fit shrink-0"
-			on:click={(e) => {
-				if (!inputVisible) {
-					inputVisible = true;
-					e.preventDefault();
+			on:mousedown|preventDefault
+			on:click|preventDefault={(e) => {
+				inputField.focus();
+				if (inputField.value.length > 0) {
+					handleSubmit();
 				}
 			}}
 		>
-			<span title={`Add ${name}`} class="flex" class:active={inputVisible}>
+			<span title={`Add ${name}`} class="flex">
 				<slot />
 				<icon class={addIconStyle} />
 			</span>
@@ -342,7 +397,6 @@
 <style lang="scss">
 	input {
 		transition: all 0.2s;
-		color: black;
 	}
 	button span {
 		filter: drop-shadow(1px 1px 0.5px rgb(0 0 0 / 0.4));

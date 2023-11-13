@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, afterUpdate, beforeUpdate, createEventDispatcher } from 'svelte';
 	import type { Writable } from 'svelte/store';
-	import DOMPurify from 'dompurify';
+	import DOMPurify from 'isomorphic-dompurify';
 
 	export let expand = true;
 	export let inModal = false;
