@@ -150,4 +150,3 @@ export async function handleAutocomplete(e: CustomEvent<string>) {
 		console.error('Error in fetching search results:', error);
 		return [];
 	}
-}

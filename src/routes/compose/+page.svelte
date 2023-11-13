@@ -30,6 +30,7 @@
 	let editor: EditorJS;
 	let topicInput: HTMLInputElement;
 	let recipientInput: HTMLInputElement;
+
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
 	});
