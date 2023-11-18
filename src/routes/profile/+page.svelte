@@ -11,9 +11,9 @@
 	import modal, { handlePopover } from '$lib/ui/modal';
 	import Modal from '$components/Modal.svelte';
 	import Login from '$components/Login.svelte';
-	import Share from '$components/Share.svelte';
-	import Reader from '$components/Reader.svelte';
-	import Confirm from '$components/Confirm.svelte';
+	import Share from '$components/popover/Share.svelte';
+	import Reader from '$components/popover/Reader.svelte';
+	import Confirm from '$components/popover/Confirm.svelte';
 	import { signOut } from '@auth/sveltekit/client';
 
 	export let data;

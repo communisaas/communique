@@ -3,20 +3,15 @@
 	import { writable, type Writable } from 'svelte/store';
 	import { trapFocus, updateFocusableElements } from '$lib/ui/ux';
 
-	export let advisoryText: string;
-	export let inputToConfirm: string;
-	export let action: (e: SubmitEvent) => Response | Promise<Response>;
+	export let postID: string;
 
 	let focusableElements = writable<HTMLElement[]>([]);
 	let lastFocusableElement = writable<HTMLElement>();
-	let currentInputValue: string = '';
 	let inputValueWidth = 0;
 
 	let store: Writable<UserState>;
 
 	let dialog: HTMLElement;
-	let confirmButton: HTMLButtonElement;
-	let submitDisabled = false;
 	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let firstFocus = true;
 	let focusHandler: (e: KeyboardEvent) => void;
@@ -51,7 +46,7 @@
 		if (context) {
 			// TODO measure input width smoothly using in-dom placeholder
 			context.font = getComputedStyle(inputField).font;
-			inputValueWidth = context.measureText(inputToConfirm).width * 1.1;
+			inputValueWidth = context.measureText(postID).width * 1.1;
 		}
 		dialog.addEventListener('keydown', focusHandler);
 	});
@@ -64,57 +59,18 @@
 	function setPopover(value: boolean) {
 		dispatch('popover', value);
 	}
-
-	$: confirmButtonText = currentInputValue.length > 0 ? 'Confirm' : 'Close';
 </script>
 
-<section tabindex="-1" class="flex flex-col gap-2 markdown-content m-10" bind:this={dialog}>
-	<form
-		on:submit|preventDefault={async (e) => {
-			if (!submitDisabled && currentInputValue.length > 0 && e.submitter) {
-				e.submitter.innerHTML = 'Confirming...';
-				try {
-					await action(e);
-				} catch (err) {
-					console.error(err);
-					e.submitter.innerHTML = "Error! Try again; we'll look into it";
-					e.stopPropagation();
-					return;
-				}
-			}
-			if (!submitDisabled) setPopover(false);
-		}}
+<section class="flex flex-col gap-2 m-10" bind:this={dialog}>
+	<aside
+		tabindex="-1"
+		style="text-align: initial;"
+		class="bg-artistBlue-800 p-5 overflow-auto w-full max-h-[75vh]"
 	>
-		<aside
-			tabindex="-1"
-			style="text-align: initial;"
-			class="bg-artistBlue-800 p-5 overflow-auto w-full max-h-[75vh]"
-		>
-			<div tabindex="-1" aria-label="content" class="max-h-fit w-full">
-				<p>{advisoryText}</p>
-
-				<input
-					bind:this={inputField}
-					placeholder={inputToConfirm}
-					bind:value={currentInputValue}
-					on:input={(e) => {
-						e.currentTarget.setCustomValidity('');
-						confirmButton.innerHTML = confirmButtonText;
-						if (currentInputValue.length > 0 && currentInputValue !== inputToConfirm) {
-							submitDisabled = true;
-							e.currentTarget.setCustomValidity('Does not match!');
-						} else {
-							submitDisabled = false;
-						}
-					}}
-					class="m-auto block h-10 bg-artistBlue-700 text-white rounded-md p-2 mt-2"
-					style={`width: ${inputValueWidth}px`}
-					type="text"
-				/>
-			</div>
-		</aside>
-		<button bind:this={confirmButton} class="w-full h-10 mt-2">{confirmButtonText}</button>
-	</form>
+		<h1>🎉 Posted!</h1>
+		<p>Your post has been published and is now visible to the public.</p>
+		<input value={postID} />
+	</aside>
 </section>
 
 <style lang="scss">

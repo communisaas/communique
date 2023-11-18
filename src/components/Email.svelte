@@ -3,7 +3,7 @@
 	import { createEventDispatcher, onMount, afterUpdate, tick } from 'svelte';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
-	import Reader from './Reader.svelte';
+	import Reader from './popover/Reader.svelte';
 	import RecipientIcon from './icon/Recipient.svelte';
 	import SentIcon from './icon/Sent.svelte';
 	import MenuIcon from './icon/Menu.svelte';

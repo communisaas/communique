@@ -112,13 +112,13 @@
 		<section class="min-h-screen">
 			<header
 				aria-label="Popular topics list"
-				class="flex md:h-12 pr-2 py-2 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
+				class="flex md:h-12 pr-2 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
 						selectable={Tag}
 						itemStyle="whitespace-nowrap sm:text-base bg-peacockFeather-500 text-paper-500 text-sm"
-						selectorStyle="self-center m-auto w-full h-full sm:px-2 px-1"
+						selectorStyle="self-center m-auto w-full h-full px-1 py-2"
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}

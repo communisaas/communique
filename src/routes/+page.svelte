@@ -8,10 +8,10 @@
 	import type { Writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { handleMailto } from '$lib/data/email';
-	import Share from '$components/Share.svelte';
+	import Share from '$components/popover/Share.svelte';
 	import Login from '$components/Login.svelte';
 	import { page } from '$app/stores';
-	import Reader from '$components/Reader.svelte';
+	import Reader from '$components/popover/Reader.svelte';
 	import type { email } from '@prisma/client';
 
 	export let data;

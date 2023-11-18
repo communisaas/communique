@@ -4,7 +4,8 @@
 	import AddRecipient from '$components/icon/Recipient.svelte';
 	import AddTopic from '$components/icon/Topic.svelte';
 	import Post from '$components/icon/Post.svelte';
-	import Reader from '$components/Reader.svelte';
+	import Reader from '$components/popover/Reader.svelte';
+	import AfterPost from '$components/popover/AfterPost.svelte';
 
 	import { writable, type Writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
@@ -47,6 +48,10 @@
 		termsOfUse: {
 			component: Reader,
 			props: () => ({ item: $page.data.termsOfUse, inModal: true })
+		},
+		afterPost: {
+			component: AfterPost,
+			props: () => ({ postID: $sessionStore.user.postID })
 		}
 	};
 </script>
