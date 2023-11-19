@@ -133,7 +133,7 @@ export const actions = {
 			});
 		});
 
-		return { success: true };
+		return { type: 'success', status: 200, postID: stagingID.slice(-8) };
 	}
 };
 

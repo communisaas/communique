@@ -3,7 +3,7 @@
 	import { writable, type Writable } from 'svelte/store';
 	import { trapFocus, updateFocusableElements } from '$lib/ui/ux';
 
-	export let postID: string;
+	export let postID: Writable<string>;
 
 	let focusableElements = writable<HTMLElement[]>([]);
 	let lastFocusableElement = writable<HTMLElement>();
@@ -46,10 +46,12 @@
 		if (context) {
 			// TODO measure input width smoothly using in-dom placeholder
 			context.font = getComputedStyle(inputField).font;
-			inputValueWidth = context.measureText(postID).width * 1.1;
+			
 		}
 		dialog.addEventListener('keydown', focusHandler);
 	});
+
+	$: if (inputField && context) inputValueWidth = context.measureText($postID).width * 1.1;
 
 	onDestroy(() => {
 		dialog.removeEventListener('keydown', focusHandler);
@@ -69,8 +71,12 @@
 	>
 		<h1>🎉 Posted!</h1>
 		<p>Your post has been published and is now visible to the public.</p>
-		<input value={postID} />
+				<input bind:this={inputField} value={$postID} 
+				style="width: {inputValueWidth ? inputValueWidth : 0}px;"
+				  />
 	</aside>
+	<button on:click={()=>setPopover(false)} class="w-full h-10 mt-2">close</button>
+
 </section>
 
 <style lang="scss">

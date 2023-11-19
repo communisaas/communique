@@ -82,7 +82,8 @@
 			privacyPolicy: false,
 			moderatioPolicy: false,
 			termsOfUse: false,
-			confirm: false
+			confirm: false,
+			afterPost: false,
 		};
 		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
 		const hashes = window.location.hash.substring(1).split('#');

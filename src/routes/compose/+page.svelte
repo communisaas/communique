@@ -32,6 +32,8 @@
 	let topicInput: HTMLInputElement;
 	let recipientInput: HTMLInputElement;
 
+	let postID = writable('');
+
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
 	});
@@ -51,7 +53,7 @@
 		},
 		afterPost: {
 			component: AfterPost,
-			props: () => ({ postID: $sessionStore.user.postID })
+			props: () => ({ postID })
 		}
 	};
 </script>
@@ -127,8 +129,12 @@
 					// TODO submit confirmation
 					recipientEmails = [];
 					topics = [];
-					// update();
-					await goto('/', { invalidateAll: true });
+					$postID = await result.data.postID;
+					console.log($postID)
+					console.log(result)
+					$sessionStore.show.afterPost = true;
+					update();
+					// await goto('/', { invalidateAll: true });
 				} else {
 					// TODO present server-side submission errors
 					console.error(result);

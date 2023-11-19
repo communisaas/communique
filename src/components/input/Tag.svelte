@@ -147,6 +147,7 @@
 					}
 				} else {
 					addTag({ item: inputField.value, type: type });
+					inputValueWidth = placeholderWidth;
 				}
 				inputValueWidth = placeholderWidth;
 			} else {
@@ -165,6 +166,7 @@
 			searchResults = [];
 		} else {
 			addTag({ item: inputField.value, type: type });
+			inputValueWidth = placeholderWidth
 		}
 	}
 
