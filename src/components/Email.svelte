@@ -145,15 +145,21 @@
 								if ($page.data.session && $page.data.session?.user?.email)
 									// TODO handle error response
 									// Display the key/value pairs
-									await fetch('/data/email/' + item.shortid, {
-										method: 'POST',
-										headers: {
-											'Report-Email-Content': 'true',
-											'User-Email': $page.data.session?.user?.email,
-											'CSRF-Token': $sessionStore.csrfToken
-										},
-										body: JSON.stringify(Object.fromEntries(formData))
-									});
+									try {
+										await fetch('/data/email/' + item.shortid, {
+											method: 'POST',
+											headers: {
+												'Report-Email-Content': 'true',
+												'User-Email': $page.data.session?.user?.email,
+												'CSRF-Token': $sessionStore.csrfToken
+											},
+											body: JSON.stringify(Object.fromEntries(formData))
+										});
+									} catch (e) {
+										console.error(e);
+										(submitterElement as HTMLInputElement).value =
+											"An error occurred! Try again, we'll look into it.";
+									}
 
 								setTimeout(() => (remove = true)); // set remove flag after form update
 								handleRemove({ background: true });

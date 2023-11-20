@@ -231,6 +231,7 @@
 						on:mouseleave={() => (deleteVisible[tag.item] = false)}
 						on:touchend={() => (deleteVisible[tag.item] = false)}
 						on:mousemove={(event) => {
+							deleteVisible[tag.item] = true;
 							const containerRect = event.currentTarget.getBoundingClientRect();
 
 							// Make sure the button stays within the boundaries

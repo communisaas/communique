@@ -19,7 +19,6 @@
 		padding: 4px 8px;
 		box-sizing: border-box;
 		border-radius: 4px;
-		font-size: 0.8rem;
 		transform: translateX(-50%);
 		white-space: nowrap;
 		z-index: 100;

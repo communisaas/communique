@@ -66,7 +66,7 @@
 </script>
 
 <form
-	class="flex flex-col m-10"
+	class="flex flex-col m-2"
 	bind:this={dialog}
 	on:submit={(e) => {
 		setPopover(false);
@@ -75,13 +75,15 @@
 	<aside
 		tabindex="-1"
 		style="text-align: initial;"
-		class="bg-artistBlue-800 p-5 w-full max-h-[75vh] items-center flex flex-col overflow-visible"
+		class="bg-artistBlue-800 p-2 w-full max-h-[75vh] items-center flex flex-col overflow-visible"
 	>
-		<h1>🎉 Posted!</h1>
-		<p>Your post has been published and is now visible to the public.</p>
-		<p class="mt-4">Click below to copy link:</p>
+		<h1 class="xs:text-md text-md">🎉 Posted!</h1>
+		<p class="xs:text-sm md:text-base text-xs">
+			Your post has been published and is now visible to the public.
+		</p>
+		<p class="mt-4 xs:text-sm md:text-bas text-xs">Click below to copy link:</p>
 		<span
-			class="relative m-auto rounded mt-2 bg-peacockFeather-500 text-paper-800 underline p-1 flex"
+			class="relative m-auto rounded mt-2 bg-peacockFeather-500 text-paper-800 underline p-1 flex xs:text-base text-xs"
 		>
 			{new URL('/', $page.url.origin)}
 			<input
@@ -96,10 +98,10 @@
 				on:blur={() => {
 					if (inputField.value.length <= 0) inputField.value = $postID;
 				}}
-				class="bg-peacockFeather-500 font-bold underline mr-0.5 min-w-0 focus:min-w-[5px]"
+				class="bg-peacockFeather-500 font-bold underline mr-0.5 min-w-0 focus:min-w-[5px] xs:text-base text-xs"
 				style="width: {inputValueWidth ? inputValueWidth : 0}px;"
 			/>
-			<Tooltip message={idEditMessage} style="top-[80%] left-[88%]" />
+			<Tooltip message={idEditMessage} style="top-[80%] left-[88%] xs:text-sm text-xs" />
 		</span>
 	</aside>
 	<button type="submit" class="w-full h-10 mt-2">Close</button>
