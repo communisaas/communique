@@ -3,6 +3,7 @@
 	import './styles.css';
 	import colors from '$lib/ui/colors';
 	import weMakeChangeLogo from '$lib/assets/We Make Change Logo.png';
+	import ContentLoader from 'svelte-content-loader';
 	import Navigation from '$components/Navigation.svelte';
 
 	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
@@ -13,7 +14,7 @@
 	import LoginIcon from '$components/icon/Login.svelte';
 	import type { Writable } from 'svelte/store';
 	import { handleSelect } from '$lib/data/select';
-	import { page } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { routeModal } from '$lib/ui/hash';
 	import { browser } from '$app/environment';
@@ -83,7 +84,7 @@
 			moderatioPolicy: false,
 			termsOfUse: false,
 			confirm: false,
-			afterPost: false,
+			afterPost: false
 		};
 		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
 		const hashes = window.location.hash.substring(1).split('#');
@@ -186,7 +187,20 @@
 					{/if}
 				</span>
 			</header>
-			<slot />
+			{#if !$navigating}
+				<slot />
+			{:else}
+				<div class="w-full h-full flex items-center justify-center">
+					<span class="m-auto">
+						<ContentLoader
+							speed={0.5}
+							primaryColor={colors.artistBlue[500]}
+							secondaryColor={colors.larimarGreen[500]}
+							width={9999999}
+						/>
+					</span>
+				</div>
+			{/if}
 		</section>
 		<!-- TODO aria labels for footer -->
 		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full z-10">

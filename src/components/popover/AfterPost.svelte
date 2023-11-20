@@ -2,6 +2,8 @@
 	import { onMount, createEventDispatcher, onDestroy } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { trapFocus, updateFocusableElements } from '$lib/ui/ux';
+	import { page } from '$app/stores';
+	import Tooltip from '$components/Tooltip.svelte';
 
 	export let postID: Writable<string>;
 
@@ -12,6 +14,7 @@
 	let store: Writable<UserState>;
 
 	let dialog: HTMLElement;
+	let idEditMessage: string | undefined = 'Click to edit ID!';
 	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let firstFocus = true;
 	let focusHandler: (e: KeyboardEvent) => void;
@@ -46,12 +49,11 @@
 		if (context) {
 			// TODO measure input width smoothly using in-dom placeholder
 			context.font = getComputedStyle(inputField).font;
-			
 		}
 		dialog.addEventListener('keydown', focusHandler);
 	});
 
-	$: if (inputField && context) inputValueWidth = context.measureText($postID).width * 1.1;
+	$: if (inputField && context) inputValueWidth = context.measureText($postID).width * 1;
 
 	onDestroy(() => {
 		dialog.removeEventListener('keydown', focusHandler);
@@ -63,21 +65,45 @@
 	}
 </script>
 
-<section class="flex flex-col gap-2 m-10" bind:this={dialog}>
+<form
+	class="flex flex-col m-10"
+	bind:this={dialog}
+	on:submit={(e) => {
+		setPopover(false);
+	}}
+>
 	<aside
 		tabindex="-1"
 		style="text-align: initial;"
-		class="bg-artistBlue-800 p-5 overflow-auto w-full max-h-[75vh]"
+		class="bg-artistBlue-800 p-5 w-full max-h-[75vh] items-center flex flex-col overflow-visible"
 	>
 		<h1>🎉 Posted!</h1>
 		<p>Your post has been published and is now visible to the public.</p>
-				<input bind:this={inputField} value={$postID} 
+		<p class="mt-4">Click below to copy link:</p>
+		<span
+			class="relative m-auto rounded mt-2 bg-peacockFeather-500 text-paper-800 underline p-1 flex"
+		>
+			{new URL('/', $page.url.origin)}
+			<input
+				tabindex="0"
+				bind:this={inputField}
+				value={$postID}
+				required
+				on:input={(e) => {
+					idEditMessage = undefined;
+					inputValueWidth = context.measureText(inputField.value).width * 1;
+				}}
+				on:blur={() => {
+					if (inputField.value.length <= 0) inputField.value = $postID;
+				}}
+				class="bg-peacockFeather-500 font-bold underline mr-0.5 min-w-0 focus:min-w-[5px]"
 				style="width: {inputValueWidth ? inputValueWidth : 0}px;"
-				  />
+			/>
+			<Tooltip message={idEditMessage} style="top-[80%] left-[88%]" />
+		</span>
 	</aside>
-	<button on:click={()=>setPopover(false)} class="w-full h-10 mt-2">close</button>
-
-</section>
+	<button type="submit" class="w-full h-10 mt-2">Close</button>
+</form>
 
 <style lang="scss">
 	button {

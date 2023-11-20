@@ -1,12 +1,34 @@
 export function updateFocusableElements(focusableContainer: HTMLElement) {
-	// TODO fix changing number of focusable elements
-	const focusableElements = Array.from(
-		focusableContainer.querySelectorAll(
-			'a, button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], div[role="button"], div[role="menuitem"], select'
-		)
-	);
-	const firstFocusableElement = focusableElements[0] as HTMLElement;
-	const lastFocusableElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+	// Helper function to check if an element is focusable
+	function isFocusable(element: HTMLElement) {
+		if (
+			element.tabIndex > -1 ||
+			(element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1')
+		) {
+			return true;
+		}
+		const focusableSelectors =
+			'a, button, textarea, input, select, [tabindex]:not([tabindex="-1"])';
+		return element.matches(focusableSelectors);
+	}
+
+	// Helper function to get focusable elements, including checking children of unfocusable elements
+	function getFocusableElements(parent: HTMLElement) {
+		const focusableElements: HTMLElement[] = [];
+		for (const child of parent.children) {
+			if (isFocusable(child as HTMLElement)) {
+				focusableElements.push(child as HTMLElement);
+			} else {
+				// If the child itself is not focusable, check its children
+				focusableElements.push(...getFocusableElements(child as HTMLElement));
+			}
+		}
+		return focusableElements;
+	}
+
+	const focusableElements = getFocusableElements(focusableContainer);
+	const firstFocusableElement = focusableElements[0];
+	const lastFocusableElement = focusableElements[focusableElements.length - 1];
 
 	return [focusableElements, firstFocusableElement, lastFocusableElement];
 }

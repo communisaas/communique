@@ -113,7 +113,7 @@
 				/>
 			</div>
 		</aside>
-		<button bind:this={confirmButton} class="w-full h-10 mt-2">{confirmButtonText}</button>
+		<button aria-live="assertive" bind:this={confirmButton} class="w-full h-10 mt-2">{confirmButtonText}</button>
 	</form>
 </section>
 

@@ -166,7 +166,7 @@
 			searchResults = [];
 		} else {
 			addTag({ item: inputField.value, type: type });
-			inputValueWidth = placeholderWidth
+			inputValueWidth = placeholderWidth;
 		}
 	}
 
@@ -353,7 +353,8 @@
 							uniqueKey="autocomplete"
 							width={inputValueWidth}
 							height={20}
-							secondaryColor={colors.larimarGreen[700]}
+							primaryColor={colors.artistBlue[500]}
+							secondaryColor={colors.larimarGreen[500]}
 							speed={0.5}
 						/>
 					</li>

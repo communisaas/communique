@@ -78,6 +78,8 @@
 			if (!submitter) throw Error('No submitter element found');
 			const initialSubmitterState = submitter.innerHTML;
 
+			submitter.innerHTML = 'Posting...';
+
 			let composerData = await editor.save();
 
 			formData.set('body', JSON.stringify(composerData));
@@ -130,8 +132,8 @@
 					recipientEmails = [];
 					topics = [];
 					$postID = await result.data.postID;
-					console.log($postID)
-					console.log(result)
+					console.log($postID);
+					console.log(result);
 					$sessionStore.show.afterPost = true;
 					update();
 					// await goto('/', { invalidateAll: true });
@@ -225,6 +227,7 @@
 			title="Post"
 			class="flex flex-row items-center gap-4 ml-5 md:ml-20 px-3 py-2 w-min min-w-fit h-14 rounded bg-peacockFeather-700 text-white"
 			aria-label="Post button"
+			aria-live="assertive"
 			on:mouseenter={() => ($postButtonHovered = true)}
 			on:touchstart={() => ($postButtonHovered = true)}
 			on:focus={() => ($postButtonHovered = true)}
