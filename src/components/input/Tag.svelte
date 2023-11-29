@@ -66,7 +66,7 @@
 			searching = false;
 		}
 
-		const currentValueWidth = context.measureText(inputField.value).width + 8;
+		const currentValueWidth = context.measureText(inputField.value).width + 9;
 		if (currentValueWidth > placeholderWidth) {
 			inputValueWidth = currentValueWidth;
 		} else {
@@ -203,7 +203,7 @@
 		if (context) {
 			// TODO measure input width smoothly using in-dom placeholder
 			context.font = getComputedStyle(inputField).font;
-			inputValueWidth = context.measureText(placeholder).width * 1.2;
+			inputValueWidth = context.measureText(placeholder).width + 9;
 			placeholderWidth = inputValueWidth;
 		}
 	});

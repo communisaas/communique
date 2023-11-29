@@ -86,6 +86,7 @@ export async function POST({ params, request, cookies, url }) {
 				]);
 				return new Response('incremented');
 			}
+
 			// case: remove email from user's sent list
 		} else if (
 			request.headers.get('remove-email-content') === 'true' &&
@@ -98,8 +99,21 @@ export async function POST({ params, request, cookies, url }) {
 			userOptions.data = { ignored_email_list: { push: params.slug } }; // push shortid
 
 			await objectMapper.user.update({ ...userOptions });
+
 			// case: update email id
-		} else if (request.headers.get('update-id') === 'true' && request.headers.get('user-email')) {
+		} else if (
+			request.headers.get('update-id') === 'true' &&
+			request.headers.get('user-email') &&
+			request.body
+		) {
+			const emailOptions: Clause = {
+				where: { shortid: params.slug }
+			};
+			const newID = await request.text();
+			emailOptions.data = { shortid: { set: newID } };
+
+			await objectMapper.email.update({ ...emailOptions });
+
 			// case: report email
 		} else if (
 			request.headers.get('report-email-content') === 'true' &&
@@ -139,6 +153,7 @@ export async function POST({ params, request, cookies, url }) {
 	} catch (e) {
 		// TODO error monitoring
 		console.error(e);
+		return new Response(e.code, { status: 500 });
 	}
 	return new Response('ok');
 }

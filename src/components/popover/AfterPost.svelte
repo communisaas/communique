@@ -12,17 +12,20 @@
 	export let postID: string;
 
 	let focusableElements = writable<HTMLElement[]>([]);
+	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let lastFocusableElement = writable<HTMLElement>();
 	let inputValueWidth = 0;
+
+	let lastSetInput = '';
 	let idConfirmed = true;
 	let confirmingID = false;
 	let confirmFailed = false;
+	let closeReady = false;
 
 	let store: Writable<UserState>;
 
 	let dialog: HTMLElement;
 	let idEditMessage: string | undefined = 'Click to edit';
-	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let firstFocus = true;
 	let focusHandler: (e: KeyboardEvent) => void;
 
@@ -73,13 +76,63 @@
 	function setPopover(value: boolean) {
 		dispatch('popover', value);
 	}
+
+	async function handleSubmit() {
+		if (inputField.value !== postID) {
+			confirmingID = true;
+			let response;
+			try {
+				response = await fetch('/data/email/' + postID, {
+					method: 'POST',
+					headers: {
+						'Update-ID': 'true',
+						'User-Email': $page.data.session?.user?.email,
+						'CSRF-Token': $store.csrfToken
+					},
+					body: inputField.value
+				});
+			} catch (e) {
+				console.error(e);
+				confirmFailed = true;
+				idConfirmed = false;
+			}
+			confirmingID = false;
+			if (response?.status !== 200) {
+				const errorCode = await response?.text();
+				if (errorCode === 'P2002') {
+					inputField.setCustomValidity('ID already exists!');
+					inputField.reportValidity();
+				}
+				confirmFailed = true;
+				idConfirmed = false;
+			} else {
+				idConfirmed = true;
+				confirmFailed = false;
+				postID = inputField.value;
+				$store.postID = postID;
+			}
+		}
+	}
 </script>
 
 <form
 	class="flex flex-col m-2"
 	bind:this={dialog}
-	on:submit={(e) => {
-		setPopover(false);
+	on:submit={async (e) => {
+		if (postID !== inputField.value || inputField.value !== lastSetInput) {
+			e.preventDefault();
+			try {
+				await handleSubmit();
+			} catch (e) {
+				console.error(e);
+			}
+			closeReady = true;
+		} else {
+			inputField.reportValidity();
+		}
+		if (closeReady) {
+			setPopover(false);
+		}
 	}}
 >
 	<aside
@@ -100,29 +153,25 @@
 					idEditMessage = undefined;
 					idConfirmed = false;
 					confirmFailed = false;
+					closeReady = false;
 					inputField.setCustomValidity('');
 					if (inputField.value.length > 30) {
 						inputField.value = inputField.value.substring(0, 30); // Trims the value if it exceeds 30 characters
 						inputField.setCustomValidity('Max 30 characters!');
 						inputField.reportValidity();
 					}
-					if (inputField.value.length === 0) {
-						inputField.value = postID;
-					}
 					inputValueWidth = context.measureText(inputField.value).width + 9;
 				}}
-				on:blur={() => {
-					console.log('blur');
-					console.log(inputField.value, postID);
-					if (inputField.value !== postID) {
-						confirmingID = true;
-						console.log(confirmingID);
-						setTimeout(() => {
-							postID = inputField.value;
-							confirmingID = false;
-							confirmFailed = true;
-						}, 500);
+				on:blur={async () => {
+					if (inputField.value.length === 0) {
+						inputField.value = postID;
+					} else if (lastSetInput === inputField.value) {
+						inputField.reportValidity();
+						return;
+					} else {
+						await handleSubmit();
 					}
+					lastSetInput = inputField.value;
 				}}
 				class="bg-artistBlue-600 rounded m-3 p-1 font-bold underline mr-0.5 min-w-0 focus:min-w-[5px] xs:text-base text-xs"
 				style="width: {inputValueWidth ? inputValueWidth : 0}px;"

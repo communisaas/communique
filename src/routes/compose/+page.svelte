@@ -51,7 +51,7 @@
 		},
 		afterPost: {
 			component: AfterPost,
-			props: () => ({ postID: $sessionStore.user.postID })
+			props: () => ({ postID: $sessionStore.postID })
 		}
 	};
 </script>
@@ -89,7 +89,6 @@
 				runningBodyLength += block.data.text.length;
 			}
 			if (runningBodyLength < 250) {
-				// TODO make user error messages accessible
 				submitter.innerHTML = `Email has ${runningBodyLength} characters... Try for at least 250.`;
 				setTimeout(() => {
 					if (submitter && initialSubmitterState) submitter.innerHTML = initialSubmitterState;
@@ -101,6 +100,7 @@
 			if (recipientEmails.length <= 0 || topics.length <= 0) {
 				if (recipientEmails.length <= 0) recipientInput.reportValidity();
 				if (topics.length <= 0) topicInput.reportValidity();
+				submitter.innerHTML = initialSubmitterState;
 				return;
 			}
 
@@ -129,7 +129,7 @@
 					// TODO submit confirmation
 					recipientEmails = [];
 					topics = [];
-					$sessionStore.user.postID = await result.data.postID;
+					$sessionStore.postID = await result.data.postID;
 					console.log(result);
 					$sessionStore.show.afterPost = true;
 					update();
@@ -137,7 +137,7 @@
 				} else {
 					// TODO present server-side submission errors
 					console.error(result);
-					if (submitter) submitter.innerHTML = "Error!! We're working on it.";
+					if (submitter) submitter.innerHTML = "Error!! We're working on it. Try again?";
 					setTimeout(() => {
 						if (submitter && initialSubmitterState) submitter.innerHTML = initialSubmitterState;
 					}, 5000);
