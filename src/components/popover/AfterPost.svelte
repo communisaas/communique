@@ -4,17 +4,24 @@
 	import { trapFocus, updateFocusableElements } from '$lib/ui/ux';
 	import { page } from '$app/stores';
 	import Tooltip from '$components/Tooltip.svelte';
+	import Checkmark from '$components/icon/Checkmark.svelte';
+	import ContentLoader from 'svelte-content-loader';
+	import colors from '$lib/ui/colors';
+	import Error from '$components/icon/Error.svelte';
 
-	export let postID: Writable<string>;
+	export let postID: string;
 
 	let focusableElements = writable<HTMLElement[]>([]);
 	let lastFocusableElement = writable<HTMLElement>();
 	let inputValueWidth = 0;
+	let idConfirmed = true;
+	let confirmingID = false;
+	let confirmFailed = false;
 
 	let store: Writable<UserState>;
 
 	let dialog: HTMLElement;
-	let idEditMessage: string | undefined = 'Click to edit ID!';
+	let idEditMessage: string | undefined = 'Click to edit';
 	let firstFocusableElement = writable<HTMLElement | null>(null);
 	let firstFocus = true;
 	let focusHandler: (e: KeyboardEvent) => void;
@@ -50,10 +57,13 @@
 			// TODO measure input width smoothly using in-dom placeholder
 			context.font = getComputedStyle(inputField).font;
 		}
+		if (inputField) {
+			inputField.value = postID;
+		}
 		dialog.addEventListener('keydown', focusHandler);
 	});
 
-	$: if (inputField && context) inputValueWidth = context.measureText($postID).width * 1;
+	$: if (inputField && context) inputValueWidth = context.measureText(postID).width + 9;
 
 	onDestroy(() => {
 		dialog.removeEventListener('keydown', focusHandler);
@@ -81,27 +91,73 @@
 		<p class="xs:text-sm md:text-base text-xs">
 			Your post has been published and is now visible to the public.
 		</p>
-		<p class="mt-4 xs:text-sm md:text-bas text-xs">Click below to copy link:</p>
-		<span
-			class="relative m-auto rounded mt-2 bg-peacockFeather-500 text-paper-800 underline p-1 flex xs:text-base text-xs"
-		>
-			{new URL('/', $page.url.origin)}
+		<span class="flex items-center relative">
 			<input
 				tabindex="0"
 				bind:this={inputField}
-				value={$postID}
 				required
 				on:input={(e) => {
 					idEditMessage = undefined;
-					inputValueWidth = context.measureText(inputField.value).width * 1;
+					idConfirmed = false;
+					confirmFailed = false;
+					inputField.setCustomValidity('');
+					if (inputField.value.length > 30) {
+						inputField.value = inputField.value.substring(0, 30); // Trims the value if it exceeds 30 characters
+						inputField.setCustomValidity('Max 30 characters!');
+						inputField.reportValidity();
+					}
+					if (inputField.value.length === 0) {
+						inputField.value = postID;
+					}
+					inputValueWidth = context.measureText(inputField.value).width + 9;
 				}}
 				on:blur={() => {
-					if (inputField.value.length <= 0) inputField.value = $postID;
+					console.log('blur');
+					console.log(inputField.value, postID);
+					if (inputField.value !== postID) {
+						confirmingID = true;
+						console.log(confirmingID);
+						setTimeout(() => {
+							postID = inputField.value;
+							confirmingID = false;
+							confirmFailed = true;
+						}, 500);
+					}
 				}}
-				class="bg-peacockFeather-500 font-bold underline mr-0.5 min-w-0 focus:min-w-[5px] xs:text-base text-xs"
+				class="bg-artistBlue-600 rounded m-3 p-1 font-bold underline mr-0.5 min-w-0 focus:min-w-[5px] xs:text-base text-xs"
 				style="width: {inputValueWidth ? inputValueWidth : 0}px;"
 			/>
-			<Tooltip message={idEditMessage} style="top-[80%] left-[88%] xs:text-sm text-xs" />
+			<Tooltip
+				on:click={() => inputField.focus()}
+				message={idEditMessage}
+				style="top-[75%] left-[55%] xs:text-sm text-xs cursor-pointer"
+			/>
+			<span class="absolute max-w-[30px] m-1 -right-10">
+				<span class="relative w-[30px] top-0">
+					{#if idConfirmed}
+						<Checkmark />
+					{/if}
+					{#if confirmFailed}
+						<Error />
+					{/if}
+				</span>
+				{#if confirmingID}
+					<ContentLoader
+						speed={0.5}
+						primaryColor={colors.artistBlue[500]}
+						secondaryColor={colors.larimarGreen[500]}
+						width={30}
+						height={30}
+					/>
+				{/if}
+			</span>
+		</span>
+
+		<p class="mt-5 xs:text-sm md:text-bas text-xs">Gather senders & share the link below!</p>
+		<span
+			class="relative font-bold m-auto rounded mt-2 bg-peacockFeather-600 text-paper-800 underline p-1 flex text-[10px] xs:text-sm"
+		>
+			{new URL(postID, $page.url.origin)}
 		</span>
 	</aside>
 	<button type="submit" class="w-full h-10 mt-2">Close</button>

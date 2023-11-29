@@ -54,7 +54,7 @@
 		}
 	}
 
-	async function handleInput() {
+	async function handleInput(e: InputEvent) {
 		if (firstInput && type == 'email') {
 			validityMessage = 'Try pasting a list of email addresses!';
 			firstInput = false;
@@ -324,8 +324,8 @@
 						inputField.blur();
 					}
 				}}
-				on:input={() => {
-					handleInput();
+				on:input={(e) => {
+					handleInput(e);
 				}}
 				on:paste={(e) => {
 					if (type === 'email') {
@@ -340,7 +340,7 @@
 				{type}
 			/>
 			{#if validityMessage}
-				<Tooltip message={validityMessage} style="top-[75%] left-[100%]" />
+				<Tooltip message={validityMessage} style="top-[75%] left-[100%] text-xs" />
 			{/if}
 			<ul
 				bind:this={completionList}

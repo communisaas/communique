@@ -32,8 +32,6 @@
 	let topicInput: HTMLInputElement;
 	let recipientInput: HTMLInputElement;
 
-	let postID = writable('');
-
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
 	});
@@ -53,7 +51,7 @@
 		},
 		afterPost: {
 			component: AfterPost,
-			props: () => ({ postID })
+			props: () => ({ postID: $sessionStore.user.postID })
 		}
 	};
 </script>
@@ -131,8 +129,7 @@
 					// TODO submit confirmation
 					recipientEmails = [];
 					topics = [];
-					$postID = await result.data.postID;
-					console.log($postID);
+					$sessionStore.user.postID = await result.data.postID;
 					console.log(result);
 					$sessionStore.show.afterPost = true;
 					update();
@@ -164,13 +161,10 @@
 					searchField="recipient"
 					placeholder="Recipient"
 					style="h-14 w-fit bg-peacockFeather-700"
-					inputStyle="bg-artistBlue-700 text-paper-500"
+					inputStyle="bg-peacockFeather-600 text-paper-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-600 text-paper-500 m-2 w-fit"
 					inputVisible={true}
 					bind:searchResults={suggestedRecipientEmails}
-					on:autocomplete={async (e) => {
-						suggestedRecipientEmails = await handleAutocomplete(e);
-					}}
 				>
 					<icon class="w-12 inline-block m-1"><AddRecipient /></icon>
 				</TagInput>
@@ -185,7 +179,7 @@
 					searchField="topic"
 					placeholder="Topic"
 					style="h-14 w-fit bg-peacockFeather-700"
-					inputStyle="bg-artistBlue-700 text-paper-500"
+					inputStyle="bg-peacockFeather-600 text-paper-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500 m-2 w-fit"
 					inputVisible={true}
 					autocompleteStyle="left-0"

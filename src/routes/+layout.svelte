@@ -114,7 +114,7 @@
 		<section class="min-h-screen">
 			<header
 				aria-label="Popular topics list"
-				class="flex md:h-12 pr-2 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
+				class="flex md:h-12 pr-1 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector

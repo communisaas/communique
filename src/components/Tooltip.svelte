@@ -5,7 +5,7 @@
 </script>
 
 {#if message}
-	<div class="tooltip {style}">
+	<div on:click class="tooltip {style}">
 		{message}
 	</div>
 {/if}
