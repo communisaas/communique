@@ -66,7 +66,9 @@
 	});
 </script>
 
-<aside
+<div
+	role="menu"
+	tabindex="0"
 	class="menu rounded absolute top-0 left-0 min-h-full w-full z-20 flex justify-center"
 	in:fade={{ delay: 25, duration: 300, easing: expoIn }}
 	out:fade={{ delay: 50, duration: 300, easing: expoOut }}
@@ -75,7 +77,7 @@
 	on:click|preventDefault
 	on:keypress|preventDefault
 >
-	<section role="menu" tabindex="0" class="menu pt-[0.75rem] w-full">
+	<section class="menu pt-[0.75rem] w-full">
 		<div
 			bind:this={menu}
 			transition:slide={{ delay: 50, axis: 'x', easing: quintOut }}
@@ -128,7 +130,7 @@
 			{/each}
 		</div>
 	</section>
-</aside>
+</div>
 
 <style lang="scss">
 	.menu {
