@@ -178,6 +178,11 @@
 			/>
 			<Tooltip
 				on:click={() => inputField.focus()}
+				on:keypress={(e) => {
+					if (e.key === 'Enter') {
+						inputField.focus();
+					}
+				}}
 				message={idEditMessage}
 				style="top-[75%] left-[55%] xs:text-sm text-xs cursor-pointer"
 			/>

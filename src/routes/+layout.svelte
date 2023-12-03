@@ -23,7 +23,8 @@
 	const dispatch = createEventDispatcher();
 
 	let sessionStore: Writable<UserState>,
-		navCollapsed = false;
+		navCollapsed = false,
+		windowWidth = 0;
 
 	function handleHashChange(e: HashChangeEvent) {
 		$sessionStore.show = {
@@ -88,6 +89,8 @@
 		};
 		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
 		const hashes = window.location.hash.substring(1).split('#');
+
+		windowWidth = window.innerWidth;
 		// TODO use enum
 		routeModal(hashes, $sessionStore, dispatch);
 		window.addEventListener('hashchange', handleHashChange);
@@ -128,6 +131,7 @@
 						on:select={async (e) => {
 							// TODO loading placeholders on topic change
 							if ($sessionStore.template.primary) {
+								$sessionStore.template.primary.cardList = [];
 								$sessionStore.template.primary.cardList = await handleSelect(e);
 								$sessionStore.template.primary.focus = {
 									type: 'topic',
@@ -187,16 +191,17 @@
 					{/if}
 				</span>
 			</header>
-			{#if !$navigating}
+			{#if !$navigating && $sessionStore && $sessionStore.template.primary.cardList.length > 0}
 				<slot />
 			{:else}
 				<div class="w-full h-full flex items-center justify-center">
 					<span class="m-auto">
 						<ContentLoader
+							uniqueKey="layoutLoader"
 							speed={0.5}
-							primaryColor={colors.artistBlue[500]}
-							secondaryColor={colors.larimarGreen[500]}
-							width={9999999}
+							primaryColor={colors.peacockFeather[700]}
+							secondaryColor={colors.artistBlue[500]}
+							width={windowWidth}
 						/>
 					</span>
 				</div>

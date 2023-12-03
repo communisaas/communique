@@ -5,7 +5,7 @@
 </script>
 
 {#if message}
-	<div on:click class="tooltip {style}">
+	<div role="tooltip" on:click on:keypress class="tooltip {style}">
 		{message}
 	</div>
 {/if}
