@@ -3,8 +3,7 @@
 	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import TagInput from './input/Tag.svelte';
-	import { debounce, fetchSearchResults, handleAutocomplete, handleSelect } from '$lib/data/select';
-	import { page } from '$app/stores';
+	import { handleAutocomplete } from '$lib/data/select';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';

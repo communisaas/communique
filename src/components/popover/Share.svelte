@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { backInOut } from 'svelte/easing';
 	import { fade, scale } from 'svelte/transition';
-	import Clipboard from './icon/Clipboard.svelte';
+	import Clipboard from '../icon/Clipboard.svelte';
 	import DOMPurify from 'isomorphic-dompurify';
-	import Checkmark from './icon/Checkmark.svelte';
-	import Social from './Social.svelte';
+	import Checkmark from '../icon/Checkmark.svelte';
+	import Social from '../Social.svelte';
 	import type { email } from '@prisma/client';
 	import { page } from '$app/stores';
 	import { createEventDispatcher, onMount } from 'svelte';

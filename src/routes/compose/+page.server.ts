@@ -70,12 +70,16 @@ export const actions = {
 			await tx.author.upsert({
 				where: { email_address: emailForm.author_email },
 				update: {
-					last_updated: updateTime
+					last_updated: updateTime,
+					email_id_list: {
+						push: stagingID.slice(-8)
+					}
 				},
 				create: {
 					read_email_count: 0,
 					sent_email_count: 0,
 					open_email_count: 0,
+					email_id_list: [stagingID.slice(-8)],
 					user: {
 						connect: {
 							email: emailForm.author_email
@@ -133,7 +137,7 @@ export const actions = {
 			});
 		});
 
-		return { success: true };
+		return { type: 'success', status: 200, postID: stagingID.slice(-8) };
 	}
 };
 

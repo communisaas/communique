@@ -30,7 +30,7 @@ export async function handleCopy(dataType: 'email' | 'link', content: email | st
 	let copyData, cleanedBody;
 
 	if (dataType === 'email') {
-		cleanedBody = DOMPurify.DOMPurify.sanitize(content);
+		cleanedBody = DOMPurify.sanitize(content);
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(cleanedBody, 'text/html');
 		content = convertHtmlToText(doc.body);

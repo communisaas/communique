@@ -68,7 +68,7 @@
 	$: confirmButtonText = currentInputValue.length > 0 ? 'Confirm' : 'Close';
 </script>
 
-<section tabindex="-1" class="flex flex-col gap-2 markdown-content m-10" bind:this={dialog}>
+<section class="flex flex-col gap-2 m-10" bind:this={dialog}>
 	<form
 		on:submit|preventDefault={async (e) => {
 			if (!submitDisabled && currentInputValue.length > 0 && e.submitter) {
@@ -113,7 +113,7 @@
 				/>
 			</div>
 		</aside>
-		<button bind:this={confirmButton} class="w-full h-10 mt-2">{confirmButtonText}</button>
+		<button aria-live="assertive" bind:this={confirmButton} class="w-full h-10 mt-2">{confirmButtonText}</button>
 	</form>
 </section>
 

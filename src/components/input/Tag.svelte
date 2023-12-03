@@ -2,6 +2,7 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import ContentLoader from 'svelte-content-loader';
 	import colors from '$lib/ui/colors';
+	import Tooltip from '../Tooltip.svelte';
 
 	export let type: 'text' | 'search' | 'email',
 		name: string,
@@ -23,13 +24,16 @@
 
 	let searching = false;
 
-	let deleteVisible: FlagMap = {}; // A map to hold visibility states
-	let firstFocus = true;
+	let firstInput = true;
 
+	let completionFocusIndex: number = 0;
 	let completionList: HTMLUListElement;
+	let completionButtons: HTMLDivElement[] = [];
+
+	let deleteVisible: FlagMap = {}; // A map to hold visibility states
 	let deleteButtons: ButtonElementMap = {}; // A map to hold the delete buttons
 
-	let autocompleteIndex: number = 0;
+	let validityMessage: string | null;
 
 	const dispatch = createEventDispatcher();
 
@@ -37,6 +41,7 @@
 
 	function addTag(tag: Descriptor<string>) {
 		inputField.value = '';
+		validityMessage = null;
 		if (tagValues.includes(tag.item)) {
 			inputField.setCustomValidity(
 				`${name.replace(name[0], name[0].toLocaleUpperCase())} ${tag.item} already entered.`
@@ -44,18 +49,24 @@
 			inputField.reportValidity();
 		} else {
 			tagList = [...tagList, tag];
+			searchResults = searchResults.filter((result) => result.item !== tag.item);
 			dispatch('add', tag);
 		}
 	}
 
-	async function handleInput() {
+	async function handleInput(e: InputEvent) {
+		if (firstInput && type == 'email') {
+			validityMessage = 'Try pasting a list of email addresses!';
+			firstInput = false;
+		}
+
 		if (inputField.value.length > 2 && autocomplete) {
 			searching = true;
 		} else {
 			searching = false;
 		}
 
-		const currentValueWidth = context.measureText(inputField.value).width + 8;
+		const currentValueWidth = context.measureText(inputField.value).width + 9;
 		if (currentValueWidth > placeholderWidth) {
 			inputValueWidth = currentValueWidth;
 		} else {
@@ -63,7 +74,7 @@
 		}
 		if (autocomplete && inputField.value.length > 2) {
 			dispatch('autocomplete', { value: inputField.value, source: searchField });
-			autocompleteIndex = -1;
+			completionFocusIndex = -1;
 		}
 	}
 
@@ -109,6 +120,7 @@
 			if (tagList.length > 0) inputVisible = false;
 			groupedResults = {};
 		}
+		validityMessage = null;
 		dispatch('blur', e.detail);
 	}
 
@@ -128,13 +140,14 @@
 		if (autocomplete) {
 			if (inputField.checkValidity()) {
 				if (autocomplete) {
-					if (autocompleteIndex >= 0) {
-						addTag(visibleSearchResults[autocompleteIndex]);
+					if (completionFocusIndex >= 0) {
+						addTag(filteredSearchResults[completionFocusIndex]);
 					} else {
 						addTag({ item: inputField.value, type: type });
 					}
 				} else {
 					addTag({ item: inputField.value, type: type });
+					inputValueWidth = placeholderWidth;
 				}
 				inputValueWidth = placeholderWidth;
 			} else {
@@ -146,23 +159,29 @@
 		} else if (
 			inputField.value.length > 0 &&
 			!allowCustomValues &&
-			!visibleSearchResults.some((result) => result.item === inputField.value)
+			!filteredSearchResults.some((result) => result.item === inputField.value)
 		) {
 			inputField.setCustomValidity('Nothing here! Try adding it?');
 			inputField.reportValidity();
 			searchResults = [];
+		} else {
+			addTag({ item: inputField.value, type: type });
+			inputValueWidth = placeholderWidth;
 		}
 	}
 
 	$: if (searchResults) {
 		searching = false;
 	}
-	$: visibleSearchResults = searchResults
+	$: filteredSearchResults = searchResults
 		? searchResults.filter(
-				(result) => !tagList.some((tag) => tag.item === result.item && tag.type === result.type)
+				(result) =>
+					!tagList.some((tag) => tag.item === result.item && tag.type === result.type) &&
+					(result.source === searchField || !searchField)
 		  )
 		: [];
-	$: groupedResults = visibleSearchResults.reduce(
+
+	$: groupedResults = filteredSearchResults.reduce(
 		(accumulator: { [key: string]: Descriptor<string>[] }, result) => {
 			// TODO filter by searchfield at endpoint
 			if (result.source && (result.source === searchField || !searchField)) {
@@ -184,13 +203,13 @@
 		if (context) {
 			// TODO measure input width smoothly using in-dom placeholder
 			context.font = getComputedStyle(inputField).font;
-			inputValueWidth = context.measureText(placeholder).width * 1.2;
+			inputValueWidth = context.measureText(placeholder).width + 9;
 			placeholderWidth = inputValueWidth;
 		}
 	});
 </script>
 
-<div class="px-2 rounded max-w-full h-max inline-block items-center justify-center z-10 {style}">
+<div class="px-2 rounded max-w-full h-max relative items-center justify-center {style}">
 	<form
 		autocomplete="off"
 		class="flex flex-nowrap max-w-full"
@@ -212,6 +231,7 @@
 						on:mouseleave={() => (deleteVisible[tag.item] = false)}
 						on:touchend={() => (deleteVisible[tag.item] = false)}
 						on:mousemove={(event) => {
+							deleteVisible[tag.item] = true;
 							const containerRect = event.currentTarget.getBoundingClientRect();
 
 							// Make sure the button stays within the boundaries
@@ -238,6 +258,7 @@
 							type="button"
 							on:click|stopPropagation={(e) => {
 								tagList = tagList.filter((item) => item != tag);
+								if (autocomplete) filteredSearchResults = [...filteredSearchResults, tag];
 								if (tagList.length < 1 || inputVisible) inputField.focus();
 								dispatch('delete', tag);
 							}}
@@ -268,31 +289,27 @@
 				inputmode={type}
 				bind:this={inputField}
 				on:blur={handleBlur}
-				on:focus={() => {
-					if (firstFocus && type == 'email') {
-						inputField.setCustomValidity('Also paste in any list of email addresses!');
-						inputField.reportValidity();
-					}
-					firstFocus = false;
-					inputVisible = true;
-				}}
+				on:focus={(e) => (inputVisible = true)}
 				on:keydown|self={(e) => {
 					// clear earlier validation errors
 					inputField.setCustomValidity('');
 
-					const resultsLength = visibleSearchResults ? visibleSearchResults.length : 0;
-
+					const resultsLength = filteredSearchResults ? filteredSearchResults.length : 0;
 					if (resultsLength > 0) {
 						if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
 							e.preventDefault();
-							autocompleteIndex = (autocompleteIndex + 1) % resultsLength;
+							if (completionFocusIndex === resultsLength - 1) {
+								completionFocusIndex = -1;
+							} else {
+								completionFocusIndex = (completionFocusIndex + 1) % resultsLength;
+							}
 						}
 						if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
 							e.preventDefault();
-							if (autocompleteIndex === 0) {
-								autocompleteIndex = resultsLength - 1;
+							if (completionFocusIndex === -1) {
+								completionFocusIndex = resultsLength - 1;
 							} else {
-								autocompleteIndex = (autocompleteIndex - 1 + resultsLength) % resultsLength;
+								completionFocusIndex = (completionFocusIndex - 1 + resultsLength) % resultsLength;
 							}
 						}
 					}
@@ -302,13 +319,13 @@
 						handleSubmit();
 					}
 
-					if (e.key === 'Escape' || (e.key === 'Tab' && !visibleSearchResults)) {
+					if (e.key === 'Escape' || (e.key === 'Tab' && !filteredSearchResults)) {
 						e.preventDefault();
 						inputField.blur();
 					}
 				}}
-				on:input={() => {
-					handleInput();
+				on:input={(e) => {
+					handleInput(e);
 				}}
 				on:paste={(e) => {
 					if (type === 'email') {
@@ -322,10 +339,14 @@
 				class:p-1={inputVisible}
 				{type}
 			/>
+			{#if validityMessage}
+				<Tooltip message={validityMessage} style="top-[75%] left-[100%] text-xs" />
+			{/if}
 			<ul
 				bind:this={completionList}
 				class="autocomplete flex flex-col bg-paper-500 py-1 max-w-[80vw] w-fit {autocompleteStyle}"
 				class:px-4={Object.keys(groupedResults).length > 0 && inputVisible}
+				on:mouseleave={() => (completionFocusIndex = -1)}
 			>
 				{#if searching}
 					<li class="relative px-1">
@@ -333,33 +354,35 @@
 							uniqueKey="autocomplete"
 							width={inputValueWidth}
 							height={20}
-							secondaryColor={colors.larimarGreen[700]}
+							primaryColor={colors.artistBlue[500]}
+							secondaryColor={colors.larimarGreen[500]}
 							speed={0.5}
 						/>
 					</li>
-				{:else if visibleSearchResults && visibleSearchResults.length > 0 && inputVisible}
-					{#each Object.keys(groupedResults) as type}
+				{:else if filteredSearchResults && filteredSearchResults.length > 0 && inputVisible}
+					{#each Object.keys(groupedResults) as type, groupIndex}
 						<li class="-ml-1">{type}s</li>
-						{#each groupedResults[type] as result, index}
+						{#each groupedResults[type] as result, itemIndex}
 							<li class="relative">
 								<div
 									tabindex="0"
+									bind:this={completionButtons[completionButtons.length]}
 									role="button"
 									class="p-1 rounded mr-2 cursor-pointer w-full text-xs text-center overflow-hidden overflow-ellipsis"
-									class:bg-paper-800={visibleSearchResults[autocompleteIndex] &&
-										visibleSearchResults[autocompleteIndex].item === result.item}
+									class:bg-paper-800={filteredSearchResults[completionFocusIndex] &&
+										filteredSearchResults[completionFocusIndex].item === result.item}
 									on:mouseenter={() =>
-										(autocompleteIndex = visibleSearchResults.findIndex(
+										(completionFocusIndex = filteredSearchResults.findIndex(
 											(r) => r.item === result.item
 										))}
 									on:click|preventDefault|stopPropagation={(e) => {
-										addTag(visibleSearchResults[autocompleteIndex]);
+										addTag(filteredSearchResults[completionFocusIndex]);
 										inputValueWidth = placeholderWidth;
 										inputField.focus();
 									}}
 									on:keydown|preventDefault|stopPropagation={(e) => {
 										if (e.key === 'Enter') {
-											addTag(visibleSearchResults[autocompleteIndex]);
+											addTag(filteredSearchResults[completionFocusIndex]);
 											inputValueWidth = placeholderWidth;
 											inputField.focus();
 										}
@@ -449,7 +472,7 @@
 
 	.autocomplete {
 		position: absolute;
-		top: 100%;
+		top: 75%;
 		max-height: 200px;
 		overflow-y: auto;
 		overflow-x: visible;

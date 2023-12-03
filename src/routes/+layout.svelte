@@ -3,6 +3,7 @@
 	import './styles.css';
 	import colors from '$lib/ui/colors';
 	import weMakeChangeLogo from '$lib/assets/We Make Change Logo.png';
+	import ContentLoader from 'svelte-content-loader';
 	import Navigation from '$components/Navigation.svelte';
 
 	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
@@ -13,7 +14,7 @@
 	import LoginIcon from '$components/icon/Login.svelte';
 	import type { Writable } from 'svelte/store';
 	import { handleSelect } from '$lib/data/select';
-	import { page } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { routeModal } from '$lib/ui/hash';
 	import { browser } from '$app/environment';
@@ -22,7 +23,8 @@
 	const dispatch = createEventDispatcher();
 
 	let sessionStore: Writable<UserState>,
-		navCollapsed = false;
+		navCollapsed = false,
+		windowWidth = 0;
 
 	function handleHashChange(e: HashChangeEvent) {
 		$sessionStore.show = {
@@ -82,10 +84,13 @@
 			privacyPolicy: false,
 			moderatioPolicy: false,
 			termsOfUse: false,
-			confirm: false
+			confirm: false,
+			afterPost: false
 		};
 		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
 		const hashes = window.location.hash.substring(1).split('#');
+
+		windowWidth = window.innerWidth;
 		// TODO use enum
 		routeModal(hashes, $sessionStore, dispatch);
 		window.addEventListener('hashchange', handleHashChange);
@@ -112,13 +117,13 @@
 		<section class="min-h-screen">
 			<header
 				aria-label="Popular topics list"
-				class="flex md:h-12 pr-2 py-2 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
+				class="flex md:h-12 pr-1 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<Selector
 						selectable={Tag}
 						itemStyle="whitespace-nowrap sm:text-base bg-peacockFeather-500 text-paper-500 text-sm"
-						selectorStyle="self-center m-auto w-full h-full sm:px-2 px-1"
+						selectorStyle="self-center m-auto w-full h-full px-1 py-2"
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}
@@ -126,6 +131,7 @@
 						on:select={async (e) => {
 							// TODO loading placeholders on topic change
 							if ($sessionStore.template.primary) {
+								$sessionStore.template.primary.cardList = [];
 								$sessionStore.template.primary.cardList = await handleSelect(e);
 								$sessionStore.template.primary.focus = {
 									type: 'topic',
@@ -185,7 +191,21 @@
 					{/if}
 				</span>
 			</header>
-			<slot />
+			{#if !$navigating && $sessionStore && $sessionStore.template && $sessionStore.template.primary.cardList.length > 0}
+				<slot />
+			{:else}
+				<div class="w-full h-full flex items-center justify-center">
+					<span class="m-auto">
+						<ContentLoader
+							uniqueKey="layoutLoader"
+							speed={0.5}
+							primaryColor={colors.peacockFeather[700]}
+							secondaryColor={colors.artistBlue[500]}
+							width={windowWidth}
+						/>
+					</span>
+				</div>
+			{/if}
 		</section>
 		<!-- TODO aria labels for footer -->
 		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full z-10">

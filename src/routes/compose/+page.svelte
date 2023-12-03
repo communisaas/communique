@@ -4,7 +4,8 @@
 	import AddRecipient from '$components/icon/Recipient.svelte';
 	import AddTopic from '$components/icon/Topic.svelte';
 	import Post from '$components/icon/Post.svelte';
-	import Reader from '$components/Reader.svelte';
+	import Reader from '$components/popover/Reader.svelte';
+	import AfterPost from '$components/popover/AfterPost.svelte';
 
 	import { writable, type Writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
@@ -14,7 +15,6 @@
 	import modal, { handlePopover } from '$lib/ui/modal';
 	import type EditorJS from '@editorjs/editorjs';
 	import { handleAutocomplete } from '$lib/data/select';
-	import { goto, invalidateAll } from '$app/navigation';
 
 	let postButtonHovered = writable(false);
 	let sessionStore: Writable<UserState>;
@@ -47,6 +47,10 @@
 		termsOfUse: {
 			component: Reader,
 			props: () => ({ item: $page.data.termsOfUse, inModal: true })
+		},
+		afterPost: {
+			component: AfterPost,
+			props: () => ({ postID: $sessionStore.postID })
 		}
 	};
 </script>
@@ -71,6 +75,8 @@
 			if (!submitter) throw Error('No submitter element found');
 			const initialSubmitterState = submitter.innerHTML;
 
+			submitter.innerHTML = 'Posting...';
+
 			let composerData = await editor.save();
 
 			formData.set('body', JSON.stringify(composerData));
@@ -82,7 +88,6 @@
 				runningBodyLength += block.data.text.length;
 			}
 			if (runningBodyLength < 250) {
-				// TODO make user error messages accessible
 				submitter.innerHTML = `Email has ${runningBodyLength} characters... Try for at least 250.`;
 				setTimeout(() => {
 					if (submitter && initialSubmitterState) submitter.innerHTML = initialSubmitterState;
@@ -94,6 +99,7 @@
 			if (recipientEmails.length <= 0 || topics.length <= 0) {
 				if (recipientEmails.length <= 0) recipientInput.reportValidity();
 				if (topics.length <= 0) topicInput.reportValidity();
+				submitter.innerHTML = initialSubmitterState;
 				return;
 			}
 
@@ -122,12 +128,16 @@
 					// TODO submit confirmation
 					recipientEmails = [];
 					topics = [];
-					// update();
-					await goto('/', { invalidateAll: true });
+					$sessionStore.postID = await result.data.postID;
+					console.log(result);
+					submitter.innerHTML = 'Posted!';
+					$sessionStore.show.afterPost = true;
+					update();
+					// await goto('/', { invalidateAll: true });
 				} else {
 					// TODO present server-side submission errors
 					console.error(result);
-					if (submitter) submitter.innerHTML = "Error!! We're working on it.";
+					if (submitter) submitter.innerHTML = "Error!! We're working on it. Try again?";
 					setTimeout(() => {
 						if (submitter && initialSubmitterState) submitter.innerHTML = initialSubmitterState;
 					}, 5000);
@@ -151,13 +161,10 @@
 					searchField="recipient"
 					placeholder="Recipient"
 					style="h-14 w-fit bg-peacockFeather-700"
-					inputStyle="bg-artistBlue-700 text-paper-500"
+					inputStyle="bg-peacockFeather-600 text-paper-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-600 text-paper-500 m-2 w-fit"
 					inputVisible={true}
 					bind:searchResults={suggestedRecipientEmails}
-					on:autocomplete={async (e) => {
-						suggestedRecipientEmails = await handleAutocomplete(e);
-					}}
 				>
 					<icon class="w-12 inline-block m-1"><AddRecipient /></icon>
 				</TagInput>
@@ -172,7 +179,7 @@
 					searchField="topic"
 					placeholder="Topic"
 					style="h-14 w-fit bg-peacockFeather-700"
-					inputStyle="bg-artistBlue-700 text-paper-500"
+					inputStyle="bg-peacockFeather-600 text-paper-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500 m-2 w-fit"
 					inputVisible={true}
 					autocompleteStyle="left-0"
@@ -214,6 +221,7 @@
 			title="Post"
 			class="flex flex-row items-center gap-4 ml-5 md:ml-20 px-3 py-2 w-min min-w-fit h-14 rounded bg-peacockFeather-700 text-white"
 			aria-label="Post button"
+			aria-live="assertive"
 			on:mouseenter={() => ($postButtonHovered = true)}
 			on:touchstart={() => ($postButtonHovered = true)}
 			on:focus={() => ($postButtonHovered = true)}

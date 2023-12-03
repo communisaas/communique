@@ -3,7 +3,7 @@
 	import { createEventDispatcher, onMount, afterUpdate, tick } from 'svelte';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
-	import Reader from './Reader.svelte';
+	import Reader from './popover/Reader.svelte';
 	import RecipientIcon from './icon/Recipient.svelte';
 	import SentIcon from './icon/Sent.svelte';
 	import MenuIcon from './icon/Menu.svelte';
@@ -145,15 +145,21 @@
 								if ($page.data.session && $page.data.session?.user?.email)
 									// TODO handle error response
 									// Display the key/value pairs
-									await fetch('/data/email/' + item.shortid, {
-										method: 'POST',
-										headers: {
-											'Report-Email-Content': 'true',
-											'User-Email': $page.data.session?.user?.email,
-											'CSRF-Token': $sessionStore.csrfToken
-										},
-										body: JSON.stringify(Object.fromEntries(formData))
-									});
+									try {
+										await fetch('/data/email/' + item.shortid, {
+											method: 'POST',
+											headers: {
+												'Report-Email-Content': 'true',
+												'User-Email': $page.data.session?.user?.email,
+												'CSRF-Token': $sessionStore.csrfToken
+											},
+											body: JSON.stringify(Object.fromEntries(formData))
+										});
+									} catch (e) {
+										console.error(e);
+										(submitterElement as HTMLInputElement).value =
+											"An error occurred! Try again, we'll look into it.";
+									}
 
 								setTimeout(() => (remove = true)); // set remove flag after form update
 								handleRemove({ background: true });
