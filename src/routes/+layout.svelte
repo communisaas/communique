@@ -18,6 +18,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { routeModal } from '$lib/ui/hash';
 	import { browser } from '$app/environment';
+	import Geolocator from '$components/Geolocator.svelte';
 
 	export let data: LayoutSchema;
 	const dispatch = createEventDispatcher();
@@ -27,14 +28,16 @@
 		windowWidth = 0;
 
 	function handleHashChange(e: HashChangeEvent) {
-		$sessionStore.show = {
-			login: false,
-			share: false,
-			privacyPolicy: false,
-			moderatioPolicy: false,
-			termsOfUse: false,
-			confirm: false
-		};
+		if (!window.location.hash) {
+			$sessionStore.show = {
+				login: false,
+				share: false,
+				privacyPolicy: false,
+				moderatioPolicy: false,
+				termsOfUse: false,
+				confirm: false
+			};
+		}
 		if (window.location.hash === '#terms-of-use') {
 			$sessionStore.show.termsOfUse = true;
 		} else if (window.location.hash === '#privacy-policy') {
@@ -90,7 +93,7 @@
 		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
 		const hashes = window.location.hash.substring(1).split('#');
 
-		windowWidth = window.innerWidth;
+		windowWidth = window.outerWidth;
 		// TODO use enum
 		routeModal(hashes, $sessionStore, dispatch);
 		window.addEventListener('hashchange', handleHashChange);
@@ -146,11 +149,27 @@
 					/>
 				{/if}
 				<span
-					class="relative overflow-visible ml-auto min-w-fit pl-2 flex flex-col items-center justify-center h-full text-paper-500"
+					class="ml-auto flex items-center relative overflow-visible min-w-fit pl-2 gap-2 justify-center h-full text-paper-500"
 				>
+					<span class="group relative p-0.5">
+						<Geolocator />
+						<div
+							role="menu"
+							tabindex="0"
+							class="absolute z-40 right-0 top-[90%] invisible group-hover:visible bg-peacockFeather-600 shadow-lg"
+						>
+							<ul class="flex flex-col items-start space-y-1">
+								<button
+									class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
+									on:click={() => goto('/profile')}>Set city & state</button
+								>
+							</ul>
+						</div>
+					</span>
+
 					{#if $page.data.session}
 						<div
-							class="group relative rounded hover:bg-peacockFeather-600 transition-all duration-200"
+							class="group relative rounded hover:bg-peacockFeather-600 transition-colors duration-200"
 						>
 							{#if $page.data.session.user?.image}
 								<img
@@ -164,26 +183,23 @@
 							<div
 								role="menu"
 								tabindex="0"
-								class="p-2 absolute z-40 right-0 w-auto hidden group-hover:block bg-peacockFeather-700 shadow-lg"
+								class="absolute z-40 right-0 w-0 group-hover:w-auto bg-peacockFeather-600 shadow-lg"
 							>
 								<ul class="flex flex-col items-start space-y-1">
 									<button
-										class="min-w-full text-left whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
+										class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
 										on:click={() => goto('/profile')}>Profile</button
 									>
 									<button
-										class="min-w-full text-left whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
+										class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
 										on:click={() => signOut({ callbackUrl: '/', redirect: false })}>Sign out</button
 									>
 								</ul>
 							</div>
 						</div>
 					{:else}
-						<span class="whitespace-nowrap text-[11px] self-end justify-self-end ml-1.5 -mb-0.5"
-							>Sign in</span
-						>
 						<button
-							class="w-8 justify-self-end -mr-4"
+							class="w-9 justify-self-end"
 							on:click={() => signIn({ callbackUrl: '/', redirect: false })}
 						>
 							<LoginIcon />

@@ -72,6 +72,7 @@
 					bind:items={panel.cardList}
 					bind:selected={$sessionStore.email}
 					on:select={async (e) => {
+						$sessionStore.template.primary.cardList = [];
 						$sessionStore.template.primary.cardList = await handleSelect(e);
 						// switch (e.detail.type) {
 						// 	case 'recipient':

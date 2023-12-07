@@ -161,7 +161,7 @@
 					searchField="recipient"
 					placeholder="Recipient"
 					style="h-14 w-fit bg-peacockFeather-700"
-					inputStyle="bg-peacockFeather-600 text-paper-500"
+					inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-600 text-paper-500 m-2 w-fit"
 					inputVisible={true}
 					bind:searchResults={suggestedRecipientEmails}
@@ -179,7 +179,7 @@
 					searchField="topic"
 					placeholder="Topic"
 					style="h-14 w-fit bg-peacockFeather-700"
-					inputStyle="bg-peacockFeather-600 text-paper-500"
+					inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500 m-2 w-fit"
 					inputVisible={true}
 					autocompleteStyle="left-0"
@@ -206,7 +206,7 @@
 					}}
 					name="subject"
 					placeholder="Subject"
-					class="w-42 h-fit p-0.5 bg-artistBlue-700 text-paper-500 rounded"
+					class="w-42 h-fit p-0.5 bg-artistBlue-700 focus:outline-peacockFeather-500 text-paper-500 rounded"
 				/>
 			</span>
 		</div>

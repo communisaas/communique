@@ -12,7 +12,7 @@
 }
 
 html {
-	background-color: theme('colors.peacockFeather.600');
+	background-color: theme('colors.peacockFeather.700');
 }
 
 body {
@@ -59,6 +59,10 @@ input,
 button {
 	font-size: inherit;
 	font-family: inherit;
+}
+
+img, video {
+	max-width: unset;
 }
 
 button:focus:not(:focus-visible) {

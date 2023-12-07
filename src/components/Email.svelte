@@ -218,7 +218,7 @@
 								{
 									type: 'text',
 									name: 'customReport',
-									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+									onFocus: (e: FocusEvent) => {
 										const reportRadioButtons = document.querySelectorAll(
 											"input[name='reportType']"
 										);
@@ -713,7 +713,6 @@
 		&::after {
 			background: linear-gradient(to top, theme('colors.artistBlue.600') 0%, transparent 10%);
 			content: '';
-			z-index: 10;
 			position: absolute;
 			bottom: -1px;
 			margin-bottom: -1px;
