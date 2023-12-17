@@ -18,7 +18,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { routeModal } from '$lib/ui/hash';
 	import { browser } from '$app/environment';
-	import Geolocator from '$components/Geolocator.svelte';
+	import Geolocator from '$components/Geolocation.svelte';
 
 	export let data: LayoutSchema;
 	const dispatch = createEventDispatcher();
@@ -151,14 +151,14 @@
 				<span
 					class="ml-auto flex items-center relative overflow-visible min-w-fit pl-2 gap-2 justify-center h-full text-paper-500"
 				>
-					<span class="group relative p-0.5">
+					<span class="group relative p-0.5 cursor-context-menu">
 						<Geolocator />
 						<div
 							role="menu"
 							tabindex="0"
 							class="absolute z-40 right-0 top-[90%] invisible group-hover:visible bg-peacockFeather-600 shadow-lg"
 						>
-							<ul class="flex flex-col items-start space-y-1">
+							<ul class="flex flex-col items-start space-y-1 text-sm">
 								<button
 									class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
 									on:click={() => goto('/profile')}>Set city & state</button
@@ -169,7 +169,7 @@
 
 					{#if $page.data.session}
 						<div
-							class="group relative rounded hover:bg-peacockFeather-600 transition-colors duration-200"
+							class="group relative rounded hover:bg-peacockFeather-600 transition-colors duration-200 cursor-context-menu"
 						>
 							{#if $page.data.session.user?.image}
 								<img
@@ -185,7 +185,7 @@
 								tabindex="0"
 								class="absolute z-40 right-0 w-0 group-hover:w-auto bg-peacockFeather-600 shadow-lg"
 							>
-								<ul class="flex flex-col items-start space-y-1">
+								<ul class="flex flex-col items-start space-y-1 text-sm">
 									<button
 										class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
 										on:click={() => goto('/profile')}>Profile</button

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import ContentLoader from 'svelte-content-loader';
 	import colors from '$lib/ui/colors';
 	import Tooltip from '../Tooltip.svelte';
@@ -40,6 +40,12 @@
 	$: tagValues = tagList.map((tag) => tag.item);
 
 	function addTag(tag: Descriptor<string>) {
+		console.log('add', tag);
+		if (tagList.length === maxItems) {
+			inputField.setCustomValidity(`Maximum of ${maxItems} ${name}s!`);
+			inputField.reportValidity();
+			return;
+		}
 		inputField.value = '';
 		validityMessage = null;
 		if (tagValues.includes(tag.item)) {
@@ -119,20 +125,15 @@
 			searching = false;
 			if (tagList.length > 0) inputVisible = false;
 			groupedResults = {};
+			validityMessage = null;
+			dispatch('blur', e.detail);
 		}
-		validityMessage = null;
-		dispatch('blur', e.detail);
 	}
 
 	function handleSubmit() {
 		if (searching && !groupedResults) return;
 		else if (searching && type === 'search') {
 			inputField.setCustomValidity('Still searching! Wait for results...');
-			inputField.reportValidity();
-			return;
-		}
-		if (tagList.length == maxItems) {
-			inputField.setCustomValidity(`Maximum of ${maxItems} ${name}s!`);
 			inputField.reportValidity();
 			return;
 		}
@@ -181,19 +182,32 @@
 		  )
 		: [];
 
-	$: groupedResults = filteredSearchResults.reduce(
-		(accumulator: { [key: string]: Descriptor<string>[] }, result) => {
-			// TODO filter by searchfield at endpoint
+	$: groupedResults = Object.entries(
+		filteredSearchResults.reduce((accumulator: { [key: string]: Descriptor<string>[] }, result) => {
 			if (result.source && (result.source === searchField || !searchField)) {
 				if (!accumulator[result.source]) {
 					accumulator[result.source] = [];
 				}
-				accumulator[result.source].push(result);
+
+				// Check if the result already exists in the group
+				if (!accumulator[result.source].some((item) => item.item === result.item)) {
+					accumulator[result.source].push(result);
+				}
 			}
 			return accumulator;
-		},
-		{}
-	);
+		}, {} as { [key: string]: Descriptor<string>[] })
+	)
+		.map(([source, results]) => {
+			// Calculate the mean rank for each group
+			const meanRank = results.reduce((acc, curr) => acc + (curr.rank ?? 0), 0) / results.length;
+			return { source, results, meanRank };
+		})
+		.sort((a, b) => a.meanRank - b.meanRank) // Sort groups by mean rank
+		.reduce((acc, { source, results }) => {
+			// Convert back to the original format
+			acc[source] = results;
+			return acc;
+		}, {} as { [key: string]: Descriptor<string>[] });
 
 	let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
 	let inputValueWidth: number, placeholderWidth: number;
@@ -207,6 +221,8 @@
 			placeholderWidth = inputValueWidth;
 		}
 	});
+
+	$: console.log(filteredSearchResults);
 </script>
 
 <div class="px-2 rounded max-w-full h-max relative items-center justify-center {style}">
@@ -218,12 +234,12 @@
 		}}
 	>
 		<ul
-			class="shrink min-w-0 inline-flex flex-row flex-wrap items-center max-w-full"
+			class="shrink min-w-0 inline-flex flex-row flex-wrap items-center max-w-full w-max"
 			aria-label="{name} list"
 			aria-describedby="List of {name}s with an add button"
 		>
 			{#each tagList as tag}
-				<li class="relative mx-2 min-w-0 {tagStyle}">
+				<li class="relative min-w-0 {tagStyle}">
 					<span
 						role="listitem"
 						class="relative h-full shrink flex whitespace-nowrap"

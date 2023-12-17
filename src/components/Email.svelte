@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { email } from '@prisma/client';
-	import { createEventDispatcher, onMount, afterUpdate, tick } from 'svelte';
+	import { createEventDispatcher, onMount, afterUpdate } from 'svelte';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
 	import Reader from './popover/Reader.svelte';
@@ -343,11 +343,13 @@
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
-		resizeObserver = new ResizeObserver(() => {
-			updateScrollableElements(scrollableElements);
-		});
+		if (card) {
+			resizeObserver = new ResizeObserver(() => {
+				updateScrollableElements(scrollableElements);
+			});
 
-		resizeObserver.observe(card);
+			resizeObserver.observe(card);
+		}
 	});
 
 	afterUpdate(() => {
@@ -469,6 +471,8 @@
 >
 	{#if showMenu}
 		<div
+			tabindex="0"
+			role="menu"
 			bind:this={menu}
 			on:click|stopPropagation={async () => {
 				if (expand) {
@@ -497,7 +501,11 @@
 						e.preventDefault();
 						return;
 					}
-					handleBlur(e);
+					if (e.relatedTarget.classList.contains('menu')) {
+						card.focus();
+					} else {
+						handleBlur(e);
+					}
 				}}
 				items={menuItems}
 				bind:focusableElements={focusableMenuElements}

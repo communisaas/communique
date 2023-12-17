@@ -20,6 +20,7 @@
 	const dispatch = createEventDispatcher();
 
 	let store: Writable<UserState>;
+	let inputVisible = false;
 	let selectionList: Descriptor<string>[] = [initialSelection];
 
 	let lastItems: Selectable[] = [];
@@ -44,6 +45,7 @@
 		const tagString = Object.entries(grouped)
 			.map(([field, items]) => `${field}=${encodeURIComponent(items.join('␞'))}`)
 			.join('&');
+		console.log(tagString);
 		return await (await fetch(`data/email?${tagString}`)).json();
 	}
 </script>
@@ -68,13 +70,14 @@
 						type="search"
 						name="search item"
 						placeholder={'search'}
-						style="h-14  xs:mx-4 mr-5 ml-1 w-fit bg-transparent xs:pr-0.5 pr-0 pl-2"
+						style="h-14 xs:mx-4 mr-5 ml-1 w-fit bg-transparent xs:pr-0.5 pr-0 pl-2"
 						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded xs:px-2 px-1 pr-1 text-paper-500"
 						addIconStyle="add bg-peacockFeather-500 h-10 w-10 md:h-12 md:w-12 text-4xl md:text-5xl inline-block leading-12"
 						inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
 						autocompleteStyle="right-0"
 						autocomplete={true}
 						bind:tagList={selectionList}
+						bind:inputVisible
 						bind:searchResults
 						on:autocomplete={async (e) => {
 							searchResults = await handleAutocomplete(e);
@@ -82,15 +85,18 @@
 						on:delete={async (e) => {
 							lastSelection = e.detail;
 							lastItems = items;
-							items = await handleFilter();
+							items = [];
+							if (selectionList.length >= 1) items = await handleFilter();
 						}}
 						on:add={async (e) => {
+							items = [];
 							items = await handleFilter();
 						}}
 						on:blur={() => {
-							if (selectionList.length < 1) {
+							if (selectionList.length <= 0) {
 								selectionList = [lastSelection];
 								items = lastItems;
+								inputVisible = false;
 							}
 						}}
 					/>

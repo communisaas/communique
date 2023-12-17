@@ -28,10 +28,11 @@ export async function GET({ params, url }) {
 export async function POST({ params, request, cookies, url }) {
 	// HTTPS-only should be enforced on host, this is a developer convenience
 	const authCookieName =
-		url.protocol === 'https:' ? '__Secure-next-auth.session-token' : 'next-auth.session-token';
+		url.protocol === 'https:' ? '__Secure-authjs.session-token' : 'authjs.session-token';
 	const jwt = await decode({
 		token: cookies.get(authCookieName),
-		secret: process.env.AUTH_SECRET || AUTH_SECRET
+		secret: process.env.AUTH_SECRET || AUTH_SECRET,
+		salt: authCookieName
 	});
 
 	if (!jwt) {
@@ -75,7 +76,8 @@ export async function POST({ params, request, cookies, url }) {
 				};
 
 				emailOptions.data = {
-					send_count: { increment: 1 }
+					send_count: { increment: 1 },
+					last_updated: new Date().toISOString()
 				};
 				userOptions.data = { sent_email_list: { push: params.slug } }; // push shortid
 				// TODO merge into single query once cockroachdb supports record types https://github.com/cockroachdb/cockroach/issues/70099?version=v23.1

@@ -20,6 +20,7 @@ interface Descriptor<T> {
 	field?: string;
 	source?: string;
 	iterable?: boolean;
+	rank?: number;
 }
 
 declare module 'svelte-content-loader';

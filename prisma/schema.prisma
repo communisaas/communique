@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model author {
   read_email_count BigInt
   sent_email_count BigInt
@@ -23,7 +22,6 @@ model author {
   topic            topic[]
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model email {
   subject         String
   body            String
@@ -39,11 +37,15 @@ model email {
   title           String?
   add_date        DateTime? @default(now()) @db.Timestamp(6)
   issue_list      String[]
+  postal_code     String?
+  state           String?
+  country         String?
+  city            String?
+  last_updated    DateTime? @default(now()) @db.Timestamp(6)
   author          author    @relation(fields: [added_by], references: [email_address], onDelete: NoAction, map: "added_by___fkey")
   issue           issue[]
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model issue {
   type        String?
   description String?
@@ -57,7 +59,6 @@ model issue {
   @@unique([added_by, email_id], map: "added_by_email_id___ckey")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model recipient {
   address          String    @id(map: "recipient___pkey")
   email_open_count BigInt
@@ -70,7 +71,6 @@ model recipient {
   author           author    @relation(fields: [added_by], references: [email_address], onDelete: NoAction, map: "added_by___fkey")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model topic {
   name             String    @id(map: "topic___pkey")
   email_count      BigInt
@@ -83,7 +83,6 @@ model topic {
   author           author    @relation(fields: [added_by], references: [email_address], onDelete: NoAction, map: "added_by___fkey")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model user {
   email              String    @id(map: "user__pkey")
   fingerprint        Json?
@@ -95,6 +94,12 @@ model user {
   last_login         DateTime? @default(now()) @db.Timestamp(6)
   sent_email_list    String[]
   privilege          BigInt?   @default(0)
+  postal_code        String?
+  state              String?
+  country            String?
+  city               String?
+  street             String?
+  street_secondary   String?
   author             author?
   issue              issue[]
 }

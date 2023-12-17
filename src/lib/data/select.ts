@@ -143,7 +143,8 @@ export async function handleAutocomplete(e: CustomEvent<string>) {
 				item: result.id,
 				field: fieldName,
 				iterable: iterable,
-				source: result.source
+				source: result.source,
+				rank: result.rank
 			} as Descriptor<string>;
 		});
 	} catch (error) {

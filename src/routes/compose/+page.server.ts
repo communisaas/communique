@@ -11,11 +11,12 @@ import { decode } from '@auth/core/jwt';
 export const actions = {
 	publish: async ({ request, url, cookies }: RequestEvent) => {
 		const authCookieName =
-			url.protocol === 'https:' ? '__Secure-next-auth.session-token' : 'next-auth.session-token';
+			url.protocol === 'https:' ? '__Secure-authjs.session-token' : 'authjs.session-token';
 
 		const jwt = await decode({
 			token: cookies.get(authCookieName),
-			secret: process.env.AUTH_SECRET || AUTH_SECRET
+			secret: process.env.AUTH_SECRET || AUTH_SECRET,
+			salt: authCookieName
 		});
 
 		if (!jwt) {
