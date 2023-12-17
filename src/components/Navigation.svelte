@@ -6,6 +6,7 @@
 	import { browser } from '$app/environment';
 	import { fade, slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
+	import { afterNavigate } from '$app/navigation';
 
 	const navLinks = {
 		'/': { component: Topic, label: 'Home' },
@@ -20,9 +21,7 @@
 
 	// Update collapsed based on screen width and scroll position
 	function updateCollapsedState() {
-		if (!collapsed)
-			collapsed =
-				window.innerWidth < smallScreenBreakpoint && Math.abs(lastScrollY - window.scrollY) > 5;
+		if (!collapsed) collapsed = window.innerWidth < smallScreenBreakpoint;
 	}
 
 	// Listen for resize and scroll events to update the collapsed state
@@ -38,10 +37,15 @@
 			}, 200); // 200ms for throttling
 		}
 	}
+
 	onMount(() => {
 		window.addEventListener('resize', handleResize);
 		window.addEventListener('scroll', handleScroll);
 		// Initially set collapsed based on screen width and scroll position
+		updateCollapsedState();
+	});
+
+	afterNavigate(() => {
 		updateCollapsedState();
 	});
 

@@ -19,8 +19,6 @@
 	let postButtonHovered = writable(false);
 	let sessionStore: Writable<UserState>;
 
-	const dispatch = createEventDispatcher();
-
 	let recipientEmails = [] as Descriptor<string>[];
 	let topics = [] as Descriptor<string>[];
 
@@ -85,7 +83,9 @@
 			// validate email length
 			let runningBodyLength = 0;
 			for (const block of composerData.blocks) {
-				runningBodyLength += block.data.text.length;
+				if (block.type === 'paragraph') {
+					runningBodyLength += block.data.text.length;
+				}
 			}
 			if (runningBodyLength < 250) {
 				submitter.innerHTML = `Email has ${runningBodyLength} characters... Try for at least 250.`;
@@ -148,7 +148,7 @@
 			};
 		}}
 	>
-		<div class="ml-5 md:ml-20 mr-20 flex flex-col w-fit h-full max-md:w-18 gap-x-20 gap-y-3">
+		<div class="ml-5 md:ml-20 mr-20 flex flex-col w-fit h-full max-w-full md:w-18 gap-x-20 gap-y-3">
 			<span class="flex flex-row flex-wrap gap-5 mr-4 pr-14">
 				<TagInput
 					bind:tagList={recipientEmails}

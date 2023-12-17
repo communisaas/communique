@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import Paragraph from '@editorjs/paragraph';
 	import type EditorJS from '@editorjs/editorjs';
+	import { Signature } from './editorPlugins/signature';
 
 	export let editor: EditorJS;
 
@@ -15,6 +16,10 @@
 			tools: {
 				paragraph: {
 					class: Paragraph,
+					inlineToolbar: false
+				},
+				signature: {
+					class: Signature,
 					inlineToolbar: false
 				}
 			}

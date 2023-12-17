@@ -156,9 +156,9 @@
 						<div
 							role="menu"
 							tabindex="0"
-							class="absolute z-40 right-0 top-[90%] invisible group-hover:visible bg-peacockFeather-600 shadow-lg"
+							class="absolute z-40 right-0 top-[85%] invisible group-hover:visible bg-peacockFeather-600 shadow-lg"
 						>
-							<ul class="flex flex-col items-start space-y-1 text-sm">
+							<ul class="flex flex-col items-start space-y-1 xs:text-sm">
 								<button
 									class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
 									on:click={() => goto('/profile')}>Set city & state</button
@@ -183,9 +183,9 @@
 							<div
 								role="menu"
 								tabindex="0"
-								class="absolute z-40 right-0 w-0 group-hover:w-auto bg-peacockFeather-600 shadow-lg"
+								class="absolute z-40 right-0 w-0 top-[105%] group-hover:w-auto bg-peacockFeather-600 shadow-lg"
 							>
-								<ul class="flex flex-col items-start space-y-1 text-sm">
+								<ul class="flex flex-col items-start space-y-1 xs:text-sm">
 									<button
 										class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
 										on:click={() => goto('/profile')}>Profile</button
@@ -224,7 +224,7 @@
 			{/if}
 		</section>
 		<!-- TODO aria labels for footer -->
-		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full z-10">
+		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full">
 			<div class="container mx-auto flex flex-wrap items-center justify-center px-4">
 				<div class="mb-4 md:mb-0">
 					<div class="flex justify-center md:justify-start">

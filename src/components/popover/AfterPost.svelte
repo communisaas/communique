@@ -214,7 +214,7 @@
 			{new URL(postID, $page.url.origin)}
 		</span>
 	</aside>
-	<button type="submit" class="w-full h-10 mt-2">Close</button>
+	<button type="submit" on:click={() => setPopover(false)} class="w-full h-10 mt-2">Close</button>
 </form>
 
 <style lang="scss">

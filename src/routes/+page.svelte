@@ -58,7 +58,7 @@
 <div
 	role="feed"
 	aria-label="Welcome to communique, you are at the home page"
-	class="flex flex-col h-full mb-5"
+	class="flex flex-col h-fit mb-5"
 >
 	{#if $sessionStore && $sessionStore.hasOwnProperty('template')}
 		{#each Object.entries($sessionStore.template) as [index, panel]}

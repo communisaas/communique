@@ -77,10 +77,10 @@ export class EmailForm {
 		let runningText = '';
 		for (const block of dataObject.blocks) {
 			if (block.type === 'paragraph') {
-				// Check if the block is a paragraph
 				runningText += DOMPurify.sanitize(`<p>${block.data.text}</p><br>`); // Wrap the text in <p> tags and add <br>
+			} else if (block.type === 'signature') {
+				runningText += DOMPurify.sanitize(block.data.html);
 			}
-			// You might want to handle other types of blocks differently here
 		}
 		return runningText;
 	}

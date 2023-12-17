@@ -20,7 +20,7 @@ export const actions = {
 		});
 
 		if (!jwt) {
-			throw new Error('Invalid token');
+			return fail(401, { name: 'Invalid auth token!' });
 		}
 
 		// TODO filter compose submissions through openAI API:
@@ -66,77 +66,84 @@ export const actions = {
 
 		console.log('shortid', emailForm.inputFields.shortid);
 
-		await objectMapper.$transaction(async (tx) => {
-			const updateTime = new Date().toISOString();
-			await tx.author.upsert({
-				where: { email_address: emailForm.author_email },
-				update: {
-					last_updated: updateTime,
-					email_id_list: {
-						push: stagingID.slice(-8)
-					}
-				},
-				create: {
-					read_email_count: 0,
-					sent_email_count: 0,
-					open_email_count: 0,
-					email_id_list: [stagingID.slice(-8)],
-					user: {
-						connect: {
-							email: emailForm.author_email
+		await objectMapper.$transaction(
+			async (tx) => {
+				const updateTime = new Date().toISOString();
+				await tx.author.upsert({
+					where: { email_address: emailForm.author_email },
+					update: {
+						last_updated: updateTime,
+						email_id_list: {
+							push: stagingID.slice(-8)
+						}
+					},
+					create: {
+						read_email_count: 0,
+						sent_email_count: 0,
+						open_email_count: 0,
+						email_id_list: [stagingID.slice(-8)],
+						user: {
+							connect: {
+								email: emailForm.author_email
+							}
 						}
 					}
-				}
-			});
+				});
 
-			emailForm.inputFields.topic_list.map(
-				async (topic) =>
-					await tx.topic.upsert({
-						where: { name: topic },
-						create: {
-							name: topic,
-							last_updated: updateTime,
-							added_by: emailForm.author_email,
-							email_count: 1,
-							email_open_count: 0,
-							email_read_count: 0,
-							email_sent_count: 0
-						},
-						update: {
-							email_count: { increment: 1 },
-							last_updated: updateTime
-						}
-					})
-			);
-			emailForm.inputFields.recipient_list.map(
-				async (address) =>
-					await tx.recipient.upsert({
-						where: { address },
-						create: {
-							address: address,
-							last_updated: updateTime,
-							added_by: emailForm.author_email,
-							email_count: 1,
-							email_open_count: 0,
-							email_read_count: 0,
-							email_sent_count: 0
-						},
-						update: {
-							email_count: { increment: 1 },
-							last_updated: updateTime
-						}
-					})
-			);
+				emailForm.inputFields.topic_list.map(
+					async (topic) =>
+						await tx.topic.upsert({
+							where: { name: topic },
+							create: {
+								name: topic,
+								last_updated: updateTime,
+								added_by: emailForm.author_email,
+								email_count: 1,
+								email_open_count: 0,
+								email_read_count: 0,
+								email_sent_count: 0
+							},
+							update: {
+								email_count: { increment: 1 },
+								last_updated: updateTime
+							}
+						})
+				);
 
-			// TODO duplicate email detection
-			await tx.email.create({
-				data: {
-					...emailForm.inputFields,
-					...emailForm.defaultMetrics,
-					added_by: emailForm.author_email
-				}
-			});
-		});
+				emailForm.inputFields.recipient_list.map(
+					async (address) =>
+						await tx.recipient.upsert({
+							where: { address },
+							create: {
+								address: address,
+								last_updated: updateTime,
+								added_by: emailForm.author_email,
+								email_count: 1,
+								email_open_count: 0,
+								email_read_count: 0,
+								email_sent_count: 0
+							},
+							update: {
+								email_count: { increment: 1 },
+								last_updated: updateTime
+							}
+						})
+				);
+
+				// TODO duplicate email detection
+				await tx.email.create({
+					data: {
+						...emailForm.inputFields,
+						...emailForm.defaultMetrics,
+						added_by: emailForm.author_email
+					}
+				});
+			},
+			{
+				maxWait: 5000, // default: 2000
+				timeout: 10000 // default: 5000
+			}
+		);
 
 		return { type: 'success', status: 200, postID: stagingID.slice(-8) };
 	}
