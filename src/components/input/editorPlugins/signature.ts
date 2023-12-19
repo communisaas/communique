@@ -21,14 +21,14 @@ export class Signature {
 		container.appendChild(sincerelyText);
 
 		// Add the sender's name placeholder
-		const senderName = this.createPlaceholder('senderName', '*sender name*');
+		const senderName = this.createPlaceholder('senderName', '*your name*');
 		container.appendChild(senderName);
 
 		// Add a line break
 		container.appendChild(document.createElement('br'));
 
 		// Add the sender's address placeholder
-		const senderAddress = this.createPlaceholder('senderAddress', '*sender address*');
+		const senderAddress = this.createPlaceholder('senderAddress', '*your address*');
 		container.appendChild(senderAddress);
 
 		// Add keydown event listener to the container

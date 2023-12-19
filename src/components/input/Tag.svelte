@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount, tick } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import ContentLoader from 'svelte-content-loader';
 	import colors from '$lib/ui/colors';
 	import Tooltip from '../Tooltip.svelte';
@@ -40,7 +40,6 @@
 	$: tagValues = tagList.map((tag) => tag.item);
 
 	function addTag(tag: Descriptor<string>) {
-		console.log('add', tag);
 		if (tagList.length === maxItems) {
 			inputField.setCustomValidity(`Maximum of ${maxItems} ${name}s!`);
 			inputField.reportValidity();
@@ -117,11 +116,7 @@
 	}
 
 	async function handleBlur(e: FocusEvent) {
-		if (
-			(!Object.keys(deleteVisible).some((k) => deleteVisible[k]) &&
-				!completionList.contains(e.relatedTarget as Node)) ||
-			!autocomplete
-		) {
+		if (!completionList.contains(e.relatedTarget as Node) || !autocomplete) {
 			searching = false;
 			if (tagList.length > 0) inputVisible = false;
 			groupedResults = {};
@@ -139,7 +134,15 @@
 		}
 
 		if (autocomplete) {
-			if (inputField.checkValidity()) {
+			if (
+				inputField.value.length > 0 &&
+				!allowCustomValues &&
+				!filteredSearchResults.some((result) => result.item === inputField.value)
+			) {
+				inputField.setCustomValidity('Nothing here! Try adding it?');
+				inputField.reportValidity();
+				searchResults = [];
+			} else if (inputField.checkValidity()) {
 				if (autocomplete) {
 					if (completionFocusIndex >= 0) {
 						addTag(filteredSearchResults[completionFocusIndex]);
@@ -157,14 +160,6 @@
 		} else if (inputField.value.length < 3) {
 			inputField.setCustomValidity('Too short!');
 			inputField.reportValidity();
-		} else if (
-			inputField.value.length > 0 &&
-			!allowCustomValues &&
-			!filteredSearchResults.some((result) => result.item === inputField.value)
-		) {
-			inputField.setCustomValidity('Nothing here! Try adding it?');
-			inputField.reportValidity();
-			searchResults = [];
 		} else {
 			addTag({ item: inputField.value, type: type });
 			inputValueWidth = placeholderWidth;
@@ -221,8 +216,6 @@
 			placeholderWidth = inputValueWidth;
 		}
 	});
-
-	$: console.log(filteredSearchResults);
 </script>
 
 <div class="px-2 rounded max-w-full h-max relative items-center justify-center {style}">

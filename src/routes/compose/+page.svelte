@@ -129,7 +129,6 @@
 					recipientEmails = [];
 					topics = [];
 					$sessionStore.postID = await result.data.postID;
-					console.log(result);
 					submitter.innerHTML = 'Posted!';
 					$sessionStore.show.afterPost = true;
 					update();

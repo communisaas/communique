@@ -4,7 +4,6 @@ import prepAuth from '$lib/data/auth';
 import { sequence } from '@sveltejs/kit/hooks';
 import { decode } from '@auth/core/jwt';
 import { AUTH_SECRET } from '$env/static/private';
-import jose from 'jose';
 
 async function protectDataEndpoints({ event, resolve }) {
 	// Check for POST method and if it's a protected /data endpoint
@@ -43,7 +42,7 @@ async function protectDataEndpoints({ event, resolve }) {
 }
 
 async function authorize({ event, resolve }) {
-	// TODO structure auth requirements, verify session
+	// TODO error page
 	const authCookieName =
 		event.url.protocol === 'https:' ? '__Secure-authjs.session-token' : 'authjs.session-token';
 
@@ -67,7 +66,6 @@ async function authorize({ event, resolve }) {
 			throw redirect(302, '/sign/in?callbackUrl=/');
 		}
 	}
-
 	return resolve(event);
 }
 

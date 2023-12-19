@@ -134,7 +134,7 @@
 						on:select={async (e) => {
 							// TODO loading placeholders on topic change
 							if ($sessionStore.template.primary) {
-								$sessionStore.template.primary.cardList = [];
+								$sessionStore.template.primary.cardList = null;
 								$sessionStore.template.primary.cardList = await handleSelect(e);
 								$sessionStore.template.primary.focus = {
 									type: 'topic',
@@ -156,7 +156,7 @@
 						<div
 							role="menu"
 							tabindex="0"
-							class="absolute z-40 right-0 top-[85%] invisible group-hover:visible bg-peacockFeather-600 shadow-lg"
+							class="absolute z-40 right-0 top-[85%] sm:top-[90%] invisible group-hover:visible bg-peacockFeather-600 shadow-lg"
 						>
 							<ul class="flex flex-col items-start space-y-1 xs:text-sm">
 								<button
@@ -183,7 +183,7 @@
 							<div
 								role="menu"
 								tabindex="0"
-								class="absolute z-40 right-0 w-0 top-[105%] group-hover:w-auto bg-peacockFeather-600 shadow-lg"
+								class="absolute z-40 right-0 w-0 top-[105%] sm:top-auto group-hover:w-auto bg-peacockFeather-600 shadow-lg"
 							>
 								<ul class="flex flex-col items-start space-y-1 xs:text-sm">
 									<button
@@ -207,7 +207,7 @@
 					{/if}
 				</span>
 			</header>
-			{#if !$navigating && $sessionStore && $sessionStore.template && $sessionStore.template.primary.cardList.length > 0}
+			{#if !$navigating && $sessionStore && $sessionStore.template}
 				<slot />
 			{:else}
 				<div class="w-full h-full flex items-center justify-center">

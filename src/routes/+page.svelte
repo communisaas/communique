@@ -42,9 +42,10 @@
 
 	$: if ($sessionStore && $sessionStore.template && $sessionStore.hiddenEmails) {
 		for (const templateName in $sessionStore.template)
-			$sessionStore.template[templateName].cardList = $sessionStore.template[
-				templateName
-			].cardList.filter((card: email) => !$sessionStore.hiddenEmails.includes(card.shortid));
+			if ($sessionStore.template[templateName].cardList)
+				$sessionStore.template[templateName].cardList = $sessionStore.template[
+					templateName
+				].cardList.filter((card: email) => !$sessionStore.hiddenEmails.includes(card.shortid));
 	}
 
 	// TODO loading placeholders
@@ -72,7 +73,7 @@
 					bind:items={panel.cardList}
 					bind:selected={$sessionStore.email}
 					on:select={async (e) => {
-						$sessionStore.template.primary.cardList = [];
+						$sessionStore.template.primary.cardList = null;
 						$sessionStore.template.primary.cardList = await handleSelect(e);
 						// switch (e.detail.type) {
 						// 	case 'recipient':

@@ -3,10 +3,7 @@
 	import Panel from '$components/Panel.svelte';
 	import { onMount } from 'svelte';
 	import { get, type Writable } from 'svelte/store';
-	import ContentLoader from 'svelte-content-loader';
-	import colors from '$lib/ui/colors';
 	import Email from '$components/Email.svelte';
-	import type { email } from '@prisma/client';
 	import Selector from '$components/Selector.svelte';
 	import modal, { handlePopover } from '$lib/ui/modal';
 	import Modal from '$components/Modal.svelte';
@@ -78,6 +75,7 @@
 		initialSelection={{ item: $store.user?.email || 'Loading...', type: 'text' }}
 		header="Profile"
 		alignment="end"
+		items={[]}
 	>
 		<div class="flex flex-col justify-start gap-y-3 m-2 min-w-full">
 			<p class="italic self-end mr-6 text-paper-500">

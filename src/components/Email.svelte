@@ -13,6 +13,7 @@
 	import { writable, type Writable } from 'svelte/store';
 	import Preferences from './input/Preferences.svelte';
 	import { goto } from '$app/navigation';
+	import colors from '$lib/ui/colors';
 
 	export let item: email;
 	export let selected: Selectable;
@@ -597,53 +598,53 @@
 			<article
 				class="flex grow justify-between min-w-full h-full flex-col"
 				class:md:flex-row={!expand}
+				class:md:max-h-60={!expand}
 			>
 				<div
-					class="flex flex-col min-h-full"
+					class="flex flex-col tags h-full overflow-clip mb-1 max-h-full"
+					aria-label="Topic and recepient lists"
 					class:md:max-w-[50%]={!expand}
+					class:md:w-[200rem]={!expand}
 					class:md:pr-2={!expand}
+					class:mb-4={expand}
 				>
-					<div
-						class="tags max-w-[full] h-full"
-						aria-label="Topic and recepient lists"
-						style="max-width: {!expand ? '35rem' : '100%'};"
-					>
-						<div aria-label="Topic list">
-							<Selector
-								selectable={Tag}
-								items={item.topic_list}
-								itemStyle="text-xs sm:text-sm text-paper-500 bg-peacockFeather-500"
-								selectorStyle="pt-2 max-w-full"
-								alignment="start"
-								overflow="wrap"
-								bind:selectedContent={$sessionStore.topic}
-								on:select={(e) => {
-									setExpand(false);
-									dispatch('select', e.detail);
-								}}
-								on:blur={handleBlur}
-							/>
-						</div>
-						<div aria-label="Receipient list">
-							<Selector
-								selectable={Tag}
-								items={item.recipient_list}
-								itemStyle="text-xs sm:text-sm text-paper-500 bg-peacockFeather-600"
-								selectorStyle="pt-1 max-w-full"
-								alignment="start"
-								overflow="wrap"
-								bind:selectedContent={$sessionStore.recipient}
-								on:select={(e) => {
-									setExpand(false);
-									dispatch('select', e.detail);
-								}}
-								on:blur={handleBlur}
-							/>
-						</div>
+					<div aria-label="Topic list" class="h-fit">
+						<Selector
+							selectable={Tag}
+							items={item.topic_list}
+							itemStyle="text-xs sm:text-sm text-paper-500 bg-peacockFeather-500"
+							selectorStyle="pt-2 max-w-full md:flex-wrap"
+							alignment="start"
+							overflow={expand ? 'wrap' : 'auto'}
+							backgroundColor={colors.artistBlue[600]}
+							bind:selectedContent={$sessionStore.topic}
+							on:select={(e) => {
+								setExpand(false);
+								dispatch('select', e.detail);
+							}}
+							on:blur={handleBlur}
+						/>
+					</div>
+					<div aria-label="Receipient list" class="h-fit">
+						<Selector
+							selectable={Tag}
+							items={item.recipient_list}
+							itemStyle="text-xs sm:text-sm text-paper-500 bg-peacockFeather-600"
+							selectorStyle="pt-1 max-w-full md:flex-wrap"
+							alignment="start"
+							overflow={expand ? 'wrap' : 'auto'}
+							backgroundColor={colors.artistBlue[600]}
+							bind:selectedContent={$sessionStore.recipient}
+							on:select={(e) => {
+								setExpand(false);
+								dispatch('select', e.detail);
+							}}
+							on:blur={handleBlur}
+						/>
 					</div>
 				</div>
 				{#if expand && $page.route.id === '/'}
-					<span class="flex max-w-full gap-5 mb-6">
+					<span class="flex max-w-full gap-5 my-4">
 						<p aria-label="Info text" class="text-center ml-auto mt-1">
 							<i>
 								<span
@@ -686,8 +687,9 @@
 				{/if}
 				<details
 					style="text-align: initial;"
-					class="whitespace-normal flex flex-col appearance-none self-center"
+					class="whitespace-normal flex flex-col appearance-none self-center pl-1.5 md:pl-0"
 					class:w-full={expand}
+					class:max-w-[70%]={!expand}
 				>
 					<summary
 						tabindex="-1"
@@ -760,7 +762,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.25rem;
-		margin-bottom: 1rem;
 	}
 
 	.scrollable {

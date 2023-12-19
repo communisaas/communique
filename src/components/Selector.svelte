@@ -12,7 +12,7 @@
 	export let selectorStyle: string = '';
 	export let backgroundColor: string = '';
 
-	const listStyle = `mx-1 flex min-h-[0] items-${alignment} ${
+	$: listStyle = `mx-1 flex min-h-[0] items-${alignment} ${
 		alignment == 'end' ? 'flex-row-reverse' : 'flex-row'
 	}  gap-1.5 ${overflow == 'wrap' ? 'flex-wrap gap-y-1' : 'overflow-' + overflow} ${selectorStyle}`;
 

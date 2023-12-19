@@ -1,9 +1,11 @@
 <script lang="ts">
 	import Selector from './Selector.svelte';
+	import ContentLoader from 'svelte-content-loader';
 	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import TagInput from './input/Tag.svelte';
 	import { handleAutocomplete } from '$lib/data/select';
+	import colors from '$lib/ui/colors';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
@@ -12,7 +14,7 @@
 	export let selectorTarget: 'topic' | 'recipient' | 'spotlight' | undefined = undefined;
 	export let selected: Selectable = { item: '', type: 'option', id: '' };
 	export let initialSelection: Descriptor<string> = { item: '', type: '' };
-	export let items: Selectable[] = [];
+	export let items: Selectable[] | null = [];
 	export let filterable = false;
 	let searchResults: Descriptor<string>[] = [];
 	let searchInput: HTMLInputElement;
@@ -21,6 +23,7 @@
 
 	let store: Writable<UserState>;
 	let inputVisible = false;
+	let windowWidth: number;
 	let selectionList: Descriptor<string>[] = [initialSelection];
 
 	let lastItems: Selectable[] = [];
@@ -31,6 +34,10 @@
 		selectionList = [initialSelection];
 		oldInitialSelection = initialSelection;
 	}
+
+	onMount(() => {
+		windowWidth = window.outerWidth;
+	});
 
 	async function handleFilter() {
 		// Grouping by fields
@@ -45,12 +52,12 @@
 		const tagString = Object.entries(grouped)
 			.map(([field, items]) => `${field}=${encodeURIComponent(items.join('␞'))}`)
 			.join('&');
-		console.log(tagString);
 		return await (await fetch(`data/email?${tagString}`)).json();
 	}
+	console.log(selectionList);
 </script>
 
-<section class="flex flex-col relative gradient-background h-full">
+<section class="flex flex-col relative gradient-background">
 	<aside class="flex flex-nowrap pb-3" style="justify-content: {alignment}">
 		{#if selectorTarget != 'spotlight'}
 			<h1
@@ -84,12 +91,12 @@
 						}}
 						on:delete={async (e) => {
 							lastSelection = e.detail;
-							lastItems = items;
-							items = [];
+							if (items) lastItems = items;
+							items = null;
 							if (selectionList.length >= 1) items = await handleFilter();
 						}}
 						on:add={async (e) => {
-							items = [];
+							items = null;
 							items = await handleFilter();
 						}}
 						on:blur={() => {
@@ -111,7 +118,7 @@
 	<span class="control">
 		<slot />
 	</span>
-	{#if items && selectable}
+	{#if items && items.length > 0 && selectable}
 		<Selector
 			{selectable}
 			{items}
@@ -132,6 +139,18 @@
 			on:externalAction
 			on:blur
 		/>
+	{:else if items == null && selectionList.length > 0}
+		<div class="w-full h-full flex items-center justify-center">
+			<span class="m-auto">
+				<ContentLoader
+					uniqueKey="layoutLoader"
+					speed={0.5}
+					primaryColor={colors.peacockFeather[700]}
+					secondaryColor={colors.artistBlue[500]}
+					width={windowWidth + 10}
+				/>
+			</span>
+		</div>
 	{/if}
 </section>
 
