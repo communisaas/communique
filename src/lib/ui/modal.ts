@@ -28,6 +28,7 @@ export function handlePopover(
 		}
 	}));
 
+	// TODO soft navigation to keep callback page data
 	if (!e.detail) {
 		return goto(callback, { noScroll: true });
 	}

@@ -120,18 +120,27 @@ export async function handleAutocomplete(e: CustomEvent<string>) {
 			)) as QueryResult[]
 		).map((result) => {
 			let fieldName: string,
+				source: string,
 				iterable = false;
 			switch (result.source) {
 				case 'recipient':
+					source = 'email';
 					fieldName = 'recipient_list';
 					iterable = true;
 					break;
 				case 'topic':
+					source = 'topic';
 					fieldName = 'topic_list';
 					iterable = true;
 					break;
 				case 'email':
+					source = 'topic';
 					fieldName = 'subject';
+					iterable = false;
+					break;
+				case 'location':
+					source = 'location';
+					fieldName = 'location';
 					iterable = false;
 					break;
 				default: {
@@ -139,7 +148,7 @@ export async function handleAutocomplete(e: CustomEvent<string>) {
 				}
 			}
 			return {
-				type: result.source === 'recipient' ? 'email' : 'topic',
+				type: source,
 				item: result.id,
 				field: fieldName,
 				iterable: iterable,

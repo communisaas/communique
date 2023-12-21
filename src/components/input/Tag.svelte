@@ -360,7 +360,7 @@
 				{#if searching}
 					<li class="relative px-1">
 						<ContentLoader
-							uniqueKey="autocomplete"
+							uniqueKey="tagAutocompleteLoader"
 							width={inputValueWidth}
 							height={20}
 							primaryColor={colors.artistBlue[500]}

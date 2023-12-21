@@ -16,8 +16,8 @@ type DescribedProvider = Provider & {
 export const load = (async ({ locals }) => {
 	// TODO: compound queries, lazy load, caching
 
-	const loudestTopics = await objectMapper.topic.findMany({ take: 10 });
-	let loudestTopicEmails: email[]
+	const loudestTopics = await objectMapper.topic.findMany({ take: 25 });
+	let loudestTopicEmails: email[];
 	if (loudestTopics.length > 0) {
 		loudestTopicEmails = await objectMapper.email.findMany({
 			where: {
@@ -25,7 +25,7 @@ export const load = (async ({ locals }) => {
 					has: loudestTopics[0].name
 				}
 			},
-			take: 10
+			take: 25
 		});
 	} else {
 		loudestTopicEmails = [];
@@ -39,7 +39,7 @@ export const load = (async ({ locals }) => {
 			primary: {
 				type: 'panel',
 				selectable: 'topic',
-				header: 'Loudest voices',
+				header: 'loudest voices',
 				focus: {
 					type: 'topic',
 					item: loudestTopics[0]?.name ?? '',

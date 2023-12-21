@@ -10,7 +10,7 @@
 	import { writable, type Writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import Modal from '$components/Modal.svelte';
 	import modal, { handlePopover } from '$lib/ui/modal';
 	import type EditorJS from '@editorjs/editorjs';
@@ -147,7 +147,7 @@
 			};
 		}}
 	>
-		<div class="ml-5 md:ml-20 mr-20 flex flex-col w-fit h-full max-w-full md:w-18 gap-x-20 gap-y-3">
+		<div class="ml-5 md:ml-20 mr-20 flex flex-col w-fit h-full max-w-full md:w-18 gap-x-20 gap-y-5">
 			<span class="flex flex-row flex-wrap gap-5 mr-4 pr-14">
 				<TagInput
 					bind:tagList={recipientEmails}
@@ -191,7 +191,7 @@
 				</TagInput>
 			</span>
 
-			<span class="px-1 py-1 w-fit rounded bg-peacockFeather-700">
+			<span class="py-1 flex flex-wrap gap-5 w-fit rounded">
 				<input
 					required
 					autocomplete="off"
@@ -205,7 +205,7 @@
 					}}
 					name="subject"
 					placeholder="Subject"
-					class="w-42 h-fit p-0.5 bg-artistBlue-700 focus:outline-peacockFeather-500 text-paper-500 rounded"
+					class="w-42 h-fit p-1.5 bg-artistBlue-700 focus:outline-peacockFeather-500 text-paper-500 rounded"
 				/>
 			</span>
 		</div>

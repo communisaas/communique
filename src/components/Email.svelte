@@ -687,7 +687,7 @@
 				{/if}
 				<details
 					style="text-align: initial;"
-					class="whitespace-normal flex flex-col appearance-none self-center pl-1.5 md:pl-0"
+					class="whitespace-normal flex flex-col appearance-none self-center md:pl-0"
 					class:w-full={expand}
 					class:max-w-[70%]={!expand}
 				>

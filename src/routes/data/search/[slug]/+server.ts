@@ -2,23 +2,27 @@ import { rawSqlQuery } from '$lib/data/database';
 import { Prisma } from '@prisma/client';
 
 /** @type {import('./$types').RequestHandler} */
-export async function GET({ params }) {
+export async function GET({ params, url }) {
 	const searchTerms = decodeURIComponent(params.slug).split('&');
 	const searchQuery = searchTerms.map((term) => `${term.trim()}:*`).join(' & ');
+	const source = url.searchParams.get('source');
 
-	const pageSize = 10; // Number of items per page
-	const page = 1; // Page number, starting from 1
+	let results;
 
-	const offset = (page - 1) * pageSize;
+	if (source !== 'location') {
+		const pageSize = 10; // Number of items per page
+		const page = 1; // Page number, starting from 1
 
-	const rawQuery = Prisma.sql`
+		const offset = (page - 1) * pageSize;
+
+		const rawQuery = Prisma.sql`
         WITH 
         email_search AS (
-            SELECT 
+            SELECT
                 'email' AS source, 
                 subject AS id, 
                 ts_rank(to_tsvector('english', subject), plainto_tsquery('english', ${searchQuery})) AS rank
-            FROM email 
+            FROM email
             WHERE to_tsvector('english', subject) @@ plainto_tsquery('english', ${searchQuery})
         ),
         recipient_search AS (
@@ -47,16 +51,18 @@ export async function GET({ params }) {
         ORDER BY rank DESC
         LIMIT ${pageSize} OFFSET ${offset};
     `;
-
-	let results;
-	try {
-		results = await rawSqlQuery(rawQuery);
-	} catch (error) {
-		if (error.code == 'P2010') results = [];
-		else {
-			console.error(error);
-			return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+		try {
+			results = await rawSqlQuery(rawQuery);
+		} catch (error) {
+			if (error.code == 'P2010') results = []; // if not found, return empty array
+			else {
+				console.error(error);
+				return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+			}
 		}
+	} else if (source === 'location') {
+		// TODO resolve locations across multiple languages
+		results = [];
 	}
 	return new Response(JSON.stringify(results));
 }

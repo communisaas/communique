@@ -20,6 +20,9 @@ export class Signature {
 		sincerelyText.textContent = 'Sincerely,';
 		container.appendChild(sincerelyText);
 
+		// Add a line break
+		container.appendChild(document.createElement('br'));
+
 		// Add the sender's name placeholder
 		const senderName = this.createPlaceholder('senderName', '*your name*');
 		container.appendChild(senderName);
@@ -57,7 +60,7 @@ export class Signature {
 		element.style.fontStyle = 'italic';
 		element.style.opacity = '0.6';
 		element.style.cursor = 'text';
-		element.tabIndex = -1; // Make the span focusable
+		if (id === 'senderAddress') element.tabIndex = -1; // Make the span focusable
 
 		// Style for focus outline
 		element.style.outline = 'none'; // Remove default outline

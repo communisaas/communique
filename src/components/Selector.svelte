@@ -8,6 +8,7 @@
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let overflow: 'scroll' | 'hidden' | 'visible' | 'wrap' | 'auto' = 'auto';
 	export let scrollable = true;
+	export let scrollOverride = false;
 	export let itemStyle: string = '';
 	export let selectorStyle: string = '';
 	export let backgroundColor: string = '';
@@ -84,6 +85,7 @@
 		class:scrolledX__max={scrollX.scrolledMax}
 		class:scrolledY__max={scrollY.scrolledMax}
 		on:wheel={(e) => {
+			if (scrollOverride) e.preventDefault();
 			if (scrollable) {
 				list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY;
 				list.scrollTop += Math.abs(e.deltaY) > 0 ? e.deltaY : e.deltaX;

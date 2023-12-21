@@ -130,6 +130,7 @@
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}
+						scrollOverride={true}
 						bind:selectedContent={$sessionStore.topic}
 						on:select={async (e) => {
 							// TODO loading placeholders on topic change
@@ -152,7 +153,8 @@
 					class="ml-auto flex items-center relative overflow-visible min-w-fit pl-2 gap-2 justify-center h-full text-paper-500"
 				>
 					<span class="group relative p-0.5 cursor-context-menu">
-						<Geolocator />
+						<!-- TODO resolve location across languages -->
+						<!-- <Geolocator /> -->
 						<div
 							role="menu"
 							tabindex="0"
@@ -207,7 +209,7 @@
 					{/if}
 				</span>
 			</header>
-			{#if !$navigating && $sessionStore && $sessionStore.template}
+			{#if !$navigating}
 				<slot />
 			{:else}
 				<div class="w-full h-full flex items-center justify-center">
