@@ -11,55 +11,59 @@
 	import Share from '$components/popover/Share.svelte';
 	import Reader from '$components/popover/Reader.svelte';
 	import Confirm from '$components/popover/Confirm.svelte';
+	import ContentLoader from 'svelte-content-loader';
 	import { signOut } from '@auth/sveltekit/client';
 	import TextField from '$components/input/TextField.svelte';
+	import colors from '$lib/ui/colors.js';
 
 	export let data;
 
 	let store: Writable<UserState>,
 		selectedSentEmail: Selectable = { item: '', type: 'option', id: '' },
-		sentEmails = [] as Selectable[],
-		modalMapping: ModalMap = {
-			confirm: {
-				component: Confirm,
-				props: () => ({
-					advisoryText:
-						'If you really want to delete your account, type your email address below to confirm. Some data might be retained, like message counts, in addition to personal info according to local laws.',
-					inputToConfirm: $store.user?.email,
-					action: async (e: SubmitEvent) => {
-						const response = await fetch('/data/user/' + $store.user?.email, {
-							method: 'DELETE',
-							headers: {
-								'CSRF-Token': $store.csrfToken
-							}
-						});
-						if (response.status !== 200) {
-							throw new Error(`Could not delete user: (${response.status}) ${response.statusText}`);
-						} else {
-							signOut({ callbackUrl: '/', redirect: false });
+		sentEmails = null as Selectable[] | null,
+		windowWidth: number;
+	modalMapping: ModalMap = {
+		confirm: {
+			component: Confirm,
+			props: () => ({
+				advisoryText:
+					'If you really want to delete your account, type your email address below to confirm. Some data might be retained, like message counts, in addition to personal info according to local laws.',
+				inputToConfirm: $store.user?.email,
+				action: async (e: SubmitEvent) => {
+					const response = await fetch('/data/user/' + $store.user?.email, {
+						method: 'DELETE',
+						headers: {
+							'CSRF-Token': $store.csrfToken
 						}
+					});
+					if (response.status !== 200) {
+						throw new Error(`Could not delete user: (${response.status}) ${response.statusText}`);
+					} else {
+						signOut({ callbackUrl: '/', redirect: false });
 					}
-				})
-			},
-			share: { component: Share, props: () => ({ item: $store.email.content }) },
-			login: { component: Login, props: () => ({ providers: data.authProviders }) },
-			privacyPolicy: {
-				component: Reader,
-				props: () => ({ item: $page.data.privacyPolicy, inModal: true })
-			},
-			moderationPolicy: {
-				component: Reader,
-				props: () => ({ item: $page.data.moderationPolicy, inModal: true })
-			},
-			termsOfUse: {
-				component: Reader,
-				props: () => ({ item: $page.data.termsOfUse, inModal: true })
-			}
-		};
+				}
+			})
+		},
+		share: { component: Share, props: () => ({ item: $store.email.content }) },
+		login: { component: Login, props: () => ({ providers: data.authProviders }) },
+		privacyPolicy: {
+			component: Reader,
+			props: () => ({ item: $page.data.privacyPolicy, inModal: true })
+		},
+		moderationPolicy: {
+			component: Reader,
+			props: () => ({ item: $page.data.moderationPolicy, inModal: true })
+		},
+		termsOfUse: {
+			component: Reader,
+			props: () => ({ item: $page.data.termsOfUse, inModal: true })
+		}
+	};
 
 	onMount(async () => {
 		store = (await import('$lib/data/sessionStorage')).store;
 		const lastEmailId = $store.user.sent_email_list.slice(-1);
+		windowWidth = window.outerWidth;
 		sentEmails = await dataFetcher('data/email', 'email', [lastEmailId]);
 	});
 
@@ -136,7 +140,7 @@
 						/>
 					</div>
 				</form>
-				{#if $store.user.sent_email_list.length >= 1}
+				{#if $store.user.sent_email_list.length >= 1 && sentEmails}
 					<div class="max-w-[98%]">
 						<p class="p-2 text-paper-500">
 							You have sent {$store.user.sent_email_list.length}
@@ -162,6 +166,17 @@
 							}}
 							on:externalAction
 							on:blur
+						/>
+					</div>
+				{:else if !sentEmails}
+					<div class="flex justify-center items-center mt-20">
+						<ContentLoader
+							uniqueKey="sentEmailsLoader"
+							height={40}
+							width={windowWidth - 0.2 * windowWidth}
+							primaryColor={colors.peacockFeather[700]}
+							secondaryColor={colors.artistBlue[500]}
+							speed={0.5}
 						/>
 					</div>
 				{:else}

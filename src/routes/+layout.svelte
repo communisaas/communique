@@ -183,16 +183,43 @@
 							{/if}
 							<div
 								role="menu"
-								tabindex="0"
-								class="absolute z-40 right-0 w-0 top-[105%] sm:top-auto group-hover:w-auto bg-peacockFeather-600 shadow-lg"
+								class="absolute z-40 right-0 w-0 top-[105%] bottom-[100%] sm:top-auto group-hover:w-auto group-hover:bottom-[-150%] bg-peacockFeather-600 shadow-lg"
 							>
 								<ul class="flex flex-col items-start space-y-1 xs:text-sm">
 									<button
+										on:focus={(e) => {
+											let grandParentDiv = e.target.parentNode.parentNode;
+											if (grandParentDiv) {
+												grandParentDiv.style.bottom = '-150%';
+												grandParentDiv.style.width = 'auto';
+											}
+										}}
+										on:blur={(e) => {
+											let grandParentDiv = e.target.parentNode.parentNode;
+											if (grandParentDiv) {
+												grandParentDiv.style.bottom = '';
+												grandParentDiv.style.width = '';
+											}
+										}}
 										class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
 										on:click={() => goto('/profile')}>Profile</button
 									>
 									<button
 										class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
+										on:focus={(e) => {
+											let grandParentDiv = e.target.parentNode.parentNode;
+											if (grandParentDiv) {
+												grandParentDiv.style.bottom = '-150%';
+												grandParentDiv.style.width = 'auto';
+											}
+										}}
+										on:blur={(e) => {
+											let grandParentDiv = e.target.parentNode.parentNode;
+											if (grandParentDiv) {
+												grandParentDiv.style.bottom = '';
+												grandParentDiv.style.width = '';
+											}
+										}}
 										on:click={() => signOut({ callbackUrl: '/', redirect: false })}>Sign out</button
 									>
 								</ul>
