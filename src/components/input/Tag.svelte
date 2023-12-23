@@ -22,8 +22,9 @@
 	export let inputVisible: boolean = false;
 	export let inputField: HTMLInputElement;
 
+	let mirror: HTMLSpanElement;
+	let inputValueWidth = '0px';
 	let searching = false;
-
 	let firstInput = true;
 
 	let completionFocusIndex: number = 0;
@@ -37,7 +38,60 @@
 
 	const dispatch = createEventDispatcher();
 
+	$: if (mirror) mirror.textContent = '' || placeholder;
+	$: if (searchResults) {
+		searching = false;
+	}
+	$: filteredSearchResults = searchResults
+		? searchResults.filter(
+				(result) =>
+					!tagList.some((tag) => tag.item === result.item && tag.type === result.type) &&
+					(result.source === searchField || !searchField)
+		  )
+		: [];
+
+	$: groupedResults = Object.entries(
+		filteredSearchResults.reduce((accumulator: { [key: string]: Descriptor<string>[] }, result) => {
+			if (result.source && (result.source === searchField || !searchField)) {
+				if (!accumulator[result.source]) {
+					accumulator[result.source] = [];
+				}
+
+				// Check if the result already exists in the group
+				if (!accumulator[result.source].some((item) => item.item === result.item)) {
+					accumulator[result.source].push(result);
+				}
+			}
+			return accumulator;
+		}, {} as { [key: string]: Descriptor<string>[] })
+	)
+		.map(([source, results]) => {
+			// Calculate the mean rank for each group
+			const meanRank = results.reduce((acc, curr) => acc + (curr.rank ?? 0), 0) / results.length;
+			return { source, results, meanRank };
+		})
+		.sort((a, b) => a.meanRank - b.meanRank) // Sort groups by mean rank
+		.reduce((acc, { source, results }) => {
+			// Convert back to the original format
+			acc[source] = results;
+			return acc;
+		}, {} as { [key: string]: Descriptor<string>[] });
+
 	$: tagValues = tagList.map((tag) => tag.item);
+
+	let flatGroupedResults: Descriptor<string>[] = [];
+	$: filteredSearchResults, (flatGroupedResults = flattenGroupedResults(groupedResults));
+
+	// Flatten grouped results for easier index-based navigation
+	function flattenGroupedResults(groupedResults: { [key: string]: Descriptor<string>[] }) {
+		let flatResults: Descriptor<string>[] = [];
+		Object.entries(groupedResults).forEach(([group, items]) => {
+			items.forEach((item) => {
+				flatResults.push({ ...item });
+			});
+		});
+		return flatResults;
+	}
 
 	function addTag(tag: Descriptor<string>) {
 		if (tagList.length === maxItems) {
@@ -71,12 +125,6 @@
 			searching = false;
 		}
 
-		const currentValueWidth = context.measureText(inputField.value).width + 9;
-		if (currentValueWidth > placeholderWidth) {
-			inputValueWidth = currentValueWidth;
-		} else {
-			inputValueWidth = placeholderWidth;
-		}
 		if (autocomplete && inputField.value.length > 2) {
 			dispatch('autocomplete', { value: inputField.value, source: searchField });
 			completionFocusIndex = -1;
@@ -118,7 +166,10 @@
 	async function handleBlur(e: FocusEvent) {
 		if (!completionList.contains(e.relatedTarget as Node) || !autocomplete) {
 			searching = false;
-			if (tagList.length > 0) inputVisible = false;
+			if (tagList.length > 0) {
+				inputVisible = false;
+				inputValueWidth = '0px';
+			}
 			groupedResults = {};
 			validityMessage = null;
 			dispatch('blur', e.detail);
@@ -145,15 +196,13 @@
 			} else if (inputField.checkValidity()) {
 				if (autocomplete) {
 					if (completionFocusIndex >= 0) {
-						addTag(filteredSearchResults[completionFocusIndex]);
+						addTag(flatGroupedResults[completionFocusIndex]);
 					} else {
 						addTag({ item: inputField.value, type: type });
 					}
 				} else {
 					addTag({ item: inputField.value, type: type });
-					inputValueWidth = placeholderWidth;
 				}
-				inputValueWidth = placeholderWidth;
 			} else {
 				inputField.reportValidity();
 			}
@@ -162,59 +211,19 @@
 			inputField.reportValidity();
 		} else {
 			addTag({ item: inputField.value, type: type });
-			inputValueWidth = placeholderWidth;
 		}
 	}
 
-	$: if (searchResults) {
-		searching = false;
+	function updateInputWidth() {
+		if (inputField && mirror) {
+			mirror.textContent = inputField.value || placeholder; // Update mirror content
+			inputValueWidth = inputVisible ? `${mirror.offsetWidth + 8}px` : '0px'; // Update input width based on mirror
+			inputField.style.width = inputValueWidth; // Apply new width to input field
+		}
 	}
-	$: filteredSearchResults = searchResults
-		? searchResults.filter(
-				(result) =>
-					!tagList.some((tag) => tag.item === result.item && tag.type === result.type) &&
-					(result.source === searchField || !searchField)
-		  )
-		: [];
 
-	$: groupedResults = Object.entries(
-		filteredSearchResults.reduce((accumulator: { [key: string]: Descriptor<string>[] }, result) => {
-			if (result.source && (result.source === searchField || !searchField)) {
-				if (!accumulator[result.source]) {
-					accumulator[result.source] = [];
-				}
-
-				// Check if the result already exists in the group
-				if (!accumulator[result.source].some((item) => item.item === result.item)) {
-					accumulator[result.source].push(result);
-				}
-			}
-			return accumulator;
-		}, {} as { [key: string]: Descriptor<string>[] })
-	)
-		.map(([source, results]) => {
-			// Calculate the mean rank for each group
-			const meanRank = results.reduce((acc, curr) => acc + (curr.rank ?? 0), 0) / results.length;
-			return { source, results, meanRank };
-		})
-		.sort((a, b) => a.meanRank - b.meanRank) // Sort groups by mean rank
-		.reduce((acc, { source, results }) => {
-			// Convert back to the original format
-			acc[source] = results;
-			return acc;
-		}, {} as { [key: string]: Descriptor<string>[] });
-
-	let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
-	let inputValueWidth: number, placeholderWidth: number;
 	onMount(() => {
-		canvas = document.createElement('canvas');
-		context = canvas.getContext('2d') as CanvasRenderingContext2D;
-		if (context) {
-			// TODO measure input width smoothly using in-dom placeholder
-			context.font = getComputedStyle(inputField).font;
-			inputValueWidth = context.measureText(placeholder).width + 9;
-			placeholderWidth = inputValueWidth;
-		}
+		updateInputWidth();
 	});
 </script>
 
@@ -267,7 +276,7 @@
 							type="button"
 							on:click|stopPropagation={(e) => {
 								tagList = tagList.filter((item) => item != tag);
-								if (autocomplete) filteredSearchResults = [...filteredSearchResults, tag];
+								if (autocomplete) searchResults = [tag, ...searchResults];
 								if (tagList.length < 1 || inputVisible) inputField.focus();
 								dispatch('delete', tag);
 							}}
@@ -288,6 +297,8 @@
 			{/each}
 		</ul>
 		<li class="flex gap-3 justify-center ml-auto flex-wrap items-center relative">
+			<!-- Hidden mirror span for calculating input width -->
+			<span bind:this={mirror} class="mirror" />
 			<input
 				required={tagList.length <= 0}
 				{name}
@@ -298,11 +309,13 @@
 				inputmode={type}
 				bind:this={inputField}
 				on:blur={handleBlur}
-				on:focus={(e) => (inputVisible = true)}
+				on:focus={(e) => {
+					inputVisible = true;
+					updateInputWidth();
+				}}
 				on:keydown|self={(e) => {
 					// clear earlier validation errors
 					inputField.setCustomValidity('');
-
 					const resultsLength = filteredSearchResults ? filteredSearchResults.length : 0;
 					if (resultsLength > 0) {
 						if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
@@ -334,6 +347,7 @@
 					}
 				}}
 				on:input={(e) => {
+					updateInputWidth();
 					handleInput(e);
 				}}
 				on:paste={(e) => {
@@ -342,7 +356,7 @@
 						e.preventDefault();
 					}
 				}}
-				style="width: {inputVisible && inputValueWidth ? inputValueWidth : 0}px;"
+				style="width: {inputValueWidth};"
 				class="rounded shadow-artistBlue shadow-card w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center {inputStyle}"
 				class:show={inputVisible}
 				class:p-1={inputVisible}
@@ -353,7 +367,7 @@
 			{/if}
 			<ul
 				bind:this={completionList}
-				class="autocomplete flex flex-col bg-paper-500 py-1 max-w-[80vw] w-fit {autocompleteStyle}"
+				class="autocomplete flex flex-col py-1 max-w-[80vw] w-fit z-20 {autocompleteStyle}"
 				class:px-4={Object.keys(groupedResults).length > 0 && inputVisible}
 				on:mouseleave={() => (completionFocusIndex = -1)}
 			>
@@ -378,21 +392,19 @@
 									bind:this={completionButtons[completionButtons.length]}
 									role="button"
 									class="p-1 rounded mr-2 cursor-pointer w-full text-xs text-center overflow-hidden overflow-ellipsis"
-									class:bg-paper-800={filteredSearchResults[completionFocusIndex] &&
-										filteredSearchResults[completionFocusIndex].item === result.item}
+									class:bg-peacockFeather-500={flatGroupedResults[completionFocusIndex] &&
+										flatGroupedResults[completionFocusIndex].item === result.item}
 									on:mouseenter={() =>
-										(completionFocusIndex = filteredSearchResults.findIndex(
+										(completionFocusIndex = flatGroupedResults.findIndex(
 											(r) => r.item === result.item
 										))}
 									on:click|preventDefault|stopPropagation={(e) => {
-										addTag(filteredSearchResults[completionFocusIndex]);
-										inputValueWidth = placeholderWidth;
+										addTag(flatGroupedResults[completionFocusIndex]);
 										inputField.focus();
 									}}
 									on:keydown|preventDefault|stopPropagation={(e) => {
 										if (e.key === 'Enter') {
-											addTag(filteredSearchResults[completionFocusIndex]);
-											inputValueWidth = placeholderWidth;
+											addTag(flatGroupedResults[completionFocusIndex]);
 											inputField.focus();
 										}
 									}}
@@ -487,7 +499,6 @@
 		overflow-x: visible;
 		box-sizing: border-box;
 		border-radius: 4px;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 		z-index: 100;
 	}
 
@@ -499,5 +510,14 @@
 		width: 4.55rem;
 		height: 1.5rem;
 		transition: all 0.2s;
+	}
+
+	.mirror {
+		display: block;
+		position: absolute;
+		visibility: hidden;
+		height: 0;
+		white-space: pre; // Preserve spaces and line breaks
+		overflow: hidden;
 	}
 </style>

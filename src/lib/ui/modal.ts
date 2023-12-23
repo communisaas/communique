@@ -29,6 +29,7 @@ export function handlePopover(
 	}));
 
 	if (!e.detail) {
+		// close popover, go to callback path
 		window.history.replaceState(history.state, '', callback);
 	}
 }

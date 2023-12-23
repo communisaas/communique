@@ -83,15 +83,32 @@ const config: SvelteKitAuthConfig = {
 						break;
 				}
 			}
-
+			// TODO use provider token to grant API access
+			console.log('account', account);
+			console.log('profile', profile);
 			let userCheckInResult;
 			try {
 				userCheckInResult = await upsert('user', {
 					where: { email: profile?.email },
-					update: { auth_provider: account?.provider, last_login: new Date() },
+					update: {
+						auth_provider: account?.provider,
+						last_login: new Date(),
+						given_name: profile.given_name
+							? profile.given_name[0].toUpperCase() + profile.given_name.slice(1).toLowerCase()
+							: null,
+						family_name: profile.family_name
+							? profile.family_name[0].toUpperCase() + profile.family_name.slice(1).toLowerCase()
+							: null
+					},
 					create: {
 						email: profile?.email,
-						auth_provider: account?.provider
+						auth_provider: account?.provider,
+						given_name: profile.given_name
+							? profile.given_name[0].toUpperCase() + profile.given_name.slice(1).toLowerCase()
+							: null,
+						family_name: profile.family_name
+							? profile.family_name[0].toUpperCase() + profile.family_name.slice(1).toLowerCase()
+							: null
 					}
 				});
 			} catch (error) {
@@ -100,8 +117,8 @@ const config: SvelteKitAuthConfig = {
 			}
 			return userCheckInResult;
 		},
-		async jwt(args) {
-			return args.token;
+		async jwt({ token }) {
+			return token;
 		}
 	},
 	debug: false,

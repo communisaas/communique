@@ -42,7 +42,7 @@
 
 	$: if ($sessionStore && $sessionStore.template && $sessionStore.hiddenEmails) {
 		for (const templateName in $sessionStore.template)
-			if ($sessionStore.template[templateName].cardList)
+			if ($sessionStore.template[templateName].cardList !== null)
 				$sessionStore.template[templateName].cardList = $sessionStore.template[
 					templateName
 				].cardList.filter((card: email) => !$sessionStore.hiddenEmails.includes(card.shortid));
@@ -74,7 +74,6 @@
 					bind:selected={$sessionStore.email}
 					on:select={async (e) => {
 						$sessionStore.template.primary.cardList = null;
-						$sessionStore.template.primary.cardList = await handleSelect(e);
 						// switch (e.detail.type) {
 						// 	case 'recipient':
 						// 		$sessionStore.template.primary.header = 'Most emails sent to';
@@ -91,6 +90,7 @@
 							source: e.detail.type,
 							iterable: true
 						};
+						$sessionStore.template.primary.cardList = await handleSelect(e);
 					}}
 					on:externalAction={async (e) => {
 						if (e.detail.type === 'email') {

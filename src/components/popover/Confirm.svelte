@@ -90,7 +90,7 @@
 			style="text-align: initial;"
 			class="bg-artistBlue-800 p-5 overflow-auto w-full max-h-[75vh]"
 		>
-			<div tabindex="-1" aria-label="content" class="max-h-fit w-full">
+			<div tabindex="-1" aria-label="content" class="relative max-h-fit w-full">
 				<p>{advisoryText}</p>
 
 				<input
@@ -107,13 +107,15 @@
 							submitDisabled = false;
 						}
 					}}
-					class="m-auto block h-10 bg-artistBlue-700 text-white rounded-md p-2 mt-2"
+					class="max-w-full m-auto block h-10 bg-artistBlue-700 text-white rounded-md p-2 mt-2"
 					style={`width: ${inputValueWidth}px`}
 					type="text"
 				/>
 			</div>
 		</aside>
-		<button aria-live="assertive" bind:this={confirmButton} class="w-full h-10 mt-2">{confirmButtonText}</button>
+		<button aria-live="assertive" bind:this={confirmButton} class="w-full h-10 mt-2"
+			>{confirmButtonText}</button
+		>
 	</form>
 </section>
 

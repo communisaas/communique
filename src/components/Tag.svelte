@@ -3,6 +3,7 @@
 	import type { Writable } from 'svelte/store';
 	export let item: string;
 	export let selected: Selectable;
+	export let focusable = true;
 	export let style = '';
 
 	let store: Writable<UserState>,
@@ -30,7 +31,7 @@
 <span title={overflowing ? item : ''} class="max-w-full">
 	<div
 		bind:this={tag}
-		tabindex="0"
+		tabindex={focusable ? 0 : -1}
 		role="button"
 		aria-label={item}
 		class="button cursor-pointer text-center px-2 py-1 max-w-full whitespace-nowrap overflow-hidden overflow-ellipsis rounded w-fit {style} "

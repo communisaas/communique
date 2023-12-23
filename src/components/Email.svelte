@@ -598,7 +598,7 @@
 			<article
 				class="flex grow justify-between min-w-full h-full flex-col"
 				class:md:flex-row={!expand}
-				class:md:max-h-60={!expand}
+				class:md:max-h-80={!expand}
 			>
 				<div
 					class="flex flex-col tags h-full overflow-clip mb-1 max-h-full"
@@ -617,6 +617,7 @@
 							alignment="start"
 							overflow={expand ? 'wrap' : 'auto'}
 							backgroundColor={colors.artistBlue[600]}
+							bind:focusable={expand}
 							bind:selectedContent={$sessionStore.topic}
 							on:select={(e) => {
 								setExpand(false);
@@ -634,6 +635,7 @@
 							alignment="start"
 							overflow={expand ? 'wrap' : 'auto'}
 							backgroundColor={colors.artistBlue[600]}
+							bind:focusable={expand}
 							bind:selectedContent={$sessionStore.recipient}
 							on:select={(e) => {
 								setExpand(false);

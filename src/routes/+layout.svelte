@@ -18,7 +18,6 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { routeModal } from '$lib/ui/hash';
 	import { browser } from '$app/environment';
-	import Geolocator from '$components/Geolocation.svelte';
 
 	export let data: LayoutSchema;
 	const dispatch = createEventDispatcher();
@@ -136,7 +135,6 @@
 							// TODO loading placeholders on topic change
 							if ($sessionStore.template.primary) {
 								$sessionStore.template.primary.cardList = null;
-								$sessionStore.template.primary.cardList = await handleSelect(e);
 								$sessionStore.template.primary.focus = {
 									type: 'topic',
 									item: e.detail.id,
@@ -144,7 +142,8 @@
 									source: 'topic',
 									iterable: true
 								};
-								await goto('/', { noScroll: true });
+								$sessionStore.template.primary.cardList = await handleSelect(e);
+								if ($page.route.id !== '/') await goto('/', { noScroll: true });
 							}
 						}}
 					/>
@@ -152,9 +151,9 @@
 				<span
 					class="ml-auto flex items-center relative overflow-visible min-w-fit pl-2 gap-2 justify-center h-full text-paper-500"
 				>
-					<span class="group relative p-0.5 cursor-context-menu">
-						<!-- TODO resolve location across languages -->
-						<!-- <Geolocator /> -->
+					<!-- TODO resolve location across languages -->
+					<!-- <span class="group relative p-0.5 cursor-context-menu">
+						<Geolocator />
 						<div
 							role="menu"
 							tabindex="0"
@@ -167,7 +166,7 @@
 								>
 							</ul>
 						</div>
-					</span>
+					</span> -->
 
 					{#if $page.data.session}
 						<div

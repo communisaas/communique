@@ -58,7 +58,7 @@
 	<meta name="description" content="Write & share email templates!" />
 </svelte:head>
 
-<section class="pt-4 min-h-screen">
+<section class="pt-4">
 	<h1 class="text-paper-500 text-left ml-5 md:ml-20 pb-5 text-xl xs:text-3xl">email composer</h1>
 	<form
 		class="flex flex-col gap-y-5 mb-4 rounded-full"
@@ -181,7 +181,7 @@
 					inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500 m-2 w-fit"
 					inputVisible={true}
-					autocompleteStyle="left-0"
+					autocompleteStyle="left-0 bg-peacockFeather-600 text-paper-500"
 					bind:searchResults={suggestedTopics}
 					on:autocomplete={async (e) => {
 						suggestedTopics = await handleAutocomplete(e);

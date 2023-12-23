@@ -94,12 +94,8 @@ model user {
   last_login         DateTime? @default(now()) @db.Timestamp(6)
   sent_email_list    String[]
   privilege          BigInt?   @default(0)
-  postal_code        String?
-  state              String?
-  country            String?
-  city               String?
-  street             String?
-  street_secondary   String?
+  given_name         String?
+  family_name        String?
   author             author?
   issue              issue[]
 }

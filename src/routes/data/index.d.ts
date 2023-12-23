@@ -15,6 +15,8 @@ interface Query {
 
 interface Clause {
 	where?: Criteria;
+	update?: FieldMap;
+	create?: FieldMap;
 	data?: FieldMap;
 	take?: number;
 	select?: FieldMap;

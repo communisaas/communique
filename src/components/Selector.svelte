@@ -8,6 +8,7 @@
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let overflow: 'scroll' | 'hidden' | 'visible' | 'wrap' | 'auto' = 'auto';
 	export let scrollable = true;
+	export let focusable = true;
 	export let scrollOverride = false;
 	export let itemStyle: string = '';
 	export let selectorStyle: string = '';
@@ -132,6 +133,7 @@
 					this={selectable}
 					bind:selected={selectedContent}
 					style={itemStyle}
+					bind:focusable
 					{item}
 					on:select
 					on:blur
@@ -151,7 +153,6 @@
 		&X {
 			&::before {
 				content: '';
-				z-index: 20;
 				pointer-events: none;
 				display: block;
 				position: absolute;
@@ -167,7 +168,6 @@
 		&Y {
 			&::before {
 				content: '';
-				z-index: 20;
 				pointer-events: none;
 				display: block;
 				position: absolute;
@@ -183,7 +183,6 @@
 
 	.scrolledX {
 		&::before {
-			z-index: 20;
 			pointer-events: none;
 			background-image: linear-gradient(
 				to right,
@@ -198,7 +197,6 @@
 
 	.scrolledX__max {
 		&::before {
-			z-index: 20;
 			pointer-events: none;
 			content: '';
 			display: block;
@@ -234,7 +232,6 @@
 	.scrolledY__max {
 		&::before {
 			content: '';
-			z-index: 20;
 			display: block;
 			top: 0;
 			right: 0;

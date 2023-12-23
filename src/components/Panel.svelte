@@ -54,7 +54,6 @@
 			.join('&');
 		return await (await fetch(`data/email?${tagString}`)).json();
 	}
-	console.log(selectionList);
 </script>
 
 <section class="flex flex-col relative gradient-background">
@@ -77,11 +76,11 @@
 						type="search"
 						name="search item"
 						placeholder={'search'}
-						style="h-14 xs:mx-4 mr-5 ml-1 w-fit bg-transparent xs:pr-0.5 pr-0 pl-2"
+						style="h-14 xs:mx-4 md:mr-4 ml-2 w-fit bg-transparent xs:pr-0.5 pr-0 pl-2"
 						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded px-2 px-1 pr-1 text-paper-500"
 						addIconStyle="add bg-peacockFeather-500 h-10 w-10 md:h-12 md:w-12 text-4xl md:text-5xl inline-block leading-12"
 						inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
-						autocompleteStyle="right-0"
+						autocompleteStyle="right-0 bg-peacockFeather-600 text-paper-500"
 						autocomplete={true}
 						bind:tagList={selectionList}
 						bind:inputVisible
@@ -108,7 +107,7 @@
 						}}
 					/>
 				{:else}
-					<p class="text-paper-500 z-10 mx-10 sm:my-3 my-2">
+					<p class="text-paper-500 z-10 mx-10 my-2 md:my-3">
 						{initialSelection.item}
 					</p>
 				{/if}
