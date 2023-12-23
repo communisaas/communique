@@ -45,6 +45,7 @@ interface Settable {
 	name: string;
 	description: string;
 	label: string;
+	labelStyle: string;
 	class: string;
 	value?: string | boolean | number;
 	placeholder?: string;

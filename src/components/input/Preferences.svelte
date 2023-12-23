@@ -142,7 +142,7 @@
 						on:blur
 					>
 						{#if step.type !== 'menuitem'}
-							<label for={step.label} class="cursor-pointer pointer-events-auto px-2 py-2">
+							<label for={step.label} class="cursor-pointer {step.labelStyle}">
 								{#if step.type !== 'submit'}{step.label}{/if}
 								<input
 									tabindex="-1"
@@ -207,11 +207,21 @@
 		}
 	}
 
+	.radioLabel {
+		pointer-events: auto;
+		padding: 0.5rem;
+		display: flex;
+		justify-items: center;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
 	.submit {
 		background-color: theme('colors.peacockFeather.600');
 		border-radius: 10px;
 		transition: all ease-in-out 0.1s;
 		max-width: fit-content;
+		padding: 0.75rem;
 		&:hover {
 			transform: translateY(-0.1rem);
 		}

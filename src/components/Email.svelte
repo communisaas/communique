@@ -173,6 +173,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Spam',
+									labelStyle: 'radioLabel',
 									value: 'Spam',
 									class: 'option py-3 sm:py-2'
 								},
@@ -183,6 +184,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Harassment',
+									labelStyle: 'radioLabel',
 									value: 'Harassment',
 									class: 'option py-3 sm:py-2'
 								},
@@ -193,6 +195,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Violence',
+									labelStyle: 'radioLabel',
 									value: 'Violence',
 									class: 'option py-3 sm:py-2'
 								},
@@ -203,6 +206,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Privacy',
+									labelStyle: 'radioLabel',
 									value: 'Privacy',
 									class: 'option py-3 sm:py-2'
 								},
@@ -213,6 +217,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Misleading',
+									labelStyle: 'radioLabel',
 									value: 'Misleading',
 									class: 'option py-3 sm:py-2'
 								},
@@ -228,6 +233,7 @@
 										});
 									},
 									label: 'Other',
+									labelStyle: 'radioLabel',
 									placeholder: '50 characters',
 									maxLength: 50,
 									class:
