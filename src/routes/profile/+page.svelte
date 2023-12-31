@@ -5,14 +5,9 @@
 	import { get, type Writable } from 'svelte/store';
 	import Email from '$components/Email.svelte';
 	import Selector from '$components/Selector.svelte';
-	import modal, { handlePopover } from '$lib/ui/modal';
+	import modal, { getModalMap, handlePopover } from '$lib/ui/modal';
 	import Modal from '$components/Modal.svelte';
-	import Login from '$components/Login.svelte';
-	import Share from '$components/popover/Share.svelte';
-	import Reader from '$components/popover/Reader.svelte';
-	import Confirm from '$components/popover/Confirm.svelte';
 	import ContentLoader from 'svelte-content-loader';
-	import { signOut } from '@auth/sveltekit/client';
 	import TextField from '$components/input/TextField.svelte';
 	import colors from '$lib/ui/colors.js';
 
@@ -22,43 +17,6 @@
 		selectedSentEmail: Selectable = { item: '', type: 'option', id: '' },
 		sentEmails = null as Selectable[] | null,
 		windowWidth: number;
-	modalMapping: ModalMap = {
-		confirm: {
-			component: Confirm,
-			props: () => ({
-				advisoryText:
-					'If you really want to delete your account, type your email address below to confirm. Some data might be retained, like message counts, in addition to personal info according to local laws.',
-				inputToConfirm: $store.user?.email,
-				action: async (e: SubmitEvent) => {
-					const response = await fetch('/data/user/' + $store.user?.email, {
-						method: 'DELETE',
-						headers: {
-							'CSRF-Token': $store.csrfToken
-						}
-					});
-					if (response.status !== 200) {
-						throw new Error(`Could not delete user: (${response.status}) ${response.statusText}`);
-					} else {
-						signOut({ callbackUrl: '/', redirect: false });
-					}
-				}
-			})
-		},
-		share: { component: Share, props: () => ({ item: $store.email.content }) },
-		login: { component: Login, props: () => ({ providers: data.authProviders }) },
-		privacyPolicy: {
-			component: Reader,
-			props: () => ({ item: $page.data.privacyPolicy, inModal: true })
-		},
-		moderationPolicy: {
-			component: Reader,
-			props: () => ({ item: $page.data.moderationPolicy, inModal: true })
-		},
-		termsOfUse: {
-			component: Reader,
-			props: () => ({ item: $page.data.termsOfUse, inModal: true })
-		}
-	};
 
 	onMount(async () => {
 		store = (await import('$lib/data/sessionStorage')).store;
@@ -66,6 +24,8 @@
 		windowWidth = window.outerWidth;
 		sentEmails = await dataFetcher('data/email', 'email', [lastEmailId]);
 	});
+
+	$: modalMapping = getModalMap($store, $page.data as LayoutSchema);
 
 	const dataFetcher = async (endpoint: string, type: string, values: string[]) => {
 		const dataURL = new URL(endpoint, get(page).url);
@@ -105,7 +65,7 @@
 								<TextField
 									type="text"
 									placeholder="given name"
-									autocomplete="given-name"
+									browserAutocomplete="given-name"
 									required={true}
 									value={$store.user.given_name
 										? $store.user.given_name[0].toUpperCase() +
@@ -118,7 +78,7 @@
 								<TextField
 									type="text"
 									placeholder="family name"
-									autocomplete="family-name"
+									browserAutocomplete="family-name"
 									required={true}
 									value={$store.user.family_name
 										? $store.user.family_name[0].toUpperCase() +

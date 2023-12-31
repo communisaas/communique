@@ -2,6 +2,9 @@ interface LayoutSchema {
 	loudestTopics: topic[];
 	template: Layout;
 	authProviders: AuthSchema;
+	privacyPolicy: Document;
+	moderationPolicy: Document;
+	termsOfUse: Document;
 }
 
 interface Layout {

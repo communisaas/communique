@@ -508,7 +508,7 @@
 						e.preventDefault();
 						return;
 					}
-					if (e.relatedTarget.classList.contains('menu')) {
+					if (e.relatedTarget && e.relatedTarget.classList.contains('menu')) {
 						card.focus();
 					} else {
 						handleBlur(e);
@@ -618,7 +618,7 @@
 						<Selector
 							selectable={Tag}
 							items={item.topic_list}
-							itemStyle="text-xs sm:text-sm text-paper-500 bg-peacockFeather-500"
+							itemStyle="text-sm text-paper-500 bg-peacockFeather-500"
 							selectorStyle="pt-2 max-w-full md:flex-wrap"
 							alignment="start"
 							overflow={expand ? 'wrap' : 'auto'}
@@ -636,7 +636,7 @@
 						<Selector
 							selectable={Tag}
 							items={item.recipient_list}
-							itemStyle="text-xs sm:text-sm text-paper-500 bg-peacockFeather-600"
+							itemStyle="text-sm text-paper-500 bg-peacockFeather-600"
 							selectorStyle="pt-1 max-w-full md:flex-wrap"
 							alignment="start"
 							overflow={expand ? 'wrap' : 'auto'}

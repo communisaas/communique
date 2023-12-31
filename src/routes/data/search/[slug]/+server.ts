@@ -1,10 +1,16 @@
 import { rawSqlQuery } from '$lib/data/database';
 import { Prisma } from '@prisma/client';
+import { fuzzyMatch } from 'fuzzbunny';
+import { Country, State, City } from 'country-state-city';
+
+const allCountries = Country.getAllCountries();
+const allStates = State.getAllStates();
+const allCities = City.getAllCities();
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ params, url }) {
 	const searchTerms = decodeURIComponent(params.slug).split('&');
-	const searchQuery = searchTerms.map((term) => `${term.trim()}:*`).join(' & ');
+	let searchQuery = searchTerms.map((term) => `${term.trim()}:*`).join(' & ');
 	const source = url.searchParams.get('source');
 
 	let results;
@@ -62,7 +68,51 @@ export async function GET({ params, url }) {
 		}
 	} else if (source === 'location') {
 		// TODO resolve locations across multiple languages
-		results = [];
+		const searchAndRank = (data, fields, type, maxResults = 5) => {
+			const searchQueries = searchTerms[0].split(',').map((part) => part.trim().toLowerCase()); // Preprocess search terms
+
+			// Return top-ranked items based on the search query
+			return data
+				.map((item) => {
+					let totalRank = 0; // Initialize total rank
+
+					searchQueries.forEach((queryPart) => {
+						let bestRankForThisPart = Infinity;
+
+						fields.forEach((field) => {
+							const itemFieldLower = item[field].toLowerCase(); // Lowercase once
+							const rank = fuzzyMatch(itemFieldLower, queryPart)?.score ?? Infinity;
+							bestRankForThisPart = Math.min(bestRankForThisPart, rank);
+						});
+
+						totalRank += bestRankForThisPart; // Aggregate rank for all parts
+					});
+
+					let normalizedRank = totalRank + searchQueries[0].length / item[fields[0]].length;
+					normalizedRank = normalizedRank < Infinity ? -normalizedRank : normalizedRank;
+
+					// Construct hierarchical name if applicable
+					let hierarchicalName = item.name;
+					if (type === 'city' && item.stateCode !== item.countryCode) {
+						hierarchicalName += `, ${item.stateCode}`;
+					}
+					if (type !== 'country') {
+						hierarchicalName += `, ${item.countryCode}`;
+					}
+
+					return { item: hierarchicalName, source: type, rank: normalizedRank };
+				})
+				.filter((item) => item.rank < 0) // Exclude no match
+				.sort((a, b) => a.rank - b.rank) // Sort by rank
+				.slice(0, maxResults); // Limit results to top 5
+		};
+
+		let cityResults = searchAndRank(allCities, ['name', 'countryCode', 'stateCode'], 'city');
+		let stateResults = searchAndRank(allStates, ['name', 'countryCode'], 'state');
+		let countryResults = searchAndRank(allCountries, ['name'], 'country');
+
+		// Merge and directly return the top sorted results
+		results = [...cityResults, ...stateResults, ...countryResults].sort((a, b) => a.rank - b.rank);
 	}
 	return new Response(JSON.stringify(results));
 }

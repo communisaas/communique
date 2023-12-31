@@ -2,19 +2,14 @@
 	import Email from '$components/Email.svelte';
 	import Panel from '$components/Panel.svelte';
 	import Modal from '$components/Modal.svelte';
-	import modal, { handlePopover } from '$lib/ui/modal';
+	import modal, { getModalMap, handlePopover } from '$lib/ui/modal';
 	import { handleSelect } from '$lib/data/select';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { handleMailto } from '$lib/data/email';
-	import Share from '$components/popover/Share.svelte';
-	import Login from '$components/Login.svelte';
 	import { page } from '$app/stores';
-	import Reader from '$components/popover/Reader.svelte';
 	import type { email } from '@prisma/client';
-
-	export let data;
 
 	let sessionStore: Writable<UserState>;
 	const dispatch = createEventDispatcher();
@@ -23,22 +18,7 @@
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
 	});
 
-	let modalMapping: ModalMap = {
-		share: { component: Share, props: () => ({ item: $sessionStore.email.content }) },
-		login: { component: Login, props: () => ({ providers: data.authProviders }) },
-		privacyPolicy: {
-			component: Reader,
-			props: () => ({ item: $page.data.privacyPolicy, inModal: true })
-		},
-		moderationPolicy: {
-			component: Reader,
-			props: () => ({ item: $page.data.moderationPolicy, inModal: true })
-		},
-		termsOfUse: {
-			component: Reader,
-			props: () => ({ item: $page.data.termsOfUse, inModal: true })
-		}
-	};
+	$: modalMapping = getModalMap($sessionStore, $page.data as LayoutSchema);
 
 	$: if ($sessionStore && $sessionStore.template && $sessionStore.hiddenEmails) {
 		for (const templateName in $sessionStore.template)

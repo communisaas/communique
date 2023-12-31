@@ -12,10 +12,10 @@
 		autocompleteStyle: string = '',
 		autocomplete: boolean = false,
 		allowCustomValues: boolean = false,
-		searchField = '',
+		searchSource = '',
 		maxItems = 100;
 	export let tagList: Descriptor<string>[] = [];
-	export let searchResults: Descriptor<string>[] = [];
+	export let searchResults: Descriptor<string>[] | null = [];
 	export let inputStyle = '';
 	export let addIconStyle =
 		'add absolute bg-peacockFeather-600 h-6 w-6 text-2xl leading-6 font-bold';
@@ -28,8 +28,8 @@
 	let firstInput = true;
 
 	let completionFocusIndex: number = 0;
-	let completionList: HTMLUListElement;
-	let completionButtons: HTMLDivElement[] = [];
+	let completionListElement: HTMLUListElement;
+	let completionItems: HTMLDivElement[] = [];
 
 	let deleteVisible: FlagMap = {}; // A map to hold visibility states
 	let deleteButtons: ButtonElementMap = {}; // A map to hold the delete buttons
@@ -46,13 +46,13 @@
 		? searchResults.filter(
 				(result) =>
 					!tagList.some((tag) => tag.item === result.item && tag.type === result.type) &&
-					(result.source === searchField || !searchField)
+					(result.source === searchSource || !searchSource)
 		  )
 		: [];
 
 	$: groupedResults = Object.entries(
 		filteredSearchResults.reduce((accumulator: { [key: string]: Descriptor<string>[] }, result) => {
-			if (result.source && (result.source === searchField || !searchField)) {
+			if (result.source && (result.source === searchSource || !searchSource)) {
 				if (!accumulator[result.source]) {
 					accumulator[result.source] = [];
 				}
@@ -121,12 +121,13 @@
 
 		if (inputField.value.length > 2 && autocomplete) {
 			searching = true;
+			searchResults = null;
 		} else {
 			searching = false;
 		}
 
 		if (autocomplete && inputField.value.length > 2) {
-			dispatch('autocomplete', { value: inputField.value, source: searchField });
+			dispatch('autocomplete', { value: inputField.value, source: searchSource });
 			completionFocusIndex = -1;
 		}
 	}
@@ -164,19 +165,20 @@
 	}
 
 	async function handleBlur(e: FocusEvent) {
-		if (!completionList.contains(e.relatedTarget as Node) || !autocomplete) {
+		if (!completionListElement.contains(e.relatedTarget as Node) || !autocomplete) {
 			searching = false;
 			if (tagList.length > 0) {
 				inputVisible = false;
 				inputValueWidth = '0px';
 			}
-			groupedResults = {};
+			searchResults = [];
 			validityMessage = null;
 			dispatch('blur', e.detail);
 		}
 	}
 
 	function handleSubmit() {
+		inputField.setCustomValidity('');
 		if (searching && !groupedResults) return;
 		else if (searching && type === 'search') {
 			inputField.setCustomValidity('Still searching! Wait for results...');
@@ -217,7 +219,8 @@
 	function updateInputWidth() {
 		if (inputField && mirror) {
 			mirror.textContent = inputField.value || placeholder; // Update mirror content
-			inputValueWidth = inputVisible ? `${mirror.offsetWidth + 8}px` : '0px'; // Update input width based on mirror
+			mirror.style.width = 'auto'; // Allow it to expand as needed for content
+			inputValueWidth = inputVisible ? `${mirror.offsetWidth + 10}px` : '0px'; // Update input width based on mirror
 			inputField.style.width = inputValueWidth; // Apply new width to input field
 		}
 	}
@@ -227,7 +230,7 @@
 	});
 </script>
 
-<div class="px-2 rounded max-w-full h-max relative items-center justify-center {style}">
+<div class="px-2 rounded max-w-full h-max items-center justify-center {style}">
 	<form
 		autocomplete="off"
 		class="flex flex-nowrap max-w-full"
@@ -366,16 +369,17 @@
 				<Tooltip message={validityMessage} style="top-[75%] left-[100%] text-xs" />
 			{/if}
 			<ul
-				bind:this={completionList}
-				class="autocomplete flex flex-col py-1 max-w-[80vw] w-fit z-20 {autocompleteStyle}"
-				class:px-4={Object.keys(groupedResults).length > 0 && inputVisible}
+				bind:this={completionListElement}
+				class="flex flex-col w-max max-w-[50vw] z-20 {autocompleteStyle}"
+				class:py-2={searchResults && searchResults.length > 0}
+				class:px-4={searchResults && searchResults.length > 0}
 				on:mouseleave={() => (completionFocusIndex = -1)}
 			>
 				{#if searching}
-					<li class="relative px-1">
+					<li class="relative p-1">
 						<ContentLoader
 							uniqueKey="tagAutocompleteLoader"
-							width={inputValueWidth}
+							width={inputValueWidth.slice(0, -2)}
 							height={20}
 							primaryColor={colors.artistBlue[500]}
 							secondaryColor={colors.larimarGreen[500]}
@@ -384,14 +388,14 @@
 					</li>
 				{:else if filteredSearchResults && filteredSearchResults.length > 0 && inputVisible}
 					{#each Object.keys(groupedResults) as type, groupIndex}
-						<li class="-ml-1">{type}s</li>
+						<li class="-ml-1 font-bold">{type}</li>
 						{#each groupedResults[type] as result, itemIndex}
 							<li class="relative">
 								<div
 									tabindex="0"
-									bind:this={completionButtons[completionButtons.length]}
+									bind:this={completionItems[completionItems.length]}
 									role="button"
-									class="p-1 rounded mr-2 cursor-pointer w-full text-xs text-center overflow-hidden overflow-ellipsis"
+									class="p-1 rounded mr-2 cursor-pointer w-full text-xs text-start overflow-hidden overflow-ellipsis"
 									class:bg-peacockFeather-500={flatGroupedResults[completionFocusIndex] &&
 										flatGroupedResults[completionFocusIndex].item === result.item}
 									on:mouseenter={() =>
@@ -421,7 +425,7 @@
 			type="submit"
 			name={`Add ${name}`}
 			aria-label="Add button for {name}s"
-			class="flex justify-center items-center relative min-w-fit shrink-0"
+			class="flex justify-center items-center min-w-fit shrink-0"
 			on:mousedown|preventDefault
 			on:click|preventDefault={(e) => {
 				inputField.focus();
@@ -491,17 +495,6 @@
 		}
 	}
 
-	.autocomplete {
-		position: absolute;
-		top: 75%;
-		max-height: 200px;
-		overflow-y: auto;
-		overflow-x: visible;
-		box-sizing: border-box;
-		border-radius: 4px;
-		z-index: 100;
-	}
-
 	.show {
 		visibility: visible;
 		opacity: 1;
@@ -519,5 +512,6 @@
 		height: 0;
 		white-space: pre; // Preserve spaces and line breaks
 		overflow: hidden;
+		white-space: nowrap;
 	}
 </style>

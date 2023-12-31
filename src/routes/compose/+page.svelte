@@ -12,7 +12,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import Modal from '$components/Modal.svelte';
-	import modal, { handlePopover } from '$lib/ui/modal';
+	import modal, { getModalMap, handlePopover } from '$lib/ui/modal';
 	import type EditorJS from '@editorjs/editorjs';
 	import { handleAutocomplete } from '$lib/data/select';
 
@@ -33,24 +33,7 @@
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
 	});
 
-	let modalMapping: ModalMap = {
-		privacyPolicy: {
-			component: Reader,
-			props: () => ({ item: $page.data.privacyPolicy, inModal: true })
-		},
-		moderationPolicy: {
-			component: Reader,
-			props: () => ({ item: $page.data.moderationPolicy, inModal: true })
-		},
-		termsOfUse: {
-			component: Reader,
-			props: () => ({ item: $page.data.termsOfUse, inModal: true })
-		},
-		afterPost: {
-			component: AfterPost,
-			props: () => ({ postID: $sessionStore.postID })
-		}
-	};
+	$: modalMapping = getModalMap($sessionStore, $page.data as LayoutSchema);
 </script>
 
 <svelte:head>
@@ -157,7 +140,7 @@
 					maxItems={100}
 					type="email"
 					name="recipient"
-					searchField="recipient"
+					searchSource="recipient"
 					placeholder="Recipient"
 					style="h-14 w-fit bg-peacockFeather-700"
 					inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
@@ -175,7 +158,7 @@
 					maxItems={5}
 					type="text"
 					name="topic"
-					searchField="topic"
+					searchSource="topic"
 					placeholder="Topic"
 					style="h-14 w-fit bg-peacockFeather-700"
 					inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
@@ -205,6 +188,23 @@
 					}}
 					name="subject"
 					placeholder="Subject"
+					class="w-42 h-fit p-1.5 bg-artistBlue-700 focus:outline-peacockFeather-500 text-paper-500 rounded"
+				/>
+			</span>
+			<span class="py-1 flex flex-wrap gap-5 w-fit rounded">
+				<input
+					required
+					autocomplete="off"
+					type="text"
+					aria-label="Subject line"
+					aria-describedby="Enter a subject line for your email"
+					on:keypress={(e) => {
+						if (e.key == 'Enter') {
+							e.preventDefault();
+						}
+					}}
+					name="location"
+					placeholder="City, state, country"
 					class="w-42 h-fit p-1.5 bg-artistBlue-700 focus:outline-peacockFeather-500 text-paper-500 rounded"
 				/>
 			</span>

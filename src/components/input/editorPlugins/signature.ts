@@ -15,14 +15,6 @@ export class Signature {
 		container.style.fontFamily = 'Arial, sans-serif';
 		container.tabIndex = 0; // Make the container focusable
 
-		// Add the "Sincerely," text
-		const sincerelyText = document.createElement('p');
-		sincerelyText.textContent = 'Sincerely,';
-		container.appendChild(sincerelyText);
-
-		// Add a line break
-		container.appendChild(document.createElement('br'));
-
 		// Add the sender's name placeholder
 		const senderName = this.createPlaceholder('senderName', '*your name*');
 		container.appendChild(senderName);

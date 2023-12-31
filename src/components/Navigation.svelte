@@ -59,11 +59,11 @@
 </script>
 
 <aside class="object-cover inline-flex h-full">
-	<div class="flex flex-col items-center h-full bg-peacockFeather-700 shadow-nav z-10">
+	<div class="flex flex-col items-center h-full bg-peacockFeather-700 z-10">
 		<nav aria-label="Page navigation" class="flex flex-col sticky h-screen top-0 md:top-0 md:h-fit">
 			{#if collapsed}
 				<div
-					class="absolute inset-0 min-w-fit h-screen flex justify-center items-center left-0 top-0 z-20"
+					class="absolute inset-0 min-w-fit h-screen flex justify-center items-center left-0 top-0"
 				>
 					<button
 						on:click={() => (collapsed = !collapsed)}

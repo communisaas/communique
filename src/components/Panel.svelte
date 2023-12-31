@@ -80,7 +80,7 @@
 						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded px-2 px-1 pr-1 text-paper-500"
 						addIconStyle="add bg-peacockFeather-500 h-10 w-10 md:h-12 md:w-12 text-4xl md:text-5xl inline-block leading-12"
 						inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
-						autocompleteStyle="right-0 bg-peacockFeather-600 text-paper-500"
+						autocompleteStyle="absolute max-h-80 overflow-y-auto right-0 top-[75%] bg-peacockFeather-600 text-paper-500"
 						autocomplete={true}
 						bind:tagList={selectionList}
 						bind:inputVisible
@@ -173,9 +173,10 @@
 	}
 
 	.tab {
-		filter: drop-shadow(1px 2px 1px theme('colors.artistBlue.500'));
-		position: relative;
-		z-index: 20;
+		filter: drop-shadow(
+			0 0 0 theme('colors.artistBlue.500')
+		); // positioning breaks if this is removed
+		z-index: 10;
 		min-width: 0;
 
 		&__start {

@@ -9,6 +9,7 @@
 	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 	import { signIn, signOut } from '@auth/sveltekit/client';
 	import type { topic } from '@prisma/client';
+	import Geolocator from '$components/Location.svelte';
 	import Selector from '$components/Selector.svelte';
 	import Tag from '$components/Tag.svelte';
 	import LoginIcon from '$components/icon/Login.svelte';
@@ -45,6 +46,9 @@
 			$sessionStore.show.moderationPolicy = true;
 		} else if (window.location.hash === '#confirm') {
 			$sessionStore.show.confirm = true;
+		} else if (window.location.hash === '#geolocator') {
+			console.log('set');
+			$sessionStore.show.geolocator = true;
 		} else {
 			dispatch('popover', false);
 		}
@@ -87,6 +91,7 @@
 			moderatioPolicy: false,
 			termsOfUse: false,
 			confirm: false,
+			geolocator: false,
 			afterPost: false
 		};
 		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
@@ -119,122 +124,108 @@
 		<section class="min-h-screen">
 			<header
 				aria-label="Popular topics list"
-				class="flex md:h-12 pr-1 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
+				class="flex md:h-12 pr-1 z-20 bg-peacockFeather-700 relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
 			>
 				{#if $sessionStore && $sessionStore.template}
-					<Selector
-						selectable={Tag}
-						itemStyle="whitespace-nowrap sm:text-base bg-peacockFeather-500 text-paper-500 text-sm"
-						selectorStyle="self-center m-auto w-full h-full px-1 py-2"
-						items={topicNames}
-						alignment="center"
-						backgroundColor={colors.peacockFeather[700]}
-						scrollOverride={true}
-						bind:selectedContent={$sessionStore.topic}
-						on:select={async (e) => {
-							// TODO loading placeholders on topic change
-							if ($sessionStore.template.primary) {
-								$sessionStore.template.primary.cardList = null;
-								$sessionStore.template.primary.focus = {
-									type: 'topic',
-									item: e.detail.id,
-									field: 'topic_list',
-									source: 'topic',
-									iterable: true
-								};
-								$sessionStore.template.primary.cardList = await handleSelect(e);
-								if ($page.route.id !== '/') await goto('/', { noScroll: true });
-							}
-						}}
-					/>
-				{/if}
-				<span
-					class="ml-auto flex items-center relative overflow-visible min-w-fit pl-2 gap-2 justify-center h-full text-paper-500"
-				>
-					<!-- TODO resolve location across languages -->
-					<!-- <span class="group relative p-0.5 cursor-context-menu">
-						<Geolocator />
-						<div
-							role="menu"
-							tabindex="0"
-							class="absolute z-40 right-0 top-[85%] sm:top-[90%] invisible group-hover:visible bg-peacockFeather-600 shadow-lg"
-						>
-							<ul class="flex flex-col items-start space-y-1 xs:text-sm">
-								<button
-									class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
-									on:click={() => goto('/profile')}>Set city & state</button
-								>
-							</ul>
-						</div>
-					</span> -->
-
-					{#if $page.data.session}
-						<div
-							class="group relative rounded hover:bg-peacockFeather-600 transition-colors duration-200 cursor-context-menu"
-						>
-							{#if $page.data.session.user?.image}
-								<img
-									src={$page.data.session.user.image}
-									alt="avatar"
-									class="h-7 w-7 md:h-10 md:w-10"
-								/>
-							{:else}
-								<LoginIcon />
-							{/if}
+					<span
+						class="mr-auto flex relative overflow-visible items-center w-full pl-2 justify-start h-full text-paper-500"
+					>
+						{#if $page.data.session}
 							<div
-								role="menu"
-								class="absolute z-40 right-0 w-0 top-[105%] bottom-[100%] sm:top-auto group-hover:w-auto group-hover:bottom-[-150%] bg-peacockFeather-600 shadow-lg"
+								class="group h-full p-1 mr-1 flex items-center justify-center relative rounded hover:bg-peacockFeather-600 transition-colors duration-200 cursor-context-menu"
 							>
-								<ul class="flex flex-col items-start space-y-1 xs:text-sm">
-									<button
-										on:focus={(e) => {
-											let grandParentDiv = e.target.parentNode.parentNode;
-											if (grandParentDiv) {
-												grandParentDiv.style.bottom = '-150%';
-												grandParentDiv.style.width = 'auto';
-											}
-										}}
-										on:blur={(e) => {
-											let grandParentDiv = e.target.parentNode.parentNode;
-											if (grandParentDiv) {
-												grandParentDiv.style.bottom = '';
-												grandParentDiv.style.width = '';
-											}
-										}}
-										class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
-										on:click={() => goto('/profile')}>Profile</button
-									>
-									<button
-										class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
-										on:focus={(e) => {
-											let grandParentDiv = e.target.parentNode.parentNode;
-											if (grandParentDiv) {
-												grandParentDiv.style.bottom = '-150%';
-												grandParentDiv.style.width = 'auto';
-											}
-										}}
-										on:blur={(e) => {
-											let grandParentDiv = e.target.parentNode.parentNode;
-											if (grandParentDiv) {
-												grandParentDiv.style.bottom = '';
-												grandParentDiv.style.width = '';
-											}
-										}}
-										on:click={() => signOut({ callbackUrl: '/', redirect: false })}>Sign out</button
-									>
-								</ul>
+								{#if $page.data.session.user?.image}
+									<img
+										src={$page.data.session.user.image}
+										alt="avatar"
+										class="h-7 w-7 md:h-10 md:w-10 mx-1"
+									/>
+								{:else}
+									<LoginIcon />
+								{/if}
+								<div
+									role="menu"
+									class="absolute h-fit z-40 left-0 w-0 bottom-[200%] group-hover:w-auto group-hover:top-[100%] bg-peacockFeather-700 shadow-lg"
+								>
+									<ul class="flex flex-col items-start space-y-1 xs:text-base my-2">
+										<button
+											on:focus={(e) => {
+												let menuDiv = e.target.parentNode.parentNode;
+												if (menuDiv) {
+													menuDiv.style.top = '100%';
+													menuDiv.style.width = 'auto';
+												}
+											}}
+											on:blur={(e) => {
+												let menuDiv = e.target.parentNode.parentNode;
+												if (menuDiv) {
+													menuDiv.style.top = '';
+													menuDiv.style.width = '';
+												}
+											}}
+											class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
+											on:click={() => goto('/profile')}>Profile</button
+										>
+										<button
+											class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
+											on:focus={(e) => {
+												let menuDiv = e.target.parentNode.parentNode;
+												if (menuDiv) {
+													menuDiv.style.top = '100%';
+													menuDiv.style.width = 'auto';
+												}
+											}}
+											on:blur={(e) => {
+												let menuDiv = e.target.parentNode.parentNode;
+												if (menuDiv) {
+													menuDiv.style.top = '';
+													menuDiv.style.width = '';
+												}
+											}}
+											on:click={() => signOut({ callbackUrl: '/', redirect: false })}
+											>Sign out</button
+										>
+									</ul>
+								</div>
 							</div>
-						</div>
-					{:else}
-						<button
-							class="w-9 justify-self-end"
-							on:click={() => signIn({ callbackUrl: '/', redirect: false })}
-						>
-							<LoginIcon />
-						</button>
-					{/if}
-				</span>
+						{:else}
+							<button
+								class="w-9 justify-self-end"
+								on:click={() => signIn({ callbackUrl: '/', redirect: false })}
+							>
+								<LoginIcon />
+							</button>
+						{/if}
+						<Geolocator />
+						<Selector
+							selectable={Tag}
+							itemStyle="whitespace-nowrap sm:text-base bg-peacockFeather-500 text-paper-500 text-sm"
+							selectorStyle="self-center m-auto w-full h-full px-1 py-2"
+							items={topicNames}
+							alignment="center"
+							backgroundColor={colors.peacockFeather[700]}
+							scrollOverride={true}
+							bind:selectedContent={$sessionStore.topic}
+							on:select={async (e) => {
+								// TODO loading placeholders on topic change
+								if ($sessionStore.template.primary) {
+									$sessionStore.template.primary.cardList = null;
+									$sessionStore.template.primary.focus = {
+										type: 'topic',
+										item: e.detail.id,
+										field: 'topic_list',
+										source: 'topic',
+										iterable: true
+									};
+									$sessionStore.template.primary.cardList = await handleSelect(e);
+									if ($page.route.id !== '/') await goto('/', { noScroll: true });
+								}
+							}}
+						/>
+					</span>
+				{/if}
 			</header>
+
 			{#if !$navigating}
 				<slot />
 			{:else}
