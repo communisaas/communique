@@ -6,7 +6,9 @@
 	import { browser } from '$app/environment';
 	import { fade, slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
+	import { signIn, signOut } from '@auth/sveltekit/client';
+	import LoginIcon from '$components/icon/Login.svelte';
 
 	const navLinks = {
 		'/': { component: Topic, label: 'Home' },
@@ -60,7 +62,71 @@
 
 <aside class="object-cover inline-flex h-full">
 	<div class="flex flex-col items-center h-full bg-peacockFeather-700 z-10">
-		<nav aria-label="Page navigation" class="flex flex-col sticky h-screen top-0 md:top-0 md:h-fit">
+		<nav aria-label="Page navigation" class="flex flex-col sticky h-screen top-0">
+			{#if !collapsed}
+				{#if $page.data.session}
+					<div
+						transition:slide={{ duration: 500, easing: quintOut, axis: 'x' }}
+						class="group h-12 flex items-center justify-center relative hover:bg-peacockFeather-600 transition-colors duration-200 cursor-context-menu"
+					>
+						{#if $page.data.session.user?.image}
+							<img src={$page.data.session.user.image} alt="avatar" class="h-10 w-10" />
+						{/if}
+						<div
+							role="menu"
+							class="absolute h-fit z-40 left-0 w-0 bottom-[200%] group-hover:w-auto group-hover:top-[100%] bg-peacockFeather-700 text-paper-500 shadow-lg"
+						>
+							<ul class="flex flex-col items-start space-y-1 xs:text-base my-2">
+								<button
+									on:focus={(e) => {
+										let menuDiv = e.target.parentNode.parentNode;
+										if (menuDiv) {
+											menuDiv.style.top = '100%';
+											menuDiv.style.width = 'auto';
+										}
+									}}
+									on:blur={(e) => {
+										let menuDiv = e.target.parentNode.parentNode;
+										if (menuDiv) {
+											menuDiv.style.top = '';
+											menuDiv.style.width = '';
+										}
+									}}
+									class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
+									on:click={() => goto('/profile')}>Profile</button
+								>
+								<button
+									class="px-1.5 py-1 min-w-full text-left whitespace-nowrap hover:bg-peacockFeather-500 transition-colors duration-200"
+									on:focus={(e) => {
+										let menuDiv = e.target.parentNode.parentNode;
+										if (menuDiv) {
+											menuDiv.style.top = '100%';
+											menuDiv.style.width = 'auto';
+										}
+									}}
+									on:blur={(e) => {
+										let menuDiv = e.target.parentNode.parentNode;
+										if (menuDiv) {
+											menuDiv.style.top = '';
+											menuDiv.style.width = '';
+										}
+									}}
+									on:click={() => signOut({ callbackUrl: '/', redirect: false })}>Sign out</button
+								>
+							</ul>
+						</div>
+					</div>
+				{:else}
+					<button
+						class="flex p-1 max-h-full hover:bg-peacockFeather-600"
+						on:click={() => signIn({ callbackUrl: '/', redirect: false })}
+					>
+						<icon class="w-10 h-10 m-auto inline-block">
+							<LoginIcon />
+						</icon>
+					</button>
+				{/if}
+			{/if}
 			{#if collapsed}
 				<div
 					class="absolute inset-0 min-w-fit h-screen flex justify-center items-center left-0 top-0"
