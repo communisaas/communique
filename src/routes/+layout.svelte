@@ -9,7 +9,7 @@
 	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 	import { signIn, signOut } from '@auth/sveltekit/client';
 	import type { topic } from '@prisma/client';
-	import Geolocator from '$components/Location.svelte';
+	import Locator from '$components/Locator.svelte';
 	import Selector from '$components/Selector.svelte';
 	import Tag from '$components/Tag.svelte';
 	import LoginIcon from '$components/icon/Login.svelte';
@@ -124,7 +124,7 @@
 		<section class="min-h-screen">
 			<header
 				aria-label="Popular topics list"
-				class="flex md:h-12 pr-1 z-20 bg-peacockFeather-700 relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
+				class="flex h-12 pr-1 z-20 bg-peacockFeather-700 relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
 			>
 				{#if $sessionStore && $sessionStore.template}
 					<span
@@ -132,16 +132,10 @@
 					>
 						{#if $page.data.session}
 							<div
-								class="group h-full p-1 mr-1 flex items-center justify-center relative rounded hover:bg-peacockFeather-600 transition-colors duration-200 cursor-context-menu"
+								class="group h-full p-1 mr-1 flex items-center justify-center relative hover:bg-peacockFeather-600 transition-colors duration-200 cursor-context-menu"
 							>
 								{#if $page.data.session.user?.image}
-									<img
-										src={$page.data.session.user.image}
-										alt="avatar"
-										class="h-7 w-7 md:h-10 md:w-10 mx-1"
-									/>
-								{:else}
-									<LoginIcon />
+									<img src={$page.data.session.user.image} alt="avatar" class="h-10 w-10 mx-1" />
 								{/if}
 								<div
 									role="menu"
@@ -190,17 +184,19 @@
 							</div>
 						{:else}
 							<button
-								class="w-9 justify-self-end"
+								class="flex pr-0.5 py-1 max-h-full hover:bg-peacockFeather-600"
 								on:click={() => signIn({ callbackUrl: '/', redirect: false })}
 							>
-								<LoginIcon />
+								<icon class="w-10 h-10 inline-block">
+									<LoginIcon />
+								</icon>
 							</button>
 						{/if}
-						<Geolocator />
+						<Locator />
 						<Selector
 							selectable={Tag}
-							itemStyle="whitespace-nowrap sm:text-base bg-peacockFeather-500 text-paper-500 text-sm"
-							selectorStyle="self-center m-auto w-full h-full px-1 py-2"
+							itemStyle="whitespace-nowrap text-base bg-peacockFeather-500 text-paper-500"
+							selectorStyle="self-center gap-x-2 m-auto w-full h-full px-1 pr-2 py-2"
 							items={topicNames}
 							alignment="center"
 							backgroundColor={colors.peacockFeather[700]}

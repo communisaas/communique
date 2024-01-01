@@ -70,28 +70,27 @@ export async function GET({ params, url }) {
 		// TODO resolve locations across multiple languages
 		const searchAndRank = (data, fields, type, maxResults = 5) => {
 			const searchQueries = searchTerms[0].split(',').map((part) => part.trim().toLowerCase()); // Preprocess search terms
+			let topResults = []; // Maintain only top 5 entities
 
-			// Return top-ranked items based on the search query
-			return data
-				.map((item) => {
-					let totalRank = 0; // Initialize total rank
+			data.forEach((item) => {
+				let totalRank = 0; // Initialize total rank
 
-					searchQueries.forEach((queryPart) => {
-						let bestRankForThisPart = Infinity;
+				searchQueries.forEach((queryPart) => {
+					let bestRankForThisPart = 0;
 
-						fields.forEach((field) => {
-							const itemFieldLower = item[field].toLowerCase(); // Lowercase once
-							const rank = fuzzyMatch(itemFieldLower, queryPart)?.score ?? Infinity;
-							bestRankForThisPart = Math.min(bestRankForThisPart, rank);
-						});
-
-						totalRank += bestRankForThisPart; // Aggregate rank for all parts
+					fields.forEach((field) => {
+						const itemFieldLower = item[field].toLowerCase(); // Lowercase once
+						const rank = fuzzyMatch(itemFieldLower, queryPart)?.score ?? 0;
+						bestRankForThisPart = Math.max(bestRankForThisPart, rank);
 					});
 
-					let normalizedRank = totalRank + searchQueries[0].length / item[fields[0]].length;
-					normalizedRank = normalizedRank < Infinity ? -normalizedRank : normalizedRank;
+					totalRank += bestRankForThisPart; // Aggregate the best rank for this part
+				});
 
-					// Construct hierarchical name if applicable
+				let normalizedRank = totalRank < Infinity ? -totalRank : totalRank;
+
+				if (normalizedRank < 0) {
+					// If the item is a meaningful match
 					let hierarchicalName = item.name;
 					if (type === 'city' && item.stateCode !== item.countryCode) {
 						hierarchicalName += `, ${item.stateCode}`;
@@ -100,19 +99,34 @@ export async function GET({ params, url }) {
 						hierarchicalName += `, ${item.countryCode}`;
 					}
 
-					return { item: hierarchicalName, source: type, rank: normalizedRank };
-				})
-				.filter((item) => item.rank < 0) // Exclude no match
-				.sort((a, b) => a.rank - b.rank) // Sort by rank
-				.slice(0, maxResults); // Limit results to top 5
+					// penalize longer matches
+					normalizedRank += hierarchicalName.length / searchTerms[0].length;
+
+					const newItem = { item: hierarchicalName, source: type, rank: normalizedRank };
+
+					// Maintain top 5 results using a sorted insertion approach
+					if (
+						topResults.length < maxResults ||
+						newItem.rank < topResults[topResults.length - 1].rank
+					) {
+						topResults.push(newItem); // Add new item
+						topResults.sort((a, b) => a.rank - b.rank); // Sort descending by rank
+						if (topResults.length > maxResults) topResults.pop(); // Ensure only top 5 are kept
+					}
+				}
+			});
+
+			return topResults; // Return the top results, up to 5
 		};
 
 		let cityResults = searchAndRank(allCities, ['name', 'countryCode', 'stateCode'], 'city');
 		let stateResults = searchAndRank(allStates, ['name', 'countryCode'], 'state');
 		let countryResults = searchAndRank(allCountries, ['name'], 'country');
 
-		// Merge and directly return the top sorted results
-		results = [...cityResults, ...stateResults, ...countryResults].sort((a, b) => a.rank - b.rank);
+		// Merge and directly return the top sorted results, up to 5
+		let combinedResults = [...cityResults, ...stateResults, ...countryResults];
+		combinedResults.sort((a, b) => a.rank - b.rank); // Sort descending by rank
+		results = combinedResults.slice(0, 5); // Return top 5 results
 	}
 	return new Response(JSON.stringify(results));
 }

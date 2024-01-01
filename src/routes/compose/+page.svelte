@@ -15,6 +15,7 @@
 	import modal, { getModalMap, handlePopover } from '$lib/ui/modal';
 	import type EditorJS from '@editorjs/editorjs';
 	import { handleAutocomplete } from '$lib/data/select';
+	import TextField from '$components/input/TextField.svelte';
 
 	let postButtonHovered = writable(false);
 	let sessionStore: Writable<UserState>;
@@ -22,12 +23,16 @@
 	let recipientEmails = [] as Descriptor<string>[];
 	let topics = [] as Descriptor<string>[];
 
+	let locationString = '';
+
 	let suggestedRecipientEmails = [] as Descriptor<string>[];
 	let suggestedTopics = [] as Descriptor<string>[];
+	let suggestedLocations = [] as Descriptor<string>[] | null;
 
 	let editor: EditorJS;
 	let topicInput: HTMLInputElement;
 	let recipientInput: HTMLInputElement;
+	let locationInput: HTMLInputElement;
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
@@ -164,7 +169,7 @@
 					inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
 					tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500 m-2 w-fit"
 					inputVisible={true}
-					autocompleteStyle="left-0 bg-peacockFeather-600 text-paper-500"
+					autocompleteStyle="absolute left-0 top-[75%] bg-peacockFeather-600 text-paper-500"
 					bind:searchResults={suggestedTopics}
 					on:autocomplete={async (e) => {
 						suggestedTopics = await handleAutocomplete(e);
@@ -191,21 +196,23 @@
 					class="w-42 h-fit p-1.5 bg-artistBlue-700 focus:outline-peacockFeather-500 text-paper-500 rounded"
 				/>
 			</span>
-			<span class="py-1 flex flex-wrap gap-5 w-fit rounded">
-				<input
-					required
-					autocomplete="off"
-					type="text"
-					aria-label="Subject line"
-					aria-describedby="Enter a subject line for your email"
-					on:keypress={(e) => {
-						if (e.key == 'Enter') {
-							e.preventDefault();
-						}
+			<span class="py-1 relative">
+				<TextField
+					bind:inputField={locationInput}
+					bind:searchResults={suggestedLocations}
+					bind:value={locationString}
+					placeholder="Search location..."
+					autocomplete={true}
+					searchSource="location"
+					autocompleteStyle="absolute left-0 top-[100%] bg-peacockFeather-600 text-paper-500"
+					style="rounded p-1.5 text-left whitespace-nowrap bg-peacockFeather-700 text-paper-500 focus:outline-peacockFeather-500 transition-colors duration-200"
+					on:blur={(e) => {
+						suggestedLocations = [];
 					}}
-					name="location"
-					placeholder="City, state, country"
-					class="w-42 h-fit p-1.5 bg-artistBlue-700 focus:outline-peacockFeather-500 text-paper-500 rounded"
+					on:autocomplete={async (e) => {
+						suggestedLocations = null;
+						suggestedLocations = await handleAutocomplete(e);
+					}}
 				/>
 			</span>
 		</div>

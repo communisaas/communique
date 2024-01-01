@@ -173,9 +173,7 @@
 	}
 
 	.tab {
-		filter: drop-shadow(
-			0 0 0 theme('colors.artistBlue.500')
-		); // positioning breaks if this is removed
+		position: relative;
 		z-index: 10;
 		min-width: 0;
 

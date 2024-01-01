@@ -20,7 +20,6 @@
 	let completionListElement: HTMLUListElement | null = null;
 	let completionItems: HTMLDivElement[] = [];
 
-	let currentValue = value; // Ensure the placeholder is considered in initial width calculation
 	const originalValue = value;
 	let mirror: HTMLSpanElement;
 	let completionFocusIndex: number = 0;
@@ -31,7 +30,7 @@
 	function updateSize() {
 		if (inputField && mirror) {
 			// Update mirror content for width calculation
-			mirror.textContent = currentValue || placeholder;
+			mirror.textContent = value || placeholder;
 			mirror.style.width = 'auto'; // Allow it to expand as needed for content
 			width = `${mirror.offsetWidth + 16}px`;
 
@@ -49,8 +48,21 @@
 	}
 
 	function resolveCompletion(completion: Descriptor<string>) {
-		currentValue = completion.item;
+		value = completion.item;
 		searchResults = searchResults.filter((result) => result.item !== completion.item);
+		dispatch('update', completion);
+	}
+
+	async function handleBlur(e: FocusEvent) {
+		if (!completionListElement.contains(e.relatedTarget as Node) || !autocomplete) {
+			searching = false;
+			if (inputField && inputField.value.trim().length === 0) {
+				value = originalValue;
+				updateSize();
+			}
+			searchResults = [];
+			dispatch('blur', e.detail);
+		}
 	}
 
 	function handleInput() {
@@ -73,7 +85,7 @@
 		updateSize();
 	});
 
-	$: currentValue, updateSize();
+	$: value, updateSize();
 
 	$: if (searchResults) {
 		searching = false;
@@ -126,7 +138,7 @@
 
 <!-- Invisible mirror span to calculate width -->
 <div class="mirror" bind:this={mirror}>
-	{currentValue}
+	{value}
 </div>
 
 {#if type === 'text'}
@@ -135,19 +147,13 @@
 		id={name}
 		{name}
 		bind:this={inputField}
-		bind:value={currentValue}
+		bind:value
 		type="text"
 		{required}
 		{placeholder}
 		class="max-w-[80vw] {style}"
 		on:input={handleInput}
-		on:blur={(e) => {
-			if (inputField && inputField.value.trim().length === 0) {
-				currentValue = originalValue;
-				updateSize();
-			}
-			dispatch('blur', e);
-		}}
+		on:blur={handleBlur}
 		on:focus
 	/>
 {:else if type === 'textarea'}
@@ -155,7 +161,7 @@
 		id={name}
 		{name}
 		bind:this={inputField}
-		bind:value={currentValue}
+		bind:value
 		{required}
 		{placeholder}
 		class="max-w-[80vw] {style}"
@@ -163,7 +169,7 @@
 		on:input={updateSize}
 		on:blur={(e) => {
 			if (inputField && inputField.value.trim().length === 0) {
-				currentValue = originalValue;
+				value = originalValue;
 				updateSize();
 			}
 		}}

@@ -170,8 +170,8 @@
 			if (tagList.length > 0) {
 				inputVisible = false;
 				inputValueWidth = '0px';
+				searchResults = [];
 			}
-			searchResults = [];
 			validityMessage = null;
 			dispatch('blur', e.detail);
 		}
@@ -248,6 +248,7 @@
 					<span
 						role="listitem"
 						class="relative h-full shrink flex whitespace-nowrap"
+						title={tag.item}
 						on:mouseenter={() => (deleteVisible[tag.item] = true)}
 						on:mouseleave={() => (deleteVisible[tag.item] = false)}
 						on:touchend={() => (deleteVisible[tag.item] = false)}
@@ -279,7 +280,7 @@
 							type="button"
 							on:click|stopPropagation={(e) => {
 								tagList = tagList.filter((item) => item != tag);
-								if (autocomplete) searchResults = [tag, ...searchResults];
+								if (autocomplete && inputVisible) searchResults = [tag, ...searchResults];
 								if (tagList.length < 1 || inputVisible) inputField.focus();
 								dispatch('delete', tag);
 							}}

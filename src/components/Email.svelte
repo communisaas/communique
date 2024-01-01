@@ -567,7 +567,7 @@
 						class:scrollable={scrollPosition.header.remainingWidth > 0}
 						class:scrolled={scrollPosition.header.x > 1}
 						class:scrolled__max={scrollPosition.header.remainingWidth - scrollPosition.header.x < 1}
-						class="inline-block mr-1 w-full text-left xs:text-xl text-base"
+						class="inline-block mr-1 w-full text-left text-xl"
 					>
 						{item.subject}
 					</h1>
@@ -592,7 +592,7 @@
 					>
 						<icon
 							aria-label="Envelope"
-							class="sm:max-w-[36px] max-w-[32px]"
+							class="max-w-[36px] pb-[0.05rem]"
 							style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
 						>
 							<SentIcon color="#94D2BD" />
@@ -618,7 +618,7 @@
 						<Selector
 							selectable={Tag}
 							items={item.topic_list}
-							itemStyle="text-sm text-paper-500 bg-peacockFeather-500"
+							itemStyle="text-base xs:text-sm text-paper-500 bg-peacockFeather-500"
 							selectorStyle="pt-2 max-w-full md:flex-wrap"
 							alignment="start"
 							overflow={expand ? 'wrap' : 'auto'}
@@ -636,7 +636,7 @@
 						<Selector
 							selectable={Tag}
 							items={item.recipient_list}
-							itemStyle="text-sm text-paper-500 bg-peacockFeather-600"
+							itemStyle="text-base xs:text-sm text-paper-500 bg-peacockFeather-600"
 							selectorStyle="pt-1 max-w-full md:flex-wrap"
 							alignment="start"
 							overflow={expand ? 'wrap' : 'auto'}

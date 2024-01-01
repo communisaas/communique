@@ -1,37 +1,46 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { getFlagEmoji } from '$lib/ui/ux';
 	import { getCountryForTimezone } from 'countries-and-timezones';
+	import { Country } from 'country-state-city';
 	import { onMount } from 'svelte';
 	import TextField from './input/TextField.svelte';
 	import { handleAutocomplete } from '$lib/data/select';
+	import type { Writable } from 'svelte/store';
 
 	export let style = '';
 	export let country = '';
 	export let countryCode = '';
 
 	let timezone: string;
+	let locationString: string;
 	let locationInputField: HTMLInputElement;
 	let searchResults: Descriptor<string>[] | null = [];
 
-	onMount(() => {
+	let sessionStore: Writable<UserState>;
+	onMount(async () => {
+		sessionStore = (await import('$lib/data/sessionStorage')).store;
 		timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 		const countryInfo = getCountryForTimezone(timezone);
-		country = countryInfo?.name || 'United States';
-		countryCode = countryInfo?.id || 'US';
+		countryCode = $sessionStore.country || countryInfo?.id || 'US';
+		$sessionStore.country = $sessionStore.country || countryCode;
+		locationString = $sessionStore.location || '';
 	});
+
+	$: if (country || countryCode) {
+		country = Country.getCountryByCode(countryCode ?? $sessionStore.country)?.name || country;
+	}
 </script>
 
 <!-- TODO resolve location across languages -->
 {#if country}
 	<div
-		class="group h-full relative rounded hover:bg-peacockFeather-600 transition-colors duration-200 cursor-context-menu px-1"
+		class="group h-full relative hover:bg-peacockFeather-600 transition-colors duration-200 cursor-context-menu px-1"
 	>
 		<span class="text-paper-700 flex flex-col items-center justify-around {style}">
-			<span class="mt-auto text-2xl md:text-3xl leading-[0.8] md:leading-[0.8] pt-1"
-				>{getFlagEmoji(countryCode)}</span
+			<span class="text-3xl leading-[0.8] pt-1.5">{getFlagEmoji(countryCode)}</span>
+			<span class="mb-auto text-xs leading-none md:leading-none pb-1 whitespace-nowrap"
+				>{country}</span
 			>
-			<span class="mb-auto text-xs md:text-sm leading-none md:leading-none pb-1">{country}</span>
 		</span>
 		<div
 			role="menu"
@@ -41,11 +50,12 @@
 				<TextField
 					bind:inputField={locationInputField}
 					bind:searchResults
+					bind:value={locationString}
 					placeholder="search location..."
 					autocomplete={true}
 					searchSource="location"
 					autocompleteStyle="absolute max-h-80 overflow-y-auto top-[80%] left-[0.25rem] bg-peacockFeather-600 text-paper-500"
-					style="rounded px-1.5 py-1 min-w-full text-left whitespace-nowrap bg-peacockFeather-600 transition-colors duration-200"
+					style="rounded px-1.5 py-1 min-w-full text-left whitespace-nowrap bg-peacockFeather-600 focus:outline-peacockFeather-500 transition-colors duration-200"
 					on:focus={(e) => {
 						let menuDiv = locationInputField ? locationInputField.parentNode?.parentNode : null;
 						if (menuDiv) {
@@ -60,10 +70,17 @@
 							menuDiv.style.top = '';
 							menuDiv.style.width = '';
 						}
+						$sessionStore.country = countryCode;
+						$sessionStore.location = locationInputField.value;
 					}}
 					on:autocomplete={async (e) => {
 						searchResults = null;
 						searchResults = await handleAutocomplete(e);
+					}}
+					on:update={(e) => {
+						countryCode = e.detail.item.includes(',')
+							? e.detail.item.split(',').pop().trim()
+							: Country.getAllCountries().find((c) => c.name === e.detail.item)?.isoCode;
 					}}
 				/>
 			</ul>
