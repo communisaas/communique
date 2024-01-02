@@ -25,6 +25,7 @@
 		header: { x: 0, remainingWidth: 0, startX: 0, startScrollLeft: 0 },
 		card: { x: 0, remainingWidth: 0, startX: 0, startScrollLeft: 0 }
 	};
+
 	let header: HTMLHeadingElement;
 	let card: HTMLElement;
 	let menu: HTMLElement;
@@ -360,18 +361,6 @@
 	});
 
 	afterUpdate(() => {
-		if (
-			scrollToCard &&
-			!$sessionStore.hiddenEmails.includes(item.shortid) &&
-			!showMenu &&
-			!remove
-		) {
-			// TODO more contextual fix for resolving pending events after DOM update
-			setTimeout(() => {
-				card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-			});
-			scrollToCard = false;
-		}
 		if (card && header) {
 			scrollableElements = { card, header };
 			updateScrollableElements(scrollableElements), 100;
@@ -443,6 +432,19 @@
 		if (remove) {
 			handleRemove({ background: false });
 		}
+	}
+
+	$: if (
+		scrollToCard &&
+		!$sessionStore.hiddenEmails.includes(item.shortid) &&
+		!showMenu &&
+		!remove
+	) {
+		// TODO more contextual fix for resolving pending events after DOM update
+		setTimeout(() => {
+			card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+		});
+		scrollToCard = false;
 	}
 </script>
 

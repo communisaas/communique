@@ -108,9 +108,10 @@
 			inputField.reportValidity();
 		} else {
 			tagList = [...tagList, tag];
-			searchResults = searchResults.filter((result) => result.item !== tag.item);
+			if (searchResults) searchResults = searchResults.filter((result) => result.item !== tag.item);
 			dispatch('add', tag);
 		}
+		updateInputWidth();
 	}
 
 	async function handleInput(e: InputEvent) {
@@ -155,7 +156,7 @@
 		// Iterate over the extracted emails and call handleSubmit for each email
 		for (const email of deduplicatedEmails) {
 			inputField.value = email; // Set the inputField value to the current email
-			handleSubmit(); // Call handleSubmit
+			handleSubmit();
 		}
 
 		if (deduplicatedEmails.length != extractedEmails.length) {
@@ -178,40 +179,40 @@
 	}
 
 	function handleSubmit() {
+		// Clear any previous custom validity messages
 		inputField.setCustomValidity('');
-		if (searching && !groupedResults) return;
-		else if (searching && type === 'search') {
+
+		// Check if still searching for autocomplete results
+		if (searching && !allowCustomValues) {
 			inputField.setCustomValidity('Still searching! Wait for results...');
 			inputField.reportValidity();
-			return;
+			return; // Exit early since we're still searching
 		}
 
-		if (autocomplete) {
-			if (
-				inputField.value.length > 0 &&
-				!allowCustomValues &&
-				!filteredSearchResults.some((result) => result.item === inputField.value)
-			) {
+		// Validate input for autocomplete or minimum length requirement
+		if (autocomplete && inputField.value.length > 0) {
+			const isResultAvailable = filteredSearchResults.some(
+				(result) => result.item === inputField.value
+			);
+
+			if (!allowCustomValues && !isResultAvailable) {
+				// No matching autocomplete result and custom values aren't allowed
 				inputField.setCustomValidity('Nothing here! Try adding it?');
-				inputField.reportValidity();
-				searchResults = [];
-			} else if (inputField.checkValidity()) {
-				if (autocomplete) {
-					if (completionFocusIndex >= 0) {
-						addTag(flatGroupedResults[completionFocusIndex]);
-					} else {
-						addTag({ item: inputField.value, type: type });
-					}
-				} else {
-					addTag({ item: inputField.value, type: type });
-				}
-			} else {
-				inputField.reportValidity();
-			}
+			} else if (completionFocusIndex >= 0) {
+				// A valid autocomplete result is selected
+				addTag(flatGroupedResults[completionFocusIndex]);
+				return;
+			} // else continue to add the input as a new tag below
 		} else if (inputField.value.length < 3) {
+			// Input is too short and not in autocomplete mode
 			inputField.setCustomValidity('Too short!');
+		}
+
+		// Check and report any validity issues before proceeding
+		if (!inputField.checkValidity()) {
 			inputField.reportValidity();
 		} else {
+			// If all checks passed, add the tag
 			addTag({ item: inputField.value, type: type });
 		}
 	}
@@ -233,7 +234,7 @@
 <div class="px-2 rounded max-w-full h-max items-center justify-center {style}">
 	<form
 		autocomplete="off"
-		class="flex flex-nowrap max-w-full"
+		class="flex flex-nowrap max-w-full w-fit"
 		on:submit|preventDefault={() => {
 			handleSubmit();
 		}}
@@ -300,7 +301,7 @@
 				</li>
 			{/each}
 		</ul>
-		<li class="flex gap-3 justify-center ml-auto flex-wrap items-center relative">
+		<li class="flex justify-center ml-auto flex-wrap items-center relative">
 			<!-- Hidden mirror span for calculating input width -->
 			<span bind:this={mirror} class="mirror" />
 			<input
@@ -308,7 +309,7 @@
 				{name}
 				role="textbox"
 				aria-label="{name} input"
-				aria-describedby="Add a {name} here"
+				aria-describedby="Add {name} here"
 				{placeholder}
 				inputmode={type}
 				bind:this={inputField}
@@ -367,13 +368,13 @@
 				{type}
 			/>
 			{#if validityMessage}
-				<Tooltip message={validityMessage} style="top-[75%] left-[100%] text-xs" />
+				<Tooltip message={validityMessage} style="top-[75%] left-28 text-xs" />
 			{/if}
 			<ul
 				bind:this={completionListElement}
 				class="flex flex-col w-max max-w-[50vw] z-20 {autocompleteStyle}"
-				class:py-2={searchResults && searchResults.length > 0}
-				class:px-4={searchResults && searchResults.length > 0}
+				class:py-2={filteredSearchResults && filteredSearchResults.length > 0}
+				class:px-4={filteredSearchResults && filteredSearchResults.length > 0}
 				on:mouseleave={() => (completionFocusIndex = -1)}
 			>
 				{#if searching}

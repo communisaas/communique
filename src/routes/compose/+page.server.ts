@@ -1,9 +1,9 @@
-import { AUTH_SECRET, TINYMCE_KEY } from '$env/static/private';
+import { AUTH_SECRET } from '$env/static/private';
 import { v4 as uuidv4 } from 'uuid';
-import type { RequestEvent, PageServerLoad } from './$types';
+import type { RequestEvent } from './$types';
 
 import { objectMapper } from '$lib/data/database';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { EmailForm } from '$lib/data/email';
 import { decode } from '@auth/core/jwt';
 
@@ -20,7 +20,7 @@ export const actions = {
 		});
 
 		if (!jwt) {
-			return fail(401, { name: 'Invalid auth token!' });
+			throw redirect(302, `/sign/in?callbackUrl=/compose`);
 		}
 
 		// TODO filter compose submissions through openAI API:
@@ -50,9 +50,6 @@ export const actions = {
 		if (!('shortid' in formSubmission.keys())) {
 			formSubmission.set('shortid', stagingID.slice(-8));
 		}
-		for (const [field, value] of formSubmission.entries()) {
-			console.log(field, value);
-		}
 
 		const emailForm = new EmailForm(
 			formSubmission,
@@ -63,8 +60,6 @@ export const actions = {
 		} catch (error) {
 			return fail(400, { name: error.toString(), missing: true });
 		}
-
-		console.log('shortid', emailForm.inputFields.shortid);
 
 		await objectMapper.$transaction(
 			async (tx) => {
@@ -148,9 +143,3 @@ export const actions = {
 		return { type: 'success', status: 200, postID: stagingID.slice(-8) };
 	}
 };
-
-export const load = (async () => {
-	return {
-		editorKey: process.env.TINYMCE_KEY || TINYMCE_KEY
-	};
-}) satisfies PageServerLoad;

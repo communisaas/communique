@@ -1,10 +1,14 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import Paragraph from '@editorjs/paragraph';
 	import type EditorJS from '@editorjs/editorjs';
 	import { Signature } from './editorPlugins/signature';
+	import type { OutputData } from '@editorjs/editorjs';
 
 	export let editor: EditorJS;
+	export let data: OutputData = { blocks: [] };
+
+	const dispatch = createEventDispatcher();
 
 	const editorID = 'editor';
 	onMount(async () => {
@@ -22,6 +26,10 @@
 					class: Signature,
 					inlineToolbar: false
 				}
+			},
+			data: data,
+			onChange: (api, data) => {
+				dispatch('change', data);
 			}
 		});
 	});

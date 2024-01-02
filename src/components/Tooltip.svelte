@@ -5,7 +5,7 @@
 </script>
 
 {#if message}
-	<div role="tooltip" on:click on:keypress class="tooltip {style}">
+	<div role="tooltip" class="tooltip {style}">
 		{message}
 	</div>
 {/if}
@@ -22,6 +22,5 @@
 		transform: translateX(-50%);
 		white-space: nowrap;
 		z-index: 100;
-		/* Add more styling as needed */
 	}
 </style>

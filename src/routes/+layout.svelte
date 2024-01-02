@@ -7,7 +7,6 @@
 	import Navigation from '$components/Navigation.svelte';
 
 	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
-	import { signIn, signOut } from '@auth/sveltekit/client';
 	import type { topic } from '@prisma/client';
 	import Locator from '$components/Locator.svelte';
 	import Selector from '$components/Selector.svelte';
@@ -37,6 +36,7 @@
 				confirm: false
 			};
 		}
+		console.log(window.location.hash);
 		if (window.location.hash === '#terms-of-use') {
 			$sessionStore.show.termsOfUse = true;
 		} else if (window.location.hash === '#privacy-policy') {
@@ -46,7 +46,6 @@
 		} else if (window.location.hash === '#confirm') {
 			$sessionStore.show.confirm = true;
 		} else if (window.location.hash === '#geolocator') {
-			console.log('set');
 			$sessionStore.show.geolocator = true;
 		} else {
 			dispatch('popover', false);
@@ -75,6 +74,7 @@
 			$sessionStore.hiddenEmails = $sessionStore.user.ignored_email_list ?? [];
 		}
 
+		$sessionStore.composer = $sessionStore.composer || {};
 		$sessionStore.topic = $sessionStore.topic || { id: topicNames[0], type: 'topic' };
 		$sessionStore.recipient = $sessionStore.recipient || {
 			id: '',
@@ -116,9 +116,8 @@
 	>
 		<Navigation bind:collapsed={navCollapsed} />
 	</div>
-
 	<div
-		class="relative flex flex-col min-h-full xl:w-full overflow-hidden"
+		class="relative flex flex-col min-h-full w-full overflow-hidden"
 		class:min-w-full={navCollapsed}
 	>
 		<header

@@ -22,11 +22,7 @@ async function authorize({ event, resolve }) {
 
 		if (!jwt) {
 			// Redirect or throw an error if no JWT or invalid JWT for protected paths
-			if (
-				event.url.pathname.startsWith('/data') ||
-				event.url.pathname.startsWith('/compose') ||
-				event.url.pathname.startsWith('/profile')
-			) {
+			if (event.url.pathname.startsWith('/data') || event.url.pathname.startsWith('/profile')) {
 				redirect(302, `/sign/in?callbackUrl=${event.url.pathname}`);
 			}
 		} else {
@@ -53,10 +49,7 @@ async function authorize({ event, resolve }) {
 
 	// Session handling and redirection for specific paths
 	const session = await event.locals.getSession();
-	if (
-		!session &&
-		(event.url.pathname.startsWith('/compose') || event.url.pathname.startsWith('/profile'))
-	) {
+	if (!session && event.url.pathname.startsWith('/profile')) {
 		throw redirect(302, `/sign/in?callbackUrl=${event.url.pathname}`);
 	}
 
