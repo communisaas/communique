@@ -22,7 +22,7 @@
 
 	$: if ($sessionStore && $sessionStore.template && $sessionStore.hiddenEmails) {
 		for (const templateName in $sessionStore.template)
-			if ($sessionStore.template[templateName].cardList !== null)
+			if (Array.isArray($sessionStore.template[templateName].cardList))
 				$sessionStore.template[templateName].cardList = $sessionStore.template[
 					templateName
 				].cardList.filter((card: email) => !$sessionStore.hiddenEmails.includes(card.shortid));

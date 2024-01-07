@@ -5,7 +5,7 @@ export class Signature {
 	static get toolbox() {
 		return {
 			title: 'Signature',
-			icon: '<svg width="17" height="15" viewBox="0 0 336 276" xmlns="http://www.w3.org/2000/svg"><path d="M291 150V79c0-19-15-34-34-34H79c-19 0-34 15-34 34v42l67-44 81 72 56-29 42 30zm0 52l-43-30-56 30-81-67-66 39v23c0 19 15 34 34 34h178c17 0 31-13 34-29zM79 0h178c44 0 79 35 79 79v118c0 44-35 79-79 79H79c-44 0-79-35-79-79V79C0 35 35 0 79 0z"/></svg>'
+			icon: '<svg width="25" height="28" viewBox="0 0 25 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 22L6.44609 18.6258C6.87107 17.6342 8.33485 17.8463 8.46091 18.9177V18.9177C8.69916 20.9428 11.0491 21.9409 12.6719 20.7062L14.6876 19.1725C15.2209 18.7667 15.9481 18.7282 16.5214 19.0754L20.3836 21.4151C21.7299 22.2306 23.4854 21.5967 24 20.1091V20.1091" stroke="#D7FEF0" stroke-width="1.5"/><path d="M2 2H21V16H22V1H1V27H22V26H2V2Z" stroke="#D7FEF0"/><line x1="4" y1="5.75" x2="6" y2="5.75" stroke="#D7FEF0" stroke-width="2.5"/><line x1="12" y1="5.75" x2="17" y2="5.75" stroke="#D7FEF0" stroke-width="2.5"/><line x1="7" y1="5.75" x2="11" y2="5.75" stroke="#D7FEF0" stroke-width="2.5"/></svg>'
 		};
 	}
 

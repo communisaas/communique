@@ -1,51 +1,48 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
-	import Paragraph from '@editorjs/paragraph';
-	import type EditorJS from '@editorjs/editorjs';
-	import { Signature } from './editorPlugins/signature';
-	import type { OutputData } from '@editorjs/editorjs';
+	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+	import { createEditor, type LexicalEditor } from 'lexical';
+	import { registerPlainText } from '@lexical/plain-text';
+	import { registerUpdateListener, canShowPlaceholder, currentState } from './editor';
 
-	export let editor: EditorJS;
-	export let data: OutputData = { blocks: [] };
+	export let editor: LexicalEditor;
 
+	let root: HTMLDivElement;
 	const dispatch = createEventDispatcher();
 
 	const editorID = 'editor';
+	let removeUpdateListener: () => void;
 	onMount(async () => {
-		const EditorJS = await import('@editorjs/editorjs').then((m) => m.default);
-		editor = new EditorJS({
-			holder: editorID,
-			hideToolbar: true,
-			placeholder: 'Write a letter here...',
-			tools: {
-				paragraph: {
-					class: Paragraph,
-					inlineToolbar: false
-				},
-				signature: {
-					class: Signature,
-					inlineToolbar: false
-				}
-			},
-			data: data,
-			onChange: (api, data) => {
-				dispatch('change', data);
-			}
+		editor = createEditor({ editable: true });
+		editor.setRootElement(document.getElementById(editorID));
+		registerPlainText(editor);
+		if ($currentState !== null) editor.setEditorState($currentState);
+
+		removeUpdateListener = registerUpdateListener(editor, (domString) => {
+			dispatch('update', { domString });
 		});
+	});
+
+	onDestroy(() => {
+		removeUpdateListener();
 	});
 </script>
 
-<main
-	aria-label="Email editor"
-	aria-describedby="Write your email here"
-	class="relative flex flex-col w-full h-full items-start bg-artistBlue-600 p-5 md:px-20"
->
+<main class="relative flex flex-col w-full h-full items-start bg-artistBlue-600 p-5 md:px-20">
 	<div
+		bind:this={root}
+		contenteditable="true"
 		aria-label="Email editor"
-		aria-describedby="Write your email here"
-		class="relative w-full self-start bg-artistBlue-600 [&>*[data-placeholder]]:text-paper-500 max-w-7xl text-paper-500 px-5 min-h-[20vh]"
-		id="editor"
+		aria-describedby="Write a letter here"
+		class="relative w-full self-start bg-artistBlue-600 focus:outline-peacockFeather-500 [&>*[data-placeholder]]:text-paper-500 max-w-7xl text-paper-500 px-1 min-h-[20vh]"
+		id={editorID}
 	/>
+	{#if $canShowPlaceholder}
+		<div
+			class="absolute pointer-events-none top-5 left-6 w-full h-full flex items-start justify-start cursor-text"
+		>
+			<p class="text-paper-900 opacity-70 text-base">Write a letter here...</p>
+		</div>
+	{/if}
 </main>
 
 <style lang="scss">

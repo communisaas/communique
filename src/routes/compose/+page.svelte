@@ -88,7 +88,7 @@
 
 				if (!$page.data.session) {
 					signIn({ callbackUrl: '/compose', redirect: false });
-					submitter.innerHTML = 'Opening login...';
+					return;
 				} else {
 					submitter.innerHTML = 'Posting...';
 				}
@@ -258,12 +258,15 @@
 					bind:editor
 					on:change={async () => {
 						editorBlocks = await editor.save();
-						postButton.innerHTML = initialSubmitterState;
+						if (initialSubmitterState) postButton.innerHTML = initialSubmitterState;
 					}}
 				/>
 			</span>
 
-			<div class="ml-5 mt-8 md:ml-20 flex flex-col">
+			<div class="ml-5 mt-8 md:ml-20 flex flex-col relative">
+				{#if !$page.data.session}
+					<p class="italic text-paper-500 -top-7 left-1 absolute">Sign in first.</p>
+				{/if}
 				<button
 					bind:this={postButton}
 					type="submit"
@@ -283,9 +286,6 @@
 					<span class="w-14 -mr-2"><Post hovered={$postButtonHovered} /></span>
 					Post
 				</button>
-				{#if !$page.data.session}
-					<p class="italic text-paper-500 pt-2">Sign in first.</p>
-				{/if}
 			</div>
 		</form>
 	{/if}
