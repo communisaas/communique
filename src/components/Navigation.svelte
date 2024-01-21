@@ -75,9 +75,10 @@
 						{#if $page.data.session.user?.image}
 							<img src={$page.data.session.user.image} alt="avatar" class="h-10 w-10" />
 						{/if}
+						<!-- TODO move login/profile to bottom of navbar -->
 						<div
 							role="menu"
-							class="absolute h-fit z-40 left-0 w-0 bottom-[200%] group-hover:w-auto group-hover:top-[100%] bg-peacockFeather-700 text-paper-500 shadow-lg"
+							class="absolute h-fit z-40 left-0 w-0 bottom-[200%] group-hover:w-auto group-hover:top-[100%] bg-artistBlue-700 text-paper-500 shadow-md"
 						>
 							<ul class="flex flex-col items-start space-y-1 xs:text-base my-2">
 								<button

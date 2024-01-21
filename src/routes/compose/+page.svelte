@@ -3,6 +3,7 @@
 	import Editor from '$components/input/Editor.svelte';
 	import AddRecipient from '$components/icon/Recipient.svelte';
 	import AddTopic from '$components/icon/Topic.svelte';
+	import AddSignature from '$components/icon/Signature.svelte';
 	import Post from '$components/icon/Post.svelte';
 
 	import { writable, type Writable } from 'svelte/store';
@@ -11,12 +12,16 @@
 	import { onMount } from 'svelte';
 	import Modal from '$components/Modal.svelte';
 	import modal, { getModalMap, handlePopover } from '$lib/ui/modal';
-	import type EditorJS from '@editorjs/editorjs';
 	import { handleAutocomplete } from '$lib/data/select';
 	import TextField from '$components/input/TextField.svelte';
 	import { goto } from '$app/navigation';
 	import { signIn } from '@auth/sveltekit/client';
 	import type { OutputData } from '@editorjs/editorjs';
+	import type { LexicalEditor } from 'lexical';
+	import { scale } from 'svelte/transition';
+	import Tooltip from '$components/Tooltip.svelte';
+	import { addSignature, isNodeTypePresent, removeNodeType } from '$components/input/editor';
+	import { SignatureNameNode, SignatureNode } from '$components/input/editorPlugins/signature';
 
 	let postButtonHovered = writable(false);
 	let sessionStore: Writable<UserState>;
@@ -29,15 +34,19 @@
 	let subjectLine = '';
 	let locationString = '';
 
+	let bodyCharacterCount = 0;
+
 	let suggestedRecipientEmails = [] as Descriptor<string>[];
 	let suggestedTopics = [] as Descriptor<string>[];
 	let suggestedLocations = [] as Descriptor<string>[] | null;
 
-	let editor: EditorJS;
+	let editor: LexicalEditor;
 	let topicInput: HTMLInputElement;
 	let recipientInput: HTMLInputElement;
 	let locationInput: HTMLInputElement;
 	let editorBlocks: OutputData;
+	let showSignatureTooltip = false;
+	let signatureExists = false;
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
@@ -61,8 +70,13 @@
 	}
 
 	$: if (editor && editorBlocks && editorBlocks.blocks.length > 0 && !editor.focus) {
-		editor.isReady.then(() => editor.render(editorBlocks));
 		initialSubmitterState = postButton.innerHTML;
+	}
+
+	function extractText(htmlString: string) {
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(htmlString, 'text/html');
+		return doc.body.textContent || '';
 	}
 </script>
 
@@ -99,14 +113,8 @@
 				formData.set('author_email', $sessionStore.user.email);
 
 				// validate email length
-				let runningBodyLength = 0;
-				for (const block of composerData.blocks) {
-					if (block.type === 'paragraph') {
-						runningBodyLength += block.data.text.length;
-					}
-				}
-				if (runningBodyLength < 250) {
-					submitter.innerHTML = `Email has ${runningBodyLength} characters... Try for at least 250.`;
+				if (bodyCharacterCount < 250) {
+					submitter.innerHTML = `Email has ${bodyCharacterCount} characters... Try for at least 250.`;
 					setTimeout(() => {
 						if (submitter && initialSubmitterState) submitter.innerHTML = initialSubmitterState;
 					}, 5000);
@@ -181,8 +189,8 @@
 						searchSource="recipient"
 						placeholder="Recipient"
 						style="h-14 w-fit bg-peacockFeather-700"
-						inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
-						tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-600 text-paper-500 m-2 w-fit"
+						inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500 shadow-md"
+						tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-600 text-paper-500 w-fit"
 						inputVisible={$sessionStore.composer.recipientEmails.length <= 0 ||
 							document.activeElement === recipientInput}
 						bind:searchResults={suggestedRecipientEmails}
@@ -200,7 +208,7 @@
 						searchSource="topic"
 						placeholder="Topic"
 						style="h-14 w-fit bg-peacockFeather-700"
-						inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
+						inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500 shadow-md"
 						tagStyle="text-xs px-1 py-1 rounded bg-peacockFeather-500 text-paper-500 m-2 w-fit"
 						inputVisible={$sessionStore.composer.topics.length <= 0 ||
 							document.activeElement === topicInput}
@@ -214,7 +222,7 @@
 					</TagInput>
 				</span>
 
-				<span class="py-1 flex flex-wrap gap-5 w-fit rounded">
+				<span class="flex flex-wrap gap-5 w-fit rounded">
 					<input
 						bind:value={subjectLine}
 						required
@@ -232,7 +240,7 @@
 						class="w-42 h-fit p-1.5 bg-artistBlue-700 focus:outline-peacockFeather-500 text-paper-500 rounded"
 					/>
 				</span>
-				<span class="py-1 relative">
+				<span class="relative">
 					<TextField
 						bind:inputField={locationInput}
 						bind:searchResults={suggestedLocations}
@@ -253,14 +261,71 @@
 				</span>
 			</div>
 
-			<span class="mt-8">
+			<span class="mt-8 relative">
 				<Editor
+					style="max-w-5xl"
 					bind:editor
-					on:change={async () => {
-						editorBlocks = await editor.save();
+					on:change={async (e) => {
+						bodyCharacterCount = extractText(e.detail.domString).length;
+						console.log(editor);
 						if (initialSubmitterState) postButton.innerHTML = initialSubmitterState;
 					}}
-				/>
+					on:update={(e) => {
+						if (signatureExists && !isNodeTypePresent(SignatureNameNode)) {
+							editor.update(() => {
+								removeNodeType(SignatureNode);
+							});
+						}
+						signatureExists = isNodeTypePresent(SignatureNameNode);
+					}}
+				>
+					<div class="flex">
+						{#if bodyCharacterCount > 0}
+							<button
+								type="button"
+								class="bg-artistBlue-800 hover:bg-artistBlue-700 p-2 flex relative items-center justify-center rounded"
+								transition:scale={{ duration: 100 }}
+								on:click={() => {
+									editor.update(() => {
+										addSignature(editor, 'Sincerely,', '*sender name*', '*sender location*', true);
+									});
+								}}
+								on:mouseenter={() => {
+									showSignatureTooltip = true;
+								}}
+								on:mouseleave={() => {
+									showSignatureTooltip = false;
+								}}
+								on:focus={() => {
+									showSignatureTooltip = true;
+								}}
+								on:blur={() => {
+									showSignatureTooltip = false;
+								}}
+							>
+								<icon class="w-6 -mr-1 inline-block transition-all origin-center">
+									<AddSignature />
+								</icon>
+								{#if showSignatureTooltip}
+									<Tooltip
+										message="Add signature"
+										style="absolute bg-peacockFeather-700 -bottom-6 left-12 mr-2"
+									/>
+								{/if}
+							</button>
+						{/if}
+					</div>
+				</Editor>
+
+				<div class="w-full relative max-w-[calc(64rem+5rem)] right-5">
+					{#if bodyCharacterCount > 0}
+						<p class="absolute right-0 mt-1 text-paper-900 opacity-70">
+							{bodyCharacterCount}
+							{bodyCharacterCount === 1 ? 'character' : 'characters'}
+						</p>
+					{/if}
+					<div />
+				</div>
 			</span>
 
 			<div class="ml-5 mt-8 md:ml-20 flex flex-col relative">

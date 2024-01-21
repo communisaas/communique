@@ -12,7 +12,9 @@
 		"test:unit": "vitest",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
-		"start": "node build"
+		"start": "node build",
+		"stage": "fly deploy -a communique-staging",
+		"deploy": "fly deploy"
 	},
 	"devDependencies": {
 		"@fontsource/fira-mono": "^5.0.1",

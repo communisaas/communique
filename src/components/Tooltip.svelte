@@ -5,7 +5,7 @@
 </script>
 
 {#if message}
-	<div role="tooltip" class="tooltip {style}">
+	<div role="tooltip" class="tooltip bg-artistBlue-600 {style}">
 		{message}
 	</div>
 {/if}
@@ -14,7 +14,6 @@
 	.tooltip {
 		position: absolute;
 		box-shadow: 0 1px 2px 2px rgba(0, 0, 0, 0.1);
-		background-color: theme('colors.artistBlue.600');
 		color: theme('colors.paper.500');
 		padding: 4px 8px;
 		box-sizing: border-box;

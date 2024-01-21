@@ -240,7 +240,7 @@
 		}}
 	>
 		<ul
-			class="shrink min-w-0 inline-flex flex-row flex-wrap items-center max-w-full w-max"
+			class="shrink min-w-0 inline-flex flex-row flex-wrap gap-2 my-2 items-center max-w-full w-max"
 			aria-label="{name} list"
 			aria-describedby="List of {name}s with an add button"
 		>
@@ -362,7 +362,7 @@
 					}
 				}}
 				style="width: {inputValueWidth};"
-				class="rounded shadow-artistBlue shadow-card w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center {inputStyle}"
+				class="rounded w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center {inputStyle}"
 				class:show={inputVisible}
 				class:p-1={inputVisible}
 				{type}

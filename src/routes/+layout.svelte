@@ -122,7 +122,7 @@
 	>
 		<header
 			aria-label="Popular topics list"
-			class="flex h-12 pr-1 z-20 bg-peacockFeather-700 relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
+			class="flex h-12 pr-1 z-50 bg-peacockFeather-700 relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
 		>
 			{#if $sessionStore && $sessionStore.template}
 				<span
@@ -149,8 +149,8 @@
 									source: 'topic',
 									iterable: true
 								};
-								$sessionStore.template.primary.cardList = await handleSelect(e);
 								if ($page.route.id !== '/') await goto('/', { noScroll: true });
+								$sessionStore.template.primary.cardList = await handleSelect(e);
 							}
 						}}
 					/>

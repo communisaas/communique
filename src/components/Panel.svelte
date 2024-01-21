@@ -56,7 +56,7 @@
 	}
 </script>
 
-<section class="flex flex-col relative gradient-background">
+<section class="flex flex-col relative">
 	<aside class="flex flex-nowrap pb-3" style="justify-content: {alignment}">
 		{#if selectorTarget != 'spotlight'}
 			<h1
@@ -103,6 +103,7 @@
 								selectionList = [lastSelection];
 								items = lastItems;
 								inputVisible = false;
+								searchInput.style.width = '0';
 							}
 						}}
 					/>
@@ -216,14 +217,5 @@
 				}
 			}
 		}
-	}
-
-	.gradient-background {
-		background: linear-gradient(
-			90deg,
-			theme('colors.peacockFeather.600'),
-			theme('colors.teal.700')
-		);
-		background-repeat: no-repeat;
 	}
 </style>

@@ -46,43 +46,43 @@ export class EmailForm {
 		for (const field of Object.keys(this.inputFields)) {
 			const value = this.emailForm.get(field);
 			console.log(field, value);
-			if (value != null && value != undefined && field != 'body') {
-				if (field == 'recipient_list' || field == 'topic_list') {
-					if (value.toString().split('␞').length === 0) {
+			if (value != null && value !== undefined) {
+				if (field === 'recipient_list' || field === 'topic_list') {
+					const list = value.toString().split('␞');
+					if (list.length === 0) {
 						throw new Error(`${field} is empty`);
 					}
-					if (value.toString().split('␞').length > 5 && field == 'topic_list') {
+					if (field === 'topic_list' && list.length > 5) {
 						throw new Error(`Too many topics! (Max 5)`);
 					}
-					if (value.toString().split('␞').length > 100 && field == 'recipient_list') {
+					if (field === 'recipient_list' && list.length > 100) {
 						throw new Error(`Too many recipients! (Max 100)`);
 					}
 				}
-				(this as RawEmailForm)[field] = value.toString();
-			} else if (value != null && value != undefined && field == 'body') {
-				const parsedBody = this.serializeBody(value.toString());
-				if (parsedBody.length < 250) {
-					throw new Error(`Email body is too short! (Min 250 characters)`);
-				} else if (parsedBody.length > 0) {
-					(this as RawEmailForm)[field] = parsedBody;
-				} else throw new Error(`${field} is empty`);
+
+				if (field === 'body') {
+					// Parse and extract text from HTML
+					const textContent = this.extractText(value.toString());
+					if (textContent.length < 250) {
+						throw new Error(`Email body is too short! (Min 250 characters)`);
+					} else if (textContent.length > 0) {
+						this.inputFields[field] = textContent;
+					} else {
+						throw new Error(`${field} is empty`);
+					}
+				} else {
+					this.inputFields[field] = value.toString();
+				}
 			} else {
 				throw new Error(`${field} is empty`);
 			}
 		}
 	}
 
-	serializeBody(editorDataString: string) {
-		const dataObject = JSON.parse(editorDataString);
-		let runningText = '';
-		for (const block of dataObject.blocks) {
-			if (block.type === 'paragraph') {
-				runningText += DOMPurify.sanitize(`<p>${block.data.text}</p><br>`); // Wrap the text in <p> tags and add <br>
-			} else if (block.type === 'signature') {
-				runningText += DOMPurify.sanitize(block.data.html);
-			}
-		}
-		return runningText;
+	extractText(htmlString: string) {
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(htmlString, 'text/html');
+		return doc.body.textContent || '';
 	}
 }
 

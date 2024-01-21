@@ -18,6 +18,7 @@
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';
+	export let focusable = true;
 
 	let sessionStore: Writable<UserState>;
 
@@ -285,7 +286,7 @@
 			onClick: () => {
 				menuItems[3].name = 'Loading...';
 				if (!$page.data.session) {
-					goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
+					goto('/sign/in?callbackUrl=', { noScroll: true, keepFocus: true });
 					return;
 				}
 				menuItems = menuItems.map((item) => {
@@ -450,7 +451,7 @@
 
 <div
 	role="button"
-	tabindex="0"
+	tabindex={focusable ? 0 : -1}
 	bind:this={card}
 	on:focus={() => {
 		handleSelect();
@@ -638,7 +639,7 @@
 						<Selector
 							selectable={Tag}
 							items={item.recipient_list}
-							itemStyle="text-base xs:text-sm text-paper-500 bg-peacockFeather-600"
+							itemStyle="text-base xs:text-sm text-paper-500 bg-peacockFeather-700"
 							selectorStyle="pt-1 max-w-full md:flex-wrap"
 							alignment="start"
 							overflow={expand ? 'wrap' : 'auto'}

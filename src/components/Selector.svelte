@@ -160,7 +160,7 @@
 				right: 0;
 				bottom: 0;
 				left: 0;
-				background-image: linear-gradient(to right, transparent 85%, var(--backgroundColor) 97%);
+				background-image: linear-gradient(to right, transparent 93%, var(--backgroundColor) 97%);
 				background-repeat: no-repeat;
 			}
 		}
@@ -175,7 +175,7 @@
 				right: 0;
 				bottom: -1px;
 				left: 0;
-				background-image: linear-gradient(to bottom, transparent 85%, var(--backgroundColor) 97%);
+				background-image: linear-gradient(to bottom, transparent 93%, var(--backgroundColor) 97%);
 				background-repeat: no-repeat;
 			}
 		}
@@ -187,8 +187,8 @@
 			background-image: linear-gradient(
 				to right,
 				var(--backgroundColor) 3%,
-				transparent 15%,
-				transparent 85%,
+				transparent 8%,
+				transparent 93%,
 				var(--backgroundColor) 97%
 			);
 			background-repeat: no-repeat;
@@ -203,7 +203,7 @@
 			top: 0;
 			right: 0;
 			bottom: 0;
-			background-image: linear-gradient(to right, var(--backgroundColor) 3%, transparent 15%);
+			background-image: linear-gradient(to right, var(--backgroundColor) 3%, transparent 8%);
 			background-repeat: no-repeat;
 		}
 	}
@@ -214,15 +214,15 @@
 			background-image: linear-gradient(
 					to bottom,
 					var(--backgroundColor) 3%,
-					transparent 15%,
-					transparent 85%,
+					transparent 8%,
+					transparent 93%,
 					var(--backgroundColor) 97%
 				),
 				linear-gradient(
 					to bottom,
 					var(--backgroundColor) 3%,
-					transparent 15%,
-					transparent 85%,
+					transparent 8%,
+					transparent 93%,
 					var(--backgroundColor) 97%
 				);
 			background-repeat: no-repeat;
@@ -236,8 +236,8 @@
 			top: 0;
 			right: 0;
 			bottom: 0;
-			background-image: linear-gradient(to right, var(--backgroundColor) 3%, transparent 15%),
-				linear-gradient(to bottom, var(--backgroundColor) 3%, transparent 15%);
+			background-image: linear-gradient(to right, var(--backgroundColor) 3%, transparent 8%),
+				linear-gradient(to bottom, var(--backgroundColor) 3%, transparent 8%);
 			background-repeat: no-repeat;
 		}
 	}
