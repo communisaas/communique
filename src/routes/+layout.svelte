@@ -37,6 +37,7 @@
 			};
 		}
 		console.log(window.location.hash);
+		// decouple internal routes from hash when sveltekit supports modals
 		if (window.location.hash === '#terms-of-use') {
 			$sessionStore.show.termsOfUse = true;
 		} else if (window.location.hash === '#privacy-policy') {
@@ -97,8 +98,8 @@
 		const hashes = window.location.hash.substring(1).split('#');
 
 		windowWidth = window.outerWidth;
-		// TODO use enum
-		routeModal(hashes, $sessionStore, dispatch);
+
+		$sessionStore = await routeModal(hashes, $sessionStore, dispatch);
 		window.addEventListener('hashchange', handleHashChange);
 	});
 
