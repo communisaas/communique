@@ -40,6 +40,8 @@
 		// decouple internal routes from hash when sveltekit supports modals
 		if (window.location.hash === '#terms-of-use') {
 			$sessionStore.show.termsOfUse = true;
+		} else if (window.location.hash === '#signin') {
+			$sessionStore.show.login = true;
 		} else if (window.location.hash === '#privacy-policy') {
 			$sessionStore.show.privacyPolicy = true;
 		} else if (window.location.hash === '#moderation-policy') {
@@ -56,9 +58,6 @@
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
 
-		$sessionStore.csrfToken =
-			($sessionStore.csrfToken || (await (await fetch('/auth/csrf')).json()).csrfToken) ?? '';
-
 		if ($sessionStore.template) {
 			// reload data if session already exists
 			await invalidateAll();
@@ -67,12 +66,9 @@
 		if ($page.data.session && $page.data.session?.user?.email) {
 			$sessionStore.user =
 				(await fetch('data/user/' + $page.data.session?.user?.email, {
-					method: 'GET',
-					headers: {
-						'CSRF-Token': $sessionStore.csrfToken
-					}
+					method: 'GET'
 				}).then((res) => res.json())) || $sessionStore.user;
-			$sessionStore.hiddenEmails = $sessionStore.user.ignored_email_list ?? [];
+			$sessionStore.hiddenEmails = $sessionStore.user.ignored_content_list ?? [];
 		}
 
 		$sessionStore.composer = $sessionStore.composer || {};

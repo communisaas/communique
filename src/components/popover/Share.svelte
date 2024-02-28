@@ -143,7 +143,7 @@
 		on:click={async () => {
 			setPopover(false);
 			if (!$page.data.session && sent) {
-				goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
+				window.location.hash = 'signin';
 				setPopover(true);
 				return;
 			} else if (sent && $page.data.session?.user?.email) {
@@ -152,8 +152,7 @@
 					method: 'POST',
 					headers: {
 						'Increment-Send': 'true',
-						'Sender-Email': $page.data.session?.user?.email,
-						'CSRF-Token': $sessionStore.csrfToken
+						'Sender-Email': $page.data.session?.user?.email
 					}
 				});
 				if ((await response.text()) === 'incremented') {
@@ -165,7 +164,7 @@
 							return email;
 						}
 					);
-					$sessionStore.user.sent_email_list.push(item.shortid);
+					$sessionStore.user.sent_content_list.push(item.shortid);
 				} else {
 					closeButtonText = 'Confirm';
 				}

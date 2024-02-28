@@ -86,8 +86,7 @@
 					method: 'POST',
 					headers: {
 						'Update-ID': 'true',
-						'User-Email': $page.data.session?.user?.email,
-						'CSRF-Token': $store.csrfToken
+						'User-Email': $page.data.session?.user?.email
 					},
 					body: inputField.value
 				});

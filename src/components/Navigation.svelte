@@ -7,7 +7,7 @@
 	import { fade, slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import { afterNavigate, goto } from '$app/navigation';
-	import { signIn, signOut } from '@auth/sveltekit/client';
+	import { signOut } from '@auth/sveltekit/client';
 	import LoginIcon from '$components/icon/Login.svelte';
 
 	const navLinks = {
@@ -123,7 +123,7 @@
 				{:else}
 					<button
 						class="flex p-1 w-full max-h-full absolute self-center top-0 hover:bg-peacockFeather-600"
-						on:click={() => signIn({ callbackUrl: '/', redirect: false })}
+						on:click={() => (window.location.hash = '#signin')}
 					>
 						<icon class="w-10 h-10 m-auto inline-block">
 							<LoginIcon />

@@ -20,7 +20,7 @@
 
 	onMount(async () => {
 		store = (await import('$lib/data/sessionStorage')).store;
-		const lastEmailId = $store.user.sent_email_list.slice(-1);
+		const lastEmailId = $store.user.sent_content_list.slice(-1);
 		windowWidth = window.outerWidth;
 		sentEmails = await dataFetcher('data/email', 'email', [lastEmailId]);
 	});
@@ -69,7 +69,7 @@
 									required={true}
 									value={$store.user.given_name
 										? $store.user.given_name[0].toUpperCase() +
-										  $store.user.given_name.slice(1).toLowerCase()
+											$store.user.given_name.slice(1).toLowerCase()
 										: ''}
 									style="bg-peacockFeather-700 text-paper-900 rounded-md shadow-card p-2 focus:outline-peacockFeather-500"
 								/>
@@ -82,7 +82,7 @@
 									required={true}
 									value={$store.user.family_name
 										? $store.user.family_name[0].toUpperCase() +
-										  $store.user.family_name.slice(1).toLowerCase()
+											$store.user.family_name.slice(1).toLowerCase()
 										: ''}
 									style="bg-peacockFeather-700 text-paper-900 rounded-md shadow-card p-2 focus:outline-peacockFeather-500"
 								/>
@@ -100,11 +100,11 @@
 						/>
 					</div>
 				</form>
-				{#if $store.user.sent_email_list.length >= 1 && sentEmails}
+				{#if $store.user.sent_content_list.length >= 1 && sentEmails}
 					<div class="max-w-[98%]">
 						<p class="p-2 text-paper-500">
-							You have sent {$store.user.sent_email_list.length}
-							{$store.user.sent_email_list.length === 1 ? 'email' : 'emails'} so far! Here's the last
+							You have sent {$store.user.sent_content_list.length}
+							{$store.user.sent_content_list.length === 1 ? 'email' : 'emails'} so far! Here's the last
 							one:
 						</p>
 						<Selector

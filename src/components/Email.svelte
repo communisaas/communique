@@ -51,8 +51,7 @@
 				method: 'POST',
 				headers: {
 					'Remove-Email-Content': 'true',
-					'User-Email': $page.data.session?.user?.email,
-					'CSRF-Token': $sessionStore.csrfToken
+					'User-Email': $page.data.session?.user?.email
 				}
 			});
 			// TODO handle error response
@@ -153,8 +152,7 @@
 											method: 'POST',
 											headers: {
 												'Report-Email-Content': 'true',
-												'User-Email': $page.data.session?.user?.email,
-												'CSRF-Token': $sessionStore.csrfToken
+												'User-Email': $page.data.session?.user?.email
 											},
 											body: JSON.stringify(Object.fromEntries(formData))
 										});
@@ -286,19 +284,19 @@
 			onClick: () => {
 				menuItems[3].name = 'Loading...';
 				if (!$page.data.session) {
-					goto('/sign/in?callbackUrl=', { noScroll: true, keepFocus: true });
-					return;
+					window.location.hash = 'signin';
+				} else {
+					menuItems = menuItems.map((item) => {
+						if (item.key !== 'moderation' && item.key !== 'back') {
+							item.show = false;
+							item.actionToggled = false;
+						} else {
+							item.show = true;
+							if (item.key === 'moderation') item.actionToggled = true;
+						}
+						return item;
+					});
 				}
-				menuItems = menuItems.map((item) => {
-					if (item.key !== 'moderation' && item.key !== 'back') {
-						item.show = false;
-						item.actionToggled = false;
-					} else {
-						item.show = true;
-						if (item.key === 'moderation') item.actionToggled = true;
-					}
-					return item;
-				});
 				menuItems[3].name = 'Report';
 			}
 		},

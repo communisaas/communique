@@ -15,7 +15,6 @@ type DescribedProvider = Provider & {
 
 export const load = (async ({ locals }) => {
 	// TODO: compound queries, lazy load, caching
-
 	const loudestTopics = await objectMapper.topic.findMany({ take: 25 });
 	let loudestTopicEmails: email[];
 	if (loudestTopics.length > 0) {
@@ -59,7 +58,7 @@ export const load = (async ({ locals }) => {
 			// 	cardList: await spotlightEmails
 			// }
 		},
-		session: await locals.getSession(),
+		session: 'auth' in locals ? await locals.auth() : null,
 		authProviders: {
 			baseLogoURL: baseProviderLogoURL.toString() as `https://${string}.svg`,
 			providers: (providers as DescribedProvider[]).reduce((accumulator, provider) => {
@@ -67,8 +66,8 @@ export const load = (async ({ locals }) => {
 				return accumulator;
 			}, {} as Record<string, ProviderAttributes>)
 		},
-		privacyPolicy: marked(privacyPolicyMarkdown, { mangle: false, headerIds: false }),
-		moderationPolicy: marked(moderationPolicyMarkdown, { mangle: false, headerIds: false }),
-		termsOfUse: marked(termsOfUseMarkdown, { mangle: false, headerIds: false }) // clear deprecation warnings for mangle & headerIds
+		privacyPolicy: marked(privacyPolicyMarkdown),
+		moderationPolicy: marked(moderationPolicyMarkdown),
+		termsOfUse: marked(termsOfUseMarkdown)
 	};
 }) satisfies LayoutServerLoad;

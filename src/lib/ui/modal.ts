@@ -1,4 +1,4 @@
-import { goto } from '$app/navigation';
+import { goto, replaceState } from '$app/navigation';
 import type { Writable } from 'svelte/store';
 import { signOut } from '@auth/sveltekit/client';
 
@@ -38,7 +38,7 @@ export function handlePopover(
 
 	if (!e.detail) {
 		// close popover, go to callback path
-		window.history.replaceState(history.state, '', callback);
+		replaceState(callback, history.state);
 	}
 }
 
@@ -53,9 +53,6 @@ export const getModalMap = (sessionStore: UserState, pageData: LayoutSchema) => 
 				action: async (e: SubmitEvent) => {
 					const response = await fetch('/data/user/' + sessionStore.user?.email, {
 						method: 'DELETE',
-						headers: {
-							'CSRF-Token': sessionStore.csrfToken
-						}
 					});
 					if (response.status !== 200) {
 						throw new Error(`Could not delete user: (${response.status}) ${response.statusText}`);

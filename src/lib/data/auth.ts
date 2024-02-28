@@ -5,7 +5,6 @@ import Linkedin from '@auth/core/providers/linkedin';
 import Reddit from '@auth/core/providers/reddit';
 import Twitter from '@auth/core/providers/twitter';
 import Google from '@auth/core/providers/google';
-import Slack from '@auth/core/providers/slack';
 import Twitch from '@auth/core/providers/twitch';
 
 import type { Provider } from '@auth/core/providers';
@@ -59,11 +58,22 @@ export const baseProviderLogoURL = new URL('https://authjs.dev/img/providers');
 const config: SvelteKitAuthConfig = {
 	providers: providers,
 	pages: {
-		signIn: '/sign/in'
-		// signOut: '/auth/signout',
+		signIn: '/sign/in',
+		signOut: '/sign/out'
 		// error: '/auth/error', // Error code passed in query string as ?error=
 		// verifyRequest: '/auth/verify-request', // (used for check email message)
 		// newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
+	},
+	cookies: {
+		pkceCodeVerifier: {
+			name: 'next-auth.pkce.code_verifier',
+			options: {
+				httpOnly: true,
+				sameSite: 'none',
+				path: '/',
+				secure: true
+			}
+		}
 	},
 	callbacks: {
 		async signIn({ account, profile }) {
@@ -129,4 +139,4 @@ const config: SvelteKitAuthConfig = {
 	}
 };
 
-export default SvelteKitAuth(config);
+export const { handle, signIn, signOut } = SvelteKitAuth(config);
