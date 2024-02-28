@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { signIn } from '@auth/sveltekit/client';
 	import { afterUpdate, createEventDispatcher } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { fade, scale } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
 	import { trapFocus, updateFocusableElements } from '$lib/ui/ux';
+	import { SignIn } from '@auth/sveltekit/components';
 
 	export let providers: AuthSchema;
 
@@ -63,6 +63,7 @@
 	function setPopover(value: boolean) {
 		dispatch('popover', value);
 	}
+	console.log(providers.providers);
 </script>
 
 <section role="dialog" bind:this={dialog} class="flex flex-col items-center relative">
@@ -77,19 +78,21 @@
 		<div class="flex flex-wrap items-center justify-center gap-5">
 			{#each Object.entries(providers.providers) as [id, attributes]}
 				{#if !chosenProvider || chosenProvider === attributes.name}
-					<button
-						on:click={() => {
-							signIn(id, { callbackUrl: $sessionStore.loginCallbackURL });
-							chosenProvider = attributes.name;
-						}}
-						class="flex flex-col items-center justify-center md:w-14 md:h-14 h-fit w-fit"
-					>
-						<img
-							src={providers.baseLogoURL + attributes.style.logo}
-							alt="{attributes.name} logo"
-							class="p-2"
-						/>
-					</button>
+					<SignIn provider={attributes.id} signInPage="sign/in">
+						<button
+							on:click={() => {
+								chosenProvider = attributes.name;
+							}}
+							class="flex flex-col items-center justify-center md:w-14 md:h-14 h-fit w-fit"
+							slot="submitButton"
+						>
+							<img
+								src={providers.baseLogoURL + attributes.style.logo}
+								alt="{attributes.name} logo"
+								class="p-2"
+							/>
+						</button>
+					</SignIn>
 				{/if}
 			{/each}
 		</div>

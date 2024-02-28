@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { email } from '@prisma/client';
-	import { createEventDispatcher, onMount, afterUpdate, tick } from 'svelte';
+	import { createEventDispatcher, onMount, afterUpdate } from 'svelte';
 	import Selector from './Selector.svelte';
 	import Tag from './Tag.svelte';
 	import Reader from './popover/Reader.svelte';
@@ -13,10 +13,12 @@
 	import { writable, type Writable } from 'svelte/store';
 	import Preferences from './input/Preferences.svelte';
 	import { goto } from '$app/navigation';
+	import colors from '$lib/ui/colors';
 
 	export let item: email;
 	export let selected: Selectable;
 	export let style = '';
+	export let focusable = true;
 
 	let sessionStore: Writable<UserState>;
 
@@ -24,6 +26,7 @@
 		header: { x: 0, remainingWidth: 0, startX: 0, startScrollLeft: 0 },
 		card: { x: 0, remainingWidth: 0, startX: 0, startScrollLeft: 0 }
 	};
+
 	let header: HTMLHeadingElement;
 	let card: HTMLElement;
 	let menu: HTMLElement;
@@ -48,8 +51,7 @@
 				method: 'POST',
 				headers: {
 					'Remove-Email-Content': 'true',
-					'User-Email': $page.data.session?.user?.email,
-					'CSRF-Token': $sessionStore.csrfToken
+					'User-Email': $page.data.session?.user?.email
 				}
 			});
 			// TODO handle error response
@@ -150,8 +152,7 @@
 											method: 'POST',
 											headers: {
 												'Report-Email-Content': 'true',
-												'User-Email': $page.data.session?.user?.email,
-												'CSRF-Token': $sessionStore.csrfToken
+												'User-Email': $page.data.session?.user?.email
 											},
 											body: JSON.stringify(Object.fromEntries(formData))
 										});
@@ -172,6 +173,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Spam',
+									labelStyle: 'radioLabel',
 									value: 'Spam',
 									class: 'option py-3 sm:py-2'
 								},
@@ -182,6 +184,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Harassment',
+									labelStyle: 'radioLabel',
 									value: 'Harassment',
 									class: 'option py-3 sm:py-2'
 								},
@@ -192,6 +195,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Violence',
+									labelStyle: 'radioLabel',
 									value: 'Violence',
 									class: 'option py-3 sm:py-2'
 								},
@@ -202,6 +206,7 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Privacy',
+									labelStyle: 'radioLabel',
 									value: 'Privacy',
 									class: 'option py-3 sm:py-2'
 								},
@@ -212,13 +217,14 @@
 										if (e.currentTarget) (e.currentTarget as HTMLInputElement).checked = true;
 									},
 									label: 'Misleading',
+									labelStyle: 'radioLabel',
 									value: 'Misleading',
 									class: 'option py-3 sm:py-2'
 								},
 								{
 									type: 'text',
 									name: 'customReport',
-									onUpdate: (e: KeyboardEvent | MouseEvent) => {
+									onFocus: (e: FocusEvent) => {
 										const reportRadioButtons = document.querySelectorAll(
 											"input[name='reportType']"
 										);
@@ -227,6 +233,7 @@
 										});
 									},
 									label: 'Other',
+									labelStyle: 'radioLabel',
 									placeholder: '50 characters',
 									maxLength: 50,
 									class:
@@ -277,19 +284,19 @@
 			onClick: () => {
 				menuItems[3].name = 'Loading...';
 				if (!$page.data.session) {
-					goto('/sign/in?callbackUrl=/', { noScroll: true, keepFocus: true });
-					return;
+					window.location.hash = 'signin';
+				} else {
+					menuItems = menuItems.map((item) => {
+						if (item.key !== 'moderation' && item.key !== 'back') {
+							item.show = false;
+							item.actionToggled = false;
+						} else {
+							item.show = true;
+							if (item.key === 'moderation') item.actionToggled = true;
+						}
+						return item;
+					});
 				}
-				menuItems = menuItems.map((item) => {
-					if (item.key !== 'moderation' && item.key !== 'back') {
-						item.show = false;
-						item.actionToggled = false;
-					} else {
-						item.show = true;
-						if (item.key === 'moderation') item.actionToggled = true;
-					}
-					return item;
-				});
 				menuItems[3].name = 'Report';
 			}
 		},
@@ -343,26 +350,16 @@
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
-		resizeObserver = new ResizeObserver(() => {
-			updateScrollableElements(scrollableElements);
-		});
+		if (card) {
+			resizeObserver = new ResizeObserver(() => {
+				updateScrollableElements(scrollableElements);
+			});
 
-		resizeObserver.observe(card);
+			resizeObserver.observe(card);
+		}
 	});
 
 	afterUpdate(() => {
-		if (
-			scrollToCard &&
-			!$sessionStore.hiddenEmails.includes(item.shortid) &&
-			!showMenu &&
-			!remove
-		) {
-			// TODO more contextual fix for resolving pending events after DOM update
-			setTimeout(() => {
-				card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-			});
-			scrollToCard = false;
-		}
 		if (card && header) {
 			scrollableElements = { card, header };
 			updateScrollableElements(scrollableElements), 100;
@@ -435,11 +432,24 @@
 			handleRemove({ background: false });
 		}
 	}
+
+	$: if (
+		scrollToCard &&
+		!$sessionStore.hiddenEmails.includes(item.shortid) &&
+		!showMenu &&
+		!remove
+	) {
+		// TODO more contextual fix for resolving pending events after DOM update
+		setTimeout(() => {
+			card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+		});
+		scrollToCard = false;
+	}
 </script>
 
 <div
 	role="button"
-	tabindex="0"
+	tabindex={focusable ? 0 : -1}
 	bind:this={card}
 	on:focus={() => {
 		handleSelect();
@@ -469,6 +479,8 @@
 >
 	{#if showMenu}
 		<div
+			tabindex="0"
+			role="menu"
 			bind:this={menu}
 			on:click|stopPropagation={async () => {
 				if (expand) {
@@ -497,7 +509,11 @@
 						e.preventDefault();
 						return;
 					}
-					handleBlur(e);
+					if (e.relatedTarget && e.relatedTarget.classList.contains('menu')) {
+						card.focus();
+					} else {
+						handleBlur(e);
+					}
 				}}
 				items={menuItems}
 				bind:focusableElements={focusableMenuElements}
@@ -552,7 +568,7 @@
 						class:scrollable={scrollPosition.header.remainingWidth > 0}
 						class:scrolled={scrollPosition.header.x > 1}
 						class:scrolled__max={scrollPosition.header.remainingWidth - scrollPosition.header.x < 1}
-						class="inline-block mr-1 w-full text-left xs:text-xl text-base"
+						class="inline-block mr-1 w-full text-left text-xl"
 					>
 						{item.subject}
 					</h1>
@@ -577,7 +593,7 @@
 					>
 						<icon
 							aria-label="Envelope"
-							class="sm:max-w-[36px] max-w-[32px]"
+							class="max-w-[36px] pb-[0.05rem]"
 							style="filter: drop-shadow(1px 0.75px 0.75px rgb(0 0 0 / 0.4));"
 						>
 							<SentIcon color="#94D2BD" />
@@ -589,53 +605,55 @@
 			<article
 				class="flex grow justify-between min-w-full h-full flex-col"
 				class:md:flex-row={!expand}
+				class:md:max-h-80={!expand}
 			>
 				<div
-					class="flex flex-col min-h-full"
+					class="flex flex-col tags h-full overflow-clip mb-1 max-h-full"
+					aria-label="Topic and recepient lists"
 					class:md:max-w-[50%]={!expand}
+					class:md:w-[200rem]={!expand}
 					class:md:pr-2={!expand}
+					class:mb-4={expand}
 				>
-					<div
-						class="tags max-w-[full] h-full"
-						aria-label="Topic and recepient lists"
-						style="max-width: {!expand ? '35rem' : '100%'};"
-					>
-						<div aria-label="Topic list">
-							<Selector
-								selectable={Tag}
-								items={item.topic_list}
-								itemStyle="text-xs sm:text-sm text-paper-500 bg-peacockFeather-500"
-								selectorStyle="pt-2 max-w-full"
-								alignment="start"
-								overflow="wrap"
-								bind:selectedContent={$sessionStore.topic}
-								on:select={(e) => {
-									setExpand(false);
-									dispatch('select', e.detail);
-								}}
-								on:blur={handleBlur}
-							/>
-						</div>
-						<div aria-label="Receipient list">
-							<Selector
-								selectable={Tag}
-								items={item.recipient_list}
-								itemStyle="text-xs sm:text-sm text-paper-500 bg-peacockFeather-600"
-								selectorStyle="pt-1 max-w-full"
-								alignment="start"
-								overflow="wrap"
-								bind:selectedContent={$sessionStore.recipient}
-								on:select={(e) => {
-									setExpand(false);
-									dispatch('select', e.detail);
-								}}
-								on:blur={handleBlur}
-							/>
-						</div>
+					<div aria-label="Topic list" class="h-fit">
+						<Selector
+							selectable={Tag}
+							items={item.topic_list}
+							itemStyle="text-base xs:text-sm text-paper-500 bg-peacockFeather-500"
+							selectorStyle="pt-2 max-w-full md:flex-wrap"
+							alignment="start"
+							overflow={expand ? 'wrap' : 'auto'}
+							backgroundColor={colors.artistBlue[600]}
+							bind:focusable={expand}
+							bind:selectedContent={$sessionStore.topic}
+							on:select={(e) => {
+								setExpand(false);
+								dispatch('select', e.detail);
+							}}
+							on:blur={handleBlur}
+						/>
+					</div>
+					<div aria-label="Receipient list" class="h-fit">
+						<Selector
+							selectable={Tag}
+							items={item.recipient_list}
+							itemStyle="text-base xs:text-sm text-paper-500 bg-peacockFeather-700"
+							selectorStyle="pt-1 max-w-full md:flex-wrap"
+							alignment="start"
+							overflow={expand ? 'wrap' : 'auto'}
+							backgroundColor={colors.artistBlue[600]}
+							bind:focusable={expand}
+							bind:selectedContent={$sessionStore.recipient}
+							on:select={(e) => {
+								setExpand(false);
+								dispatch('select', e.detail);
+							}}
+							on:blur={handleBlur}
+						/>
 					</div>
 				</div>
 				{#if expand && $page.route.id === '/'}
-					<span class="flex max-w-full gap-5 mb-6">
+					<span class="flex max-w-full gap-5 my-4">
 						<p aria-label="Info text" class="text-center ml-auto mt-1">
 							<i>
 								<span
@@ -678,8 +696,9 @@
 				{/if}
 				<details
 					style="text-align: initial;"
-					class="whitespace-normal flex flex-col appearance-none self-center"
+					class="whitespace-normal flex flex-col appearance-none self-center md:pl-0"
 					class:w-full={expand}
+					class:max-w-[70%]={!expand}
 				>
 					<summary
 						tabindex="-1"
@@ -713,7 +732,6 @@
 		&::after {
 			background: linear-gradient(to top, theme('colors.artistBlue.600') 0%, transparent 10%);
 			content: '';
-			z-index: 10;
 			position: absolute;
 			bottom: -1px;
 			margin-bottom: -1px;
@@ -753,7 +771,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.25rem;
-		margin-bottom: 1rem;
 	}
 
 	.scrollable {

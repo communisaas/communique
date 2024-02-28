@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # Adjust NODE_VERSION as desired
-ARG NODE_VERSION=19.1.0
+ARG NODE_VERSION=20.11.1
 FROM node:${NODE_VERSION}-slim as base
 
 LABEL fly_launch_runtime="NodeJS/Prisma"
@@ -60,6 +60,9 @@ RUN npm prune --omit=dev
 
 # Final stage for app image
 FROM base
+
+RUN apt-get update -qq && \
+    apt-get install -y openssl
 
 # Copy built application
 COPY --from=build /app /app

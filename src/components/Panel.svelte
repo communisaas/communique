@@ -1,9 +1,11 @@
 <script lang="ts">
 	import Selector from './Selector.svelte';
+	import ContentLoader from 'svelte-content-loader';
 	import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import TagInput from './input/Tag.svelte';
 	import { handleAutocomplete } from '$lib/data/select';
+	import colors from '$lib/ui/colors';
 
 	export let header: string;
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
@@ -12,7 +14,7 @@
 	export let selectorTarget: 'topic' | 'recipient' | 'spotlight' | undefined = undefined;
 	export let selected: Selectable = { item: '', type: 'option', id: '' };
 	export let initialSelection: Descriptor<string> = { item: '', type: '' };
-	export let items: Selectable[] = [];
+	export let items: Selectable[] | null = [];
 	export let filterable = false;
 	let searchResults: Descriptor<string>[] = [];
 	let searchInput: HTMLInputElement;
@@ -20,6 +22,8 @@
 	const dispatch = createEventDispatcher();
 
 	let store: Writable<UserState>;
+	let inputVisible = false;
+	let windowWidth: number;
 	let selectionList: Descriptor<string>[] = [initialSelection];
 
 	let lastItems: Selectable[] = [];
@@ -30,6 +34,10 @@
 		selectionList = [initialSelection];
 		oldInitialSelection = initialSelection;
 	}
+
+	onMount(() => {
+		windowWidth = window.outerWidth;
+	});
 
 	async function handleFilter() {
 		// Grouping by fields
@@ -48,7 +56,7 @@
 	}
 </script>
 
-<section class="flex flex-col relative gradient-background h-full">
+<section class="flex flex-col relative">
 	<aside class="flex flex-nowrap pb-3" style="justify-content: {alignment}">
 		{#if selectorTarget != 'spotlight'}
 			<h1
@@ -67,34 +75,40 @@
 						bind:inputField={searchInput}
 						type="search"
 						name="search item"
-						placeholder={'Search'}
-						style="h-14  xs:mx-4 mr-5 ml-1 w-fit bg-transparent xs:pr-0.5 pr-0 pl-2"
-						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded xs:px-2 px-1 pr-1 text-paper-500"
+						placeholder={'search'}
+						style="h-14 xs:mx-4 md:mr-4 ml-2 w-fit bg-transparent xs:pr-0.5 pr-0 pl-2"
+						tagStyle="md:text-xl md:leading-normal leading-tight text-sm underline font-bold bg-transparent rounded px-2 px-1 pr-1 text-paper-500"
 						addIconStyle="add bg-peacockFeather-500 h-10 w-10 md:h-12 md:w-12 text-4xl md:text-5xl inline-block leading-12"
-						autocompleteStyle="right-0"
+						inputStyle="bg-peacockFeather-600 text-paper-500 focus:outline-peacockFeather-500"
+						autocompleteStyle="absolute max-h-80 overflow-y-auto right-0 top-[75%] bg-peacockFeather-600 text-paper-500"
 						autocomplete={true}
 						bind:tagList={selectionList}
+						bind:inputVisible
 						bind:searchResults
 						on:autocomplete={async (e) => {
 							searchResults = await handleAutocomplete(e);
 						}}
 						on:delete={async (e) => {
 							lastSelection = e.detail;
-							lastItems = items;
-							items = await handleFilter();
+							if (items) lastItems = items;
+							items = null;
+							if (selectionList.length >= 1) items = await handleFilter();
 						}}
 						on:add={async (e) => {
+							items = null;
 							items = await handleFilter();
 						}}
 						on:blur={() => {
-							if (selectionList.length < 1) {
+							if (selectionList.length <= 0) {
 								selectionList = [lastSelection];
 								items = lastItems;
+								inputVisible = false;
+								searchInput.style.width = '0';
 							}
 						}}
 					/>
 				{:else}
-					<p class="text-paper-500 z-10 mx-10 my-3">
+					<p class="text-paper-500 z-10 mx-10 my-2 md:my-3">
 						{initialSelection.item}
 					</p>
 				{/if}
@@ -104,7 +118,7 @@
 	<span class="control">
 		<slot />
 	</span>
-	{#if items && selectable}
+	{#if items && items.length > 0 && selectable}
 		<Selector
 			{selectable}
 			{items}
@@ -125,6 +139,18 @@
 			on:externalAction
 			on:blur
 		/>
+	{:else if items == null && selectionList.length > 0}
+		<div class="w-full h-full flex items-center justify-center">
+			<span class="m-auto">
+				<ContentLoader
+					uniqueKey="layoutLoader"
+					speed={0.5}
+					primaryColor={colors.peacockFeather[700]}
+					secondaryColor={colors.artistBlue[500]}
+					width={windowWidth + 10}
+				/>
+			</span>
+		</div>
 	{/if}
 </section>
 
@@ -148,9 +174,8 @@
 	}
 
 	.tab {
-		filter: drop-shadow(1px 2px 1px theme('colors.artistBlue.500'));
 		position: relative;
-		z-index: 20;
+		z-index: 10;
 		min-width: 0;
 
 		&__start {
@@ -192,14 +217,5 @@
 				}
 			}
 		}
-	}
-
-	.gradient-background {
-		background: linear-gradient(
-			90deg,
-			theme('colors.peacockFeather.600'),
-			theme('colors.teal.700')
-		);
-		background-repeat: no-repeat;
 	}
 </style>

@@ -21,7 +21,6 @@ export async function GET({ url }: { url: URL }) {
 						break;
 					}
 					case 'email': {
-						fieldName = 'shortid';
 						clause = { in: valueList };
 						break;
 					}
@@ -29,7 +28,11 @@ export async function GET({ url }: { url: URL }) {
 						throw Error('Invalid field name: ' + field);
 					}
 				}
-				filter[fieldName as keyof Criteria] = clause;
+				if (field !== 'email') {
+					filter[fieldName as keyof Criteria] = clause;
+				} else {
+					filter['OR'] = [{ subject: clause }, { shortid: clause }];
+				}
 				return filter;
 			},
 			{} as Criteria

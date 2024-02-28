@@ -2,6 +2,9 @@ interface LayoutSchema {
 	loudestTopics: topic[];
 	template: Layout;
 	authProviders: AuthSchema;
+	privacyPolicy: Document;
+	moderationPolicy: Document;
+	termsOfUse: Document;
 }
 
 interface Layout {
@@ -20,6 +23,7 @@ interface Descriptor<T> {
 	field?: string;
 	source?: string;
 	iterable?: boolean;
+	rank?: number;
 }
 
 declare module 'svelte-content-loader';

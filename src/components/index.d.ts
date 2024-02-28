@@ -6,7 +6,7 @@ interface Panel extends Expandable {
 	header: string;
 	focus: Descriptor<string>;
 	alignment: 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent';
-	cardList: email[];
+	cardList: email[] | null;
 }
 
 type SelectableKey = 'option' | 'email' | 'topic' | 'recipient' | 'spotlight';
@@ -45,6 +45,7 @@ interface Settable {
 	name: string;
 	description: string;
 	label: string;
+	labelStyle: string;
 	class: string;
 	value?: string | boolean | number;
 	placeholder?: string;

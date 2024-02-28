@@ -8,11 +8,13 @@
 	export let alignment: 'start' | 'end' | 'center' | 'justify' | 'match-parent';
 	export let overflow: 'scroll' | 'hidden' | 'visible' | 'wrap' | 'auto' = 'auto';
 	export let scrollable = true;
+	export let focusable = true;
+	export let scrollOverride = false;
 	export let itemStyle: string = '';
 	export let selectorStyle: string = '';
 	export let backgroundColor: string = '';
 
-	const listStyle = `mx-1 flex min-h-[0] items-${alignment} ${
+	$: listStyle = `mx-1 flex min-h-[0] items-${alignment} ${
 		alignment == 'end' ? 'flex-row-reverse' : 'flex-row'
 	}  gap-1.5 ${overflow == 'wrap' ? 'flex-wrap gap-y-1' : 'overflow-' + overflow} ${selectorStyle}`;
 
@@ -84,6 +86,7 @@
 		class:scrolledX__max={scrollX.scrolledMax}
 		class:scrolledY__max={scrollY.scrolledMax}
 		on:wheel={(e) => {
+			if (scrollOverride) e.preventDefault();
 			if (scrollable) {
 				list.scrollLeft += Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY;
 				list.scrollTop += Math.abs(e.deltaY) > 0 ? e.deltaY : e.deltaX;
@@ -130,6 +133,7 @@
 					this={selectable}
 					bind:selected={selectedContent}
 					style={itemStyle}
+					bind:focusable
 					{item}
 					on:select
 					on:blur
@@ -149,7 +153,6 @@
 		&X {
 			&::before {
 				content: '';
-				z-index: 20;
 				pointer-events: none;
 				display: block;
 				position: absolute;
@@ -157,7 +160,7 @@
 				right: 0;
 				bottom: 0;
 				left: 0;
-				background-image: linear-gradient(to right, transparent 85%, var(--backgroundColor) 97%);
+				background-image: linear-gradient(to right, transparent 93%, var(--backgroundColor) 97%);
 				background-repeat: no-repeat;
 			}
 		}
@@ -165,7 +168,6 @@
 		&Y {
 			&::before {
 				content: '';
-				z-index: 20;
 				pointer-events: none;
 				display: block;
 				position: absolute;
@@ -173,7 +175,7 @@
 				right: 0;
 				bottom: -1px;
 				left: 0;
-				background-image: linear-gradient(to bottom, transparent 85%, var(--backgroundColor) 97%);
+				background-image: linear-gradient(to bottom, transparent 93%, var(--backgroundColor) 97%);
 				background-repeat: no-repeat;
 			}
 		}
@@ -181,13 +183,12 @@
 
 	.scrolledX {
 		&::before {
-			z-index: 20;
 			pointer-events: none;
 			background-image: linear-gradient(
 				to right,
 				var(--backgroundColor) 3%,
-				transparent 15%,
-				transparent 85%,
+				transparent 8%,
+				transparent 93%,
 				var(--backgroundColor) 97%
 			);
 			background-repeat: no-repeat;
@@ -196,14 +197,13 @@
 
 	.scrolledX__max {
 		&::before {
-			z-index: 20;
 			pointer-events: none;
 			content: '';
 			display: block;
 			top: 0;
 			right: 0;
 			bottom: 0;
-			background-image: linear-gradient(to right, var(--backgroundColor) 3%, transparent 15%);
+			background-image: linear-gradient(to right, var(--backgroundColor) 3%, transparent 8%);
 			background-repeat: no-repeat;
 		}
 	}
@@ -214,15 +214,15 @@
 			background-image: linear-gradient(
 					to bottom,
 					var(--backgroundColor) 3%,
-					transparent 15%,
-					transparent 85%,
+					transparent 8%,
+					transparent 93%,
 					var(--backgroundColor) 97%
 				),
 				linear-gradient(
 					to bottom,
 					var(--backgroundColor) 3%,
-					transparent 15%,
-					transparent 85%,
+					transparent 8%,
+					transparent 93%,
 					var(--backgroundColor) 97%
 				);
 			background-repeat: no-repeat;
@@ -232,13 +232,12 @@
 	.scrolledY__max {
 		&::before {
 			content: '';
-			z-index: 20;
 			display: block;
 			top: 0;
 			right: 0;
 			bottom: 0;
-			background-image: linear-gradient(to right, var(--backgroundColor) 3%, transparent 15%),
-				linear-gradient(to bottom, var(--backgroundColor) 3%, transparent 15%);
+			background-image: linear-gradient(to right, var(--backgroundColor) 3%, transparent 8%),
+				linear-gradient(to bottom, var(--backgroundColor) 3%, transparent 8%);
 			background-repeat: no-repeat;
 		}
 	}

@@ -53,3 +53,15 @@ export function trapFocus(e: KeyboardEvent, focusableElements: HTMLElement[]) {
 		focusableElements[nextIndex].focus();
 	}
 }
+
+export function getFlagEmoji(countryCode: string): string {
+	if (countryCode.length !== 2 || !/^[A-Z]{2}$/.test(countryCode)) {
+		throw new Error('Invalid country code');
+	}
+
+	const offset = 0x1f1e6;
+	const chars = Array.from(countryCode).map((c) =>
+		String.fromCodePoint(c.charCodeAt(0) - 65 + offset)
+	);
+	return chars.join('');
+}

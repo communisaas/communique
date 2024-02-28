@@ -1,6 +1,3 @@
--- DropEnum
-DROP TYPE "crdb_internal_region";
-
 -- CreateTable
 CREATE TABLE "author" (
     "read_email_count" INT8 NOT NULL,
@@ -31,6 +28,11 @@ CREATE TABLE "email" (
     "title" STRING,
     "add_date" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "issue_list" STRING[],
+    "postal_code" STRING,
+    "state" STRING,
+    "country" STRING,
+    "city" STRING,
+    "last_updated" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "email___pkey" PRIMARY KEY ("rowid")
 );
@@ -87,6 +89,8 @@ CREATE TABLE "user" (
     "last_login" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "sent_email_list" STRING[],
     "privilege" INT8 DEFAULT 0,
+    "given_name" STRING,
+    "family_name" STRING,
 
     CONSTRAINT "user__pkey" PRIMARY KEY ("email")
 );
@@ -114,3 +118,4 @@ ALTER TABLE "recipient" ADD CONSTRAINT "added_by___fkey" FOREIGN KEY ("added_by"
 
 -- AddForeignKey
 ALTER TABLE "topic" ADD CONSTRAINT "added_by___fkey" FOREIGN KEY ("added_by") REFERENCES "author"("email_address") ON DELETE NO ACTION ON UPDATE CASCADE;
+

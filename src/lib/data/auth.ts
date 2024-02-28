@@ -5,7 +5,6 @@ import Linkedin from '@auth/core/providers/linkedin';
 import Reddit from '@auth/core/providers/reddit';
 import Twitter from '@auth/core/providers/twitter';
 import Google from '@auth/core/providers/google';
-import Slack from '@auth/core/providers/slack';
 import Twitch from '@auth/core/providers/twitch';
 
 import type { Provider } from '@auth/core/providers';
@@ -59,11 +58,22 @@ export const baseProviderLogoURL = new URL('https://authjs.dev/img/providers');
 const config: SvelteKitAuthConfig = {
 	providers: providers,
 	pages: {
-		signIn: '/sign/in'
-		// signOut: '/auth/signout',
+		signIn: '/sign/in',
+		signOut: '/sign/out'
 		// error: '/auth/error', // Error code passed in query string as ?error=
 		// verifyRequest: '/auth/verify-request', // (used for check email message)
 		// newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
+	},
+	cookies: {
+		pkceCodeVerifier: {
+			name: 'next-auth.pkce.code_verifier',
+			options: {
+				httpOnly: true,
+				sameSite: 'none',
+				path: '/',
+				secure: true
+			}
+		}
 	},
 	callbacks: {
 		async signIn({ account, profile }) {
@@ -83,15 +93,32 @@ const config: SvelteKitAuthConfig = {
 						break;
 				}
 			}
-
+			// TODO use provider token to grant API access
+			console.log('account', account);
+			console.log('profile', profile);
 			let userCheckInResult;
 			try {
 				userCheckInResult = await upsert('user', {
 					where: { email: profile?.email },
-					update: { auth_provider: account?.provider, last_login: new Date() },
+					update: {
+						auth_provider: account?.provider,
+						last_login: new Date(),
+						given_name: profile.given_name
+							? profile.given_name[0].toUpperCase() + profile.given_name.slice(1).toLowerCase()
+							: null,
+						family_name: profile.family_name
+							? profile.family_name[0].toUpperCase() + profile.family_name.slice(1).toLowerCase()
+							: null
+					},
 					create: {
 						email: profile?.email,
-						auth_provider: account?.provider
+						auth_provider: account?.provider,
+						given_name: profile.given_name
+							? profile.given_name[0].toUpperCase() + profile.given_name.slice(1).toLowerCase()
+							: null,
+						family_name: profile.family_name
+							? profile.family_name[0].toUpperCase() + profile.family_name.slice(1).toLowerCase()
+							: null
 					}
 				});
 			} catch (error) {
@@ -100,8 +127,8 @@ const config: SvelteKitAuthConfig = {
 			}
 			return userCheckInResult;
 		},
-		async jwt(args) {
-			return args.token;
+		async jwt({ token }) {
+			return token;
 		}
 	},
 	debug: false,
@@ -112,4 +139,4 @@ const config: SvelteKitAuthConfig = {
 	}
 };
 
-export default SvelteKitAuth(config);
+export const { handle, signIn, signOut } = SvelteKitAuth(config);

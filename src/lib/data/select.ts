@@ -92,46 +92,64 @@ export async function fetchSearchResults(item: string, fetch: fetch, source = ''
 	}
 }
 
-export function debounce(timeout: number, callback: CallableFunction, ...params: unknown[]) {
-	let timer: NodeJS.Timeout;
+export function debounce(callback, delay) {
+	let timer;
+	return function (...args) {
+		return new Promise((resolve, reject) => {
+			const later = () => {
+				clearTimeout(timer);
+				try {
+					// This ensures callback runs with the correct 'this' context
+					resolve(callback(...args));
+				} catch (error) {
+					reject(error);
+				}
+			};
 
-	return new Promise<unknown>((resolve, reject) => {
-		clearTimeout(timer);
-		timer = setTimeout(async () => {
-			try {
-				const result = await callback(...params);
-				resolve(result);
-			} catch (error) {
-				reject(error);
-			}
-		}, timeout);
-	});
+			clearTimeout(timer);
+			timer = setTimeout(later, delay);
+		});
+	};
 }
 
+const debouncedSearchResults = debounce(fetchSearchResults, 600);
 export async function handleAutocomplete(e: CustomEvent<string>) {
 	try {
 		return (
-			(await debounce(
-				600,
-				fetchSearchResults,
-				e.detail.value,
-				fetch,
-				e.detail.source
-			)) as QueryResult[]
+			(await debouncedSearchResults(e.detail.value, fetch, e.detail.source)) as QueryResult[]
 		).map((result) => {
 			let fieldName: string,
+				source: string,
 				iterable = false;
 			switch (result.source) {
 				case 'recipient':
+					source = 'email';
 					fieldName = 'recipient_list';
 					iterable = true;
 					break;
 				case 'topic':
+					source = 'topic';
 					fieldName = 'topic_list';
 					iterable = true;
 					break;
 				case 'email':
+					source = 'topic';
 					fieldName = 'subject';
+					iterable = false;
+					break;
+				case 'city':
+					source = 'location';
+					fieldName = 'city';
+					iterable = false;
+					break;
+				case 'state':
+					source = 'location';
+					fieldName = 'state';
+					iterable = false;
+					break;
+				case 'country':
+					source = 'location';
+					fieldName = 'country';
 					iterable = false;
 					break;
 				default: {
@@ -139,11 +157,12 @@ export async function handleAutocomplete(e: CustomEvent<string>) {
 				}
 			}
 			return {
-				type: result.source === 'recipient' ? 'email' : 'topic',
-				item: result.id,
+				type: source,
+				item: result.id || result.item,
 				field: fieldName,
 				iterable: iterable,
-				source: result.source
+				source: result.source,
+				rank: result.rank
 			} as Descriptor<string>;
 		});
 	} catch (error) {

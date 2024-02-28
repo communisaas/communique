@@ -12,23 +12,24 @@
 		autocompleteStyle: string = '',
 		autocomplete: boolean = false,
 		allowCustomValues: boolean = false,
-		searchField = '',
+		searchSource = '',
 		maxItems = 100;
 	export let tagList: Descriptor<string>[] = [];
-	export let searchResults: Descriptor<string>[] = [];
+	export let searchResults: Descriptor<string>[] | null = [];
 	export let inputStyle = '';
 	export let addIconStyle =
 		'add absolute bg-peacockFeather-600 h-6 w-6 text-2xl leading-6 font-bold';
 	export let inputVisible: boolean = false;
 	export let inputField: HTMLInputElement;
 
+	let mirror: HTMLSpanElement;
+	let inputValueWidth = '0px';
 	let searching = false;
-
 	let firstInput = true;
 
 	let completionFocusIndex: number = 0;
-	let completionList: HTMLUListElement;
-	let completionButtons: HTMLDivElement[] = [];
+	let completionListElement: HTMLUListElement;
+	let completionItems: HTMLDivElement[] = [];
 
 	let deleteVisible: FlagMap = {}; // A map to hold visibility states
 	let deleteButtons: ButtonElementMap = {}; // A map to hold the delete buttons
@@ -37,9 +38,67 @@
 
 	const dispatch = createEventDispatcher();
 
+	$: if (mirror) mirror.textContent = '' || placeholder;
+	$: if (searchResults) {
+		searching = false;
+	}
+	$: filteredSearchResults = searchResults
+		? searchResults.filter(
+				(result) =>
+					!tagList.some((tag) => tag.item === result.item && tag.type === result.type) &&
+					(result.source === searchSource || !searchSource)
+		  )
+		: [];
+
+	$: groupedResults = Object.entries(
+		filteredSearchResults.reduce((accumulator: { [key: string]: Descriptor<string>[] }, result) => {
+			if (result.source && (result.source === searchSource || !searchSource)) {
+				if (!accumulator[result.source]) {
+					accumulator[result.source] = [];
+				}
+
+				// Check if the result already exists in the group
+				if (!accumulator[result.source].some((item) => item.item === result.item)) {
+					accumulator[result.source].push(result);
+				}
+			}
+			return accumulator;
+		}, {} as { [key: string]: Descriptor<string>[] })
+	)
+		.map(([source, results]) => {
+			// Calculate the mean rank for each group
+			const meanRank = results.reduce((acc, curr) => acc + (curr.rank ?? 0), 0) / results.length;
+			return { source, results, meanRank };
+		})
+		.sort((a, b) => a.meanRank - b.meanRank) // Sort groups by mean rank
+		.reduce((acc, { source, results }) => {
+			// Convert back to the original format
+			acc[source] = results;
+			return acc;
+		}, {} as { [key: string]: Descriptor<string>[] });
+
 	$: tagValues = tagList.map((tag) => tag.item);
 
+	let flatGroupedResults: Descriptor<string>[] = [];
+	$: filteredSearchResults, (flatGroupedResults = flattenGroupedResults(groupedResults));
+
+	// Flatten grouped results for easier index-based navigation
+	function flattenGroupedResults(groupedResults: { [key: string]: Descriptor<string>[] }) {
+		let flatResults: Descriptor<string>[] = [];
+		Object.entries(groupedResults).forEach(([group, items]) => {
+			items.forEach((item) => {
+				flatResults.push({ ...item });
+			});
+		});
+		return flatResults;
+	}
+
 	function addTag(tag: Descriptor<string>) {
+		if (tagList.length === maxItems) {
+			inputField.setCustomValidity(`Maximum of ${maxItems} ${name}s!`);
+			inputField.reportValidity();
+			return;
+		}
 		inputField.value = '';
 		validityMessage = null;
 		if (tagValues.includes(tag.item)) {
@@ -49,9 +108,10 @@
 			inputField.reportValidity();
 		} else {
 			tagList = [...tagList, tag];
-			searchResults = searchResults.filter((result) => result.item !== tag.item);
+			if (searchResults) searchResults = searchResults.filter((result) => result.item !== tag.item);
 			dispatch('add', tag);
 		}
+		updateInputWidth();
 	}
 
 	async function handleInput(e: InputEvent) {
@@ -62,18 +122,13 @@
 
 		if (inputField.value.length > 2 && autocomplete) {
 			searching = true;
+			searchResults = null;
 		} else {
 			searching = false;
 		}
 
-		const currentValueWidth = context.measureText(inputField.value).width + 9;
-		if (currentValueWidth > placeholderWidth) {
-			inputValueWidth = currentValueWidth;
-		} else {
-			inputValueWidth = placeholderWidth;
-		}
 		if (autocomplete && inputField.value.length > 2) {
-			dispatch('autocomplete', { value: inputField.value, source: searchField });
+			dispatch('autocomplete', { value: inputField.value, source: searchSource });
 			completionFocusIndex = -1;
 		}
 	}
@@ -101,7 +156,7 @@
 		// Iterate over the extracted emails and call handleSubmit for each email
 		for (const email of deduplicatedEmails) {
 			inputField.value = email; // Set the inputField value to the current email
-			handleSubmit(); // Call handleSubmit
+			handleSubmit();
 		}
 
 		if (deduplicatedEmails.length != extractedEmails.length) {
@@ -111,122 +166,90 @@
 	}
 
 	async function handleBlur(e: FocusEvent) {
-		if (
-			(!Object.keys(deleteVisible).some((k) => deleteVisible[k]) &&
-				!completionList.contains(e.relatedTarget as Node)) ||
-			!autocomplete
-		) {
+		if (!completionListElement.contains(e.relatedTarget as Node) || !autocomplete) {
 			searching = false;
-			if (tagList.length > 0) inputVisible = false;
-			groupedResults = {};
+			if (tagList.length > 0) {
+				inputVisible = false;
+				inputValueWidth = '0px';
+				searchResults = [];
+			}
+			validityMessage = null;
+			dispatch('blur', e.detail);
 		}
-		validityMessage = null;
-		dispatch('blur', e.detail);
 	}
 
 	function handleSubmit() {
-		if (searching && !groupedResults) return;
-		else if (searching && type === 'search') {
+		// Clear any previous custom validity messages
+		inputField.setCustomValidity('');
+
+		// Check if still searching for autocomplete results
+		if (searching && !allowCustomValues) {
 			inputField.setCustomValidity('Still searching! Wait for results...');
 			inputField.reportValidity();
-			return;
-		}
-		if (tagList.length == maxItems) {
-			inputField.setCustomValidity(`Maximum of ${maxItems} ${name}s!`);
-			inputField.reportValidity();
-			return;
+			return; // Exit early since we're still searching
 		}
 
-		if (autocomplete) {
-			if (inputField.checkValidity()) {
-				if (autocomplete) {
-					if (completionFocusIndex >= 0) {
-						addTag(filteredSearchResults[completionFocusIndex]);
-					} else {
-						addTag({ item: inputField.value, type: type });
-					}
-				} else {
-					addTag({ item: inputField.value, type: type });
-					inputValueWidth = placeholderWidth;
-				}
-				inputValueWidth = placeholderWidth;
-			} else {
-				inputField.reportValidity();
-			}
+		// Validate input for autocomplete or minimum length requirement
+		if (autocomplete && inputField.value.length > 0) {
+			const isResultAvailable = filteredSearchResults.some(
+				(result) => result.item === inputField.value
+			);
+
+			if (!allowCustomValues && !isResultAvailable) {
+				// No matching autocomplete result and custom values aren't allowed
+				inputField.setCustomValidity('Nothing here! Try adding it?');
+			} else if (completionFocusIndex >= 0) {
+				// A valid autocomplete result is selected
+				addTag(flatGroupedResults[completionFocusIndex]);
+				return;
+			} // else continue to add the input as a new tag below
 		} else if (inputField.value.length < 3) {
+			// Input is too short and not in autocomplete mode
 			inputField.setCustomValidity('Too short!');
+		}
+
+		// Check and report any validity issues before proceeding
+		if (!inputField.checkValidity()) {
 			inputField.reportValidity();
-		} else if (
-			inputField.value.length > 0 &&
-			!allowCustomValues &&
-			!filteredSearchResults.some((result) => result.item === inputField.value)
-		) {
-			inputField.setCustomValidity('Nothing here! Try adding it?');
-			inputField.reportValidity();
-			searchResults = [];
 		} else {
+			// If all checks passed, add the tag
 			addTag({ item: inputField.value, type: type });
-			inputValueWidth = placeholderWidth;
 		}
 	}
 
-	$: if (searchResults) {
-		searching = false;
+	function updateInputWidth() {
+		if (inputField && mirror) {
+			mirror.textContent = inputField.value || placeholder; // Update mirror content
+			mirror.style.width = 'auto'; // Allow it to expand as needed for content
+			inputValueWidth = inputVisible ? `${mirror.offsetWidth + 10}px` : '0px'; // Update input width based on mirror
+			inputField.style.width = inputValueWidth; // Apply new width to input field
+		}
 	}
-	$: filteredSearchResults = searchResults
-		? searchResults.filter(
-				(result) =>
-					!tagList.some((tag) => tag.item === result.item && tag.type === result.type) &&
-					(result.source === searchField || !searchField)
-		  )
-		: [];
 
-	$: groupedResults = filteredSearchResults.reduce(
-		(accumulator: { [key: string]: Descriptor<string>[] }, result) => {
-			// TODO filter by searchfield at endpoint
-			if (result.source && (result.source === searchField || !searchField)) {
-				if (!accumulator[result.source]) {
-					accumulator[result.source] = [];
-				}
-				accumulator[result.source].push(result);
-			}
-			return accumulator;
-		},
-		{}
-	);
-
-	let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
-	let inputValueWidth: number, placeholderWidth: number;
 	onMount(() => {
-		canvas = document.createElement('canvas');
-		context = canvas.getContext('2d') as CanvasRenderingContext2D;
-		if (context) {
-			// TODO measure input width smoothly using in-dom placeholder
-			context.font = getComputedStyle(inputField).font;
-			inputValueWidth = context.measureText(placeholder).width + 9;
-			placeholderWidth = inputValueWidth;
-		}
+		updateInputWidth();
 	});
 </script>
 
-<div class="px-2 rounded max-w-full h-max relative items-center justify-center {style}">
+<div class="px-2 rounded max-w-full h-max items-center justify-center {style}">
 	<form
 		autocomplete="off"
-		class="flex flex-nowrap max-w-full"
+		class="flex flex-nowrap max-w-full w-fit"
 		on:submit|preventDefault={() => {
 			handleSubmit();
 		}}
 	>
 		<ul
-			class="shrink min-w-0 inline-flex flex-row flex-wrap items-center max-w-full"
+			class="shrink min-w-0 inline-flex flex-row flex-wrap gap-2 my-2 items-center max-w-full w-max"
 			aria-label="{name} list"
 			aria-describedby="List of {name}s with an add button"
 		>
 			{#each tagList as tag}
-				<li class="relative mx-2 min-w-0 {tagStyle}">
+				<li class="relative min-w-0 {tagStyle}">
 					<span
 						role="listitem"
 						class="relative h-full shrink flex whitespace-nowrap"
+						title={tag.item}
 						on:mouseenter={() => (deleteVisible[tag.item] = true)}
 						on:mouseleave={() => (deleteVisible[tag.item] = false)}
 						on:touchend={() => (deleteVisible[tag.item] = false)}
@@ -258,7 +281,7 @@
 							type="button"
 							on:click|stopPropagation={(e) => {
 								tagList = tagList.filter((item) => item != tag);
-								if (autocomplete) filteredSearchResults = [...filteredSearchResults, tag];
+								if (autocomplete && inputVisible) searchResults = [tag, ...searchResults];
 								if (tagList.length < 1 || inputVisible) inputField.focus();
 								dispatch('delete', tag);
 							}}
@@ -278,22 +301,26 @@
 				</li>
 			{/each}
 		</ul>
-		<li class="flex gap-3 justify-center ml-auto flex-wrap items-center relative">
+		<li class="flex justify-center ml-auto flex-wrap items-center relative">
+			<!-- Hidden mirror span for calculating input width -->
+			<span bind:this={mirror} class="mirror" />
 			<input
 				required={tagList.length <= 0}
 				{name}
 				role="textbox"
 				aria-label="{name} input"
-				aria-describedby="Add a {name} here"
+				aria-describedby="Add {name} here"
 				{placeholder}
 				inputmode={type}
 				bind:this={inputField}
 				on:blur={handleBlur}
-				on:focus={(e) => (inputVisible = true)}
+				on:focus={(e) => {
+					inputVisible = true;
+					updateInputWidth();
+				}}
 				on:keydown|self={(e) => {
 					// clear earlier validation errors
 					inputField.setCustomValidity('');
-
 					const resultsLength = filteredSearchResults ? filteredSearchResults.length : 0;
 					if (resultsLength > 0) {
 						if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
@@ -325,6 +352,7 @@
 					}
 				}}
 				on:input={(e) => {
+					updateInputWidth();
 					handleInput(e);
 				}}
 				on:paste={(e) => {
@@ -333,26 +361,27 @@
 						e.preventDefault();
 					}
 				}}
-				style="width: {inputVisible && inputValueWidth ? inputValueWidth : 0}px;"
-				class="rounded shadow-artistBlue shadow-card w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center {inputStyle}"
+				style="width: {inputValueWidth};"
+				class="rounded w-0 h-0 focus:ml-2 focus:mr-1 self-center justify-self-center {inputStyle}"
 				class:show={inputVisible}
 				class:p-1={inputVisible}
 				{type}
 			/>
 			{#if validityMessage}
-				<Tooltip message={validityMessage} style="top-[75%] left-[100%] text-xs" />
+				<Tooltip message={validityMessage} style="top-[75%] left-28 text-xs" />
 			{/if}
 			<ul
-				bind:this={completionList}
-				class="autocomplete flex flex-col bg-paper-500 py-1 max-w-[80vw] w-fit {autocompleteStyle}"
-				class:px-4={Object.keys(groupedResults).length > 0 && inputVisible}
+				bind:this={completionListElement}
+				class="flex flex-col w-max max-w-[50vw] z-20 {autocompleteStyle}"
+				class:py-2={filteredSearchResults && filteredSearchResults.length > 0}
+				class:px-4={filteredSearchResults && filteredSearchResults.length > 0}
 				on:mouseleave={() => (completionFocusIndex = -1)}
 			>
 				{#if searching}
-					<li class="relative px-1">
+					<li class="relative p-1">
 						<ContentLoader
-							uniqueKey="autocomplete"
-							width={inputValueWidth}
+							uniqueKey="tagAutocompleteLoader"
+							width={inputValueWidth.slice(0, -2)}
 							height={20}
 							primaryColor={colors.artistBlue[500]}
 							secondaryColor={colors.larimarGreen[500]}
@@ -361,29 +390,27 @@
 					</li>
 				{:else if filteredSearchResults && filteredSearchResults.length > 0 && inputVisible}
 					{#each Object.keys(groupedResults) as type, groupIndex}
-						<li class="-ml-1">{type}s</li>
+						<li class="-ml-1 font-bold">{type}</li>
 						{#each groupedResults[type] as result, itemIndex}
 							<li class="relative">
 								<div
 									tabindex="0"
-									bind:this={completionButtons[completionButtons.length]}
+									bind:this={completionItems[completionItems.length]}
 									role="button"
-									class="p-1 rounded mr-2 cursor-pointer w-full text-xs text-center overflow-hidden overflow-ellipsis"
-									class:bg-paper-800={filteredSearchResults[completionFocusIndex] &&
-										filteredSearchResults[completionFocusIndex].item === result.item}
+									class="p-1 rounded mr-2 cursor-pointer w-full text-xs text-start overflow-hidden overflow-ellipsis"
+									class:bg-peacockFeather-500={flatGroupedResults[completionFocusIndex] &&
+										flatGroupedResults[completionFocusIndex].item === result.item}
 									on:mouseenter={() =>
-										(completionFocusIndex = filteredSearchResults.findIndex(
+										(completionFocusIndex = flatGroupedResults.findIndex(
 											(r) => r.item === result.item
 										))}
 									on:click|preventDefault|stopPropagation={(e) => {
-										addTag(filteredSearchResults[completionFocusIndex]);
-										inputValueWidth = placeholderWidth;
+										addTag(flatGroupedResults[completionFocusIndex]);
 										inputField.focus();
 									}}
 									on:keydown|preventDefault|stopPropagation={(e) => {
 										if (e.key === 'Enter') {
-											addTag(filteredSearchResults[completionFocusIndex]);
-											inputValueWidth = placeholderWidth;
+											addTag(flatGroupedResults[completionFocusIndex]);
 											inputField.focus();
 										}
 									}}
@@ -400,7 +427,7 @@
 			type="submit"
 			name={`Add ${name}`}
 			aria-label="Add button for {name}s"
-			class="flex justify-center items-center relative min-w-fit shrink-0"
+			class="flex justify-center items-center min-w-fit shrink-0"
 			on:mousedown|preventDefault
 			on:click|preventDefault={(e) => {
 				inputField.focus();
@@ -470,18 +497,6 @@
 		}
 	}
 
-	.autocomplete {
-		position: absolute;
-		top: 75%;
-		max-height: 200px;
-		overflow-y: auto;
-		overflow-x: visible;
-		box-sizing: border-box;
-		border-radius: 4px;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-		z-index: 100;
-	}
-
 	.show {
 		visibility: visible;
 		opacity: 1;
@@ -490,5 +505,15 @@
 		width: 4.55rem;
 		height: 1.5rem;
 		transition: all 0.2s;
+	}
+
+	.mirror {
+		display: block;
+		position: absolute;
+		visibility: hidden;
+		height: 0;
+		white-space: pre; // Preserve spaces and line breaks
+		overflow: hidden;
+		white-space: nowrap;
 	}
 </style>

@@ -7,11 +7,10 @@
 	import Navigation from '$components/Navigation.svelte';
 
 	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
-	import { signIn, signOut } from '@auth/sveltekit/client';
 	import type { topic } from '@prisma/client';
+	import Locator from '$components/Locator.svelte';
 	import Selector from '$components/Selector.svelte';
 	import Tag from '$components/Tag.svelte';
-	import LoginIcon from '$components/icon/Login.svelte';
 	import type { Writable } from 'svelte/store';
 	import { handleSelect } from '$lib/data/select';
 	import { navigating, page } from '$app/stores';
@@ -27,22 +26,30 @@
 		windowWidth = 0;
 
 	function handleHashChange(e: HashChangeEvent) {
-		$sessionStore.show = {
-			login: false,
-			share: false,
-			privacyPolicy: false,
-			moderatioPolicy: false,
-			termsOfUse: false,
-			confirm: false
-		};
+		if (!window.location.hash) {
+			$sessionStore.show = {
+				login: false,
+				share: false,
+				privacyPolicy: false,
+				moderatioPolicy: false,
+				termsOfUse: false,
+				confirm: false
+			};
+		}
+		console.log(window.location.hash);
+		// decouple internal routes from hash when sveltekit supports modals
 		if (window.location.hash === '#terms-of-use') {
 			$sessionStore.show.termsOfUse = true;
+		} else if (window.location.hash === '#signin') {
+			$sessionStore.show.login = true;
 		} else if (window.location.hash === '#privacy-policy') {
 			$sessionStore.show.privacyPolicy = true;
 		} else if (window.location.hash === '#moderation-policy') {
 			$sessionStore.show.moderationPolicy = true;
 		} else if (window.location.hash === '#confirm') {
 			$sessionStore.show.confirm = true;
+		} else if (window.location.hash === '#geolocator') {
+			$sessionStore.show.geolocator = true;
 		} else {
 			dispatch('popover', false);
 		}
@@ -50,9 +57,6 @@
 
 	onMount(async () => {
 		sessionStore = (await import('$lib/data/sessionStorage')).store;
-
-		$sessionStore.csrfToken =
-			($sessionStore.csrfToken || (await (await fetch('/auth/csrf')).json()).csrfToken) ?? '';
 
 		if ($sessionStore.template) {
 			// reload data if session already exists
@@ -62,14 +66,12 @@
 		if ($page.data.session && $page.data.session?.user?.email) {
 			$sessionStore.user =
 				(await fetch('data/user/' + $page.data.session?.user?.email, {
-					method: 'GET',
-					headers: {
-						'CSRF-Token': $sessionStore.csrfToken
-					}
+					method: 'GET'
 				}).then((res) => res.json())) || $sessionStore.user;
-			$sessionStore.hiddenEmails = $sessionStore.user.ignored_email_list ?? [];
+			$sessionStore.hiddenEmails = $sessionStore.user.ignored_content_list ?? [];
 		}
 
+		$sessionStore.composer = $sessionStore.composer || {};
 		$sessionStore.topic = $sessionStore.topic || { id: topicNames[0], type: 'topic' };
 		$sessionStore.recipient = $sessionStore.recipient || {
 			id: '',
@@ -85,14 +87,15 @@
 			moderatioPolicy: false,
 			termsOfUse: false,
 			confirm: false,
+			geolocator: false,
 			afterPost: false
 		};
 		$sessionStore.hiddenEmails = $sessionStore.hiddenEmails || [];
 		const hashes = window.location.hash.substring(1).split('#');
 
-		windowWidth = window.innerWidth;
-		// TODO use enum
-		routeModal(hashes, $sessionStore, dispatch);
+		windowWidth = window.outerWidth;
+
+		$sessionStore = await routeModal(hashes, $sessionStore, dispatch);
 		window.addEventListener('hashchange', handleHashChange);
 	});
 
@@ -105,34 +108,37 @@
 
 <main class="flex">
 	<div
-		class="grow-0 shrink-0 sm:m-0 w-[7%] md:w-[4rem]"
-		style={navCollapsed ? 'max-width: 0' : 'min-width: 50px;'}
+		class="grow-0 shrink-0 sm:m-0 w-[3.5rem] md:w-[4rem]"
+		style={navCollapsed ? 'max-width: 0' : 'min-width: auto;'}
 	>
 		<Navigation bind:collapsed={navCollapsed} />
 	</div>
 	<div
-		class="relative flex flex-col min-h-full w-[calc(100%-50px)] xl:w-full overflow-hidden"
+		class="relative flex flex-col min-h-full w-full overflow-hidden"
 		class:min-w-full={navCollapsed}
 	>
-		<section class="min-h-screen">
-			<header
-				aria-label="Popular topics list"
-				class="flex md:h-12 pr-1 bg-peacockFeather-700 items-center relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
-			>
-				{#if $sessionStore && $sessionStore.template}
+		<header
+			aria-label="Popular topics list"
+			class="flex h-12 pr-1 z-50 bg-peacockFeather-700 relative align-middle w-full 2xl:pr-[calc(100vw-1500px)]"
+		>
+			{#if $sessionStore && $sessionStore.template}
+				<span
+					class="mr-auto flex relative overflow-visible items-center w-full justify-start h-full text-paper-500"
+				>
+					<Locator />
 					<Selector
 						selectable={Tag}
-						itemStyle="whitespace-nowrap sm:text-base bg-peacockFeather-500 text-paper-500 text-sm"
-						selectorStyle="self-center m-auto w-full h-full px-1 py-2"
+						itemStyle="whitespace-nowrap text-base bg-peacockFeather-500 text-paper-500"
+						selectorStyle="self-center gap-x-2 m-auto w-full h-full px-1 pr-2 py-2"
 						items={topicNames}
 						alignment="center"
 						backgroundColor={colors.peacockFeather[700]}
+						scrollOverride={true}
 						bind:selectedContent={$sessionStore.topic}
 						on:select={async (e) => {
 							// TODO loading placeholders on topic change
 							if ($sessionStore.template.primary) {
-								$sessionStore.template.primary.cardList = [];
-								$sessionStore.template.primary.cardList = await handleSelect(e);
+								$sessionStore.template.primary.cardList = null;
 								$sessionStore.template.primary.focus = {
 									type: 'topic',
 									item: e.detail.id,
@@ -140,58 +146,16 @@
 									source: 'topic',
 									iterable: true
 								};
-								await goto('/', { noScroll: true });
+								if ($page.route.id !== '/') await goto('/', { noScroll: true });
+								$sessionStore.template.primary.cardList = await handleSelect(e);
 							}
 						}}
 					/>
-				{/if}
-				<span
-					class="relative overflow-visible ml-auto min-w-fit pl-2 flex flex-col items-center justify-center h-full text-paper-500"
-				>
-					{#if $page.data.session}
-						<div
-							class="group relative rounded hover:bg-peacockFeather-600 transition-all duration-200"
-						>
-							{#if $page.data.session.user?.image}
-								<img
-									src={$page.data.session.user.image}
-									alt="avatar"
-									class="h-7 w-7 md:h-10 md:w-10"
-								/>
-							{:else}
-								<LoginIcon />
-							{/if}
-							<div
-								role="menu"
-								tabindex="0"
-								class="p-2 absolute z-40 right-0 w-auto hidden group-hover:block bg-peacockFeather-700 shadow-lg"
-							>
-								<ul class="flex flex-col items-start space-y-1">
-									<button
-										class="min-w-full text-left whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
-										on:click={() => goto('/profile')}>Profile</button
-									>
-									<button
-										class="min-w-full text-left whitespace-nowrap px-1 rounded-md hover:bg-peacockFeather-600 transition-all duration-200"
-										on:click={() => signOut({ callbackUrl: '/', redirect: false })}>Sign out</button
-									>
-								</ul>
-							</div>
-						</div>
-					{:else}
-						<span class="whitespace-nowrap text-[11px] self-end justify-self-end ml-1.5 -mb-0.5"
-							>Sign in</span
-						>
-						<button
-							class="w-8 justify-self-end -mr-4"
-							on:click={() => signIn({ callbackUrl: '/', redirect: false })}
-						>
-							<LoginIcon />
-						</button>
-					{/if}
 				</span>
-			</header>
-			{#if !$navigating && $sessionStore && $sessionStore.template && $sessionStore.template.primary.cardList.length > 0}
+			{/if}
+		</header>
+		<section class="min-h-screen">
+			{#if !$navigating}
 				<slot />
 			{:else}
 				<div class="w-full h-full flex items-center justify-center">
@@ -208,7 +172,7 @@
 			{/if}
 		</section>
 		<!-- TODO aria labels for footer -->
-		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full z-10">
+		<footer class="bg-gray-900 text-white py-6 static bottom-0 w-full">
 			<div class="container mx-auto flex flex-wrap items-center justify-center px-4">
 				<div class="mb-4 md:mb-0">
 					<div class="flex justify-center md:justify-start">

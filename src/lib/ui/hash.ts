@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
 import { handleMailto, setActiveEmail } from '$lib/data/email';
-import type { DispatchOptions } from 'svelte/internal';
+import type { DispatchOptions } from 'svelte';
 import { page } from '$app/stores';
 import { get } from 'svelte/store';
 
@@ -30,6 +30,8 @@ export async function routeModal(
 			sessionStore.show.moderationPolicy = true;
 		} else if (slug == 'confirm') {
 			sessionStore.show.confirm = true;
+		} else if (slug == 'geolocator') {
+			sessionStore.show.geolocator = true;
 		} else if (
 			sessionStore &&
 			'email' in sessionStore &&

@@ -1,6 +1,8 @@
 import { AUTH_SECRET } from '$env/static/private';
 import { find, objectMapper } from '$lib/data/database';
 import { decode, getToken } from '@auth/core/jwt';
+import type { Prisma } from '@prisma/client';
+import type { DefaultArgs } from '@prisma/client/runtime/library';
 import { error } from '@sveltejs/kit';
 
 function isUUID(s: string) {
@@ -13,10 +15,10 @@ function isUUID(s: string) {
 export async function GET({ params, url }) {
 	const whereCriteria: Criteria = {};
 
-	if (isUUID(params.slug)) {
-		whereCriteria.rowid = { equals: params.slug };
+	if (isUUID(params.id)) {
+		whereCriteria.rowid = { equals: params.id };
 	} else {
-		whereCriteria.shortid = { equals: params.slug };
+		whereCriteria.shortid = { equals: params.id };
 	}
 
 	const options = { where: whereCriteria };
@@ -28,10 +30,11 @@ export async function GET({ params, url }) {
 export async function POST({ params, request, cookies, url }) {
 	// HTTPS-only should be enforced on host, this is a developer convenience
 	const authCookieName =
-		url.protocol === 'https:' ? '__Secure-next-auth.session-token' : 'next-auth.session-token';
+		url.protocol === 'https:' ? '__Secure-authjs.session-token' : 'authjs.session-token';
 	const jwt = await decode({
 		token: cookies.get(authCookieName),
-		secret: process.env.AUTH_SECRET || AUTH_SECRET
+		secret: process.env.AUTH_SECRET || AUTH_SECRET,
+		salt: authCookieName
 	});
 
 	if (!jwt) {
@@ -44,40 +47,42 @@ export async function POST({ params, request, cookies, url }) {
 		return new Response('Email address mismatch', { status: 403 });
 	}
 
-	const whereCriteria: Criteria = {};
-	whereCriteria.shortid = params.slug;
+	const whereCriteria = { shortid: params.id };
 	try {
 		// case: increment send count
 		if (request.headers.get('increment-send') === 'true' && request.headers.get('sender-email')) {
 			const senderEmail = request.headers.get('sender-email') as string;
 
-			const emailOptions: Clause = { where: whereCriteria };
-			const userOptions: Clause = {
-				where: { email: senderEmail }
+			const emailOptions: Prisma.emailUpdateArgs = { where: whereCriteria, data: {} };
+			const userOptions: Prisma.userUpdateArgs = {
+				where: { email: senderEmail },
+				data: {}
 			};
 
-			const sentEmailList = await objectMapper.user.findMany({
-				where: { email: senderEmail, sent_email_list: { has: params.slug } }
-			});
+			const sentEmailList =
+				(
+					await objectMapper.user.findUnique({
+						where: { email: senderEmail },
+						select: { sent_content_list: true }
+					})
+				)?.sent_content_list ?? [];
 
-			if (sentEmailList.length <= 0) {
+			if (!sentEmailList.includes(params.id)) {
 				const email = await objectMapper.email.findFirst({ where: whereCriteria });
 				if (!email) {
 					return new Response('Email not found', { status: 404 });
 				}
-
 				const topicOptions: Clause = {
 					where: { name: { in: email.topic_list } }
 				};
-
 				topicOptions.data = {
 					email_sent_count: { increment: 1 }
 				};
-
 				emailOptions.data = {
-					send_count: { increment: 1 }
+					send_count: { increment: 1 },
+					last_updated: new Date().toISOString()
 				};
-				userOptions.data = { sent_email_list: { push: params.slug } }; // push shortid
+				userOptions.data = { sent_content_list: { push: params.id } };
 				// TODO merge into single query once cockroachdb supports record types https://github.com/cockroachdb/cockroach/issues/70099?version=v23.1
 				await objectMapper.$transaction([
 					objectMapper.user.update({ ...userOptions }),
@@ -87,7 +92,7 @@ export async function POST({ params, request, cookies, url }) {
 				return new Response('incremented');
 			}
 
-			// case: remove email from user's sent list
+			// case: add email to ignore list
 		} else if (
 			request.headers.get('remove-email-content') === 'true' &&
 			request.headers.get('user-email')
@@ -96,8 +101,7 @@ export async function POST({ params, request, cookies, url }) {
 			const userOptions: Clause = {
 				where: { email: userEmail }
 			};
-			userOptions.data = { ignored_email_list: { push: params.slug } }; // push shortid
-
+			userOptions.data = { ignored_content_list: { push: params.id } }; // push shortid
 			await objectMapper.user.update({ ...userOptions });
 
 			// case: update email id
@@ -107,7 +111,7 @@ export async function POST({ params, request, cookies, url }) {
 			request.body
 		) {
 			const emailOptions: Clause = {
-				where: { shortid: params.slug }
+				where: { shortid: params.id }
 			};
 			const newID = await request.text();
 			emailOptions.data = { shortid: { set: newID } };
@@ -122,7 +126,7 @@ export async function POST({ params, request, cookies, url }) {
 		) {
 			const userEmail = request.headers.get('user-email') as string;
 			const issueOptions: Clause = {
-				where: { added_by_email_id: { added_by: userEmail, email_id: params.slug } }
+				where: { added_by_email_id: { added_by: userEmail, email_id: params.id } }
 			};
 			const formData = await request.json();
 
@@ -143,7 +147,7 @@ export async function POST({ params, request, cookies, url }) {
 					connect: { email: userEmail }
 				},
 				email: {
-					connect: { shortid: params.slug }
+					connect: { shortid: params.id }
 				},
 				...upsertable
 			};
